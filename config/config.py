@@ -19,9 +19,8 @@ LOG_GROUP_ID: int = int(os.getenv("LOG_GROUP_ID", -4694535872))
 
 PREFIX: str = str(".")
 
-PREFIX: str = str("$")
+RPREFIX: str = str("/")
 
-PREFIX: str = str("/")
 
 
 # No Need To Edit Below This
