@@ -5,7 +5,7 @@ Copyright ©️ 2025
 
 
 from Player import app
-from Player.Core import userbot
+from Player.Core import Userbot
 from Player.Utils.YtDetails import searchPlaylist, extract_playlist_id
 from Player.Utils.Queue import QUEUE, add_to_queue, clear_queue
 from Player.Plugins.Sounds.Play import ytdl
@@ -66,7 +66,7 @@ async def _aPlay(_, message):
                 add_to_queue(chat_id, title[:19], videoCount, songlink, link)
                 videoCount -= 1
 
-            Status, Text = await userbot.playAudio(chat_id, songlinkplay)
+            Status, Text = await Userbot.playAudio(chat_id, songlinkplay)
             if Status == False:
                 await m.edit(Text)
             finish_time = time.time()
