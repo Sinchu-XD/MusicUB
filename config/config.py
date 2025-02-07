@@ -21,7 +21,7 @@ PREFIX: str = str(".")
 
 PREFIX: str = str("$")
 
-PREFIX: str = str("/)
+PREFIX: str = str("/")
 
 
 # No Need To Edit Below This
