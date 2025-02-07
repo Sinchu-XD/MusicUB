@@ -11,13 +11,13 @@ from urllib.parse import urlparse, parse_qs
 def searchYt(query, is_videoId=False):
     query = str(query)
     if is_videoId:
-        video = pyYouTube(f"https://www.youtube.com/watch?v={query}")
+        video = pyYouTube(f"https://www.youtube.com/watch?v={query}", "WEB")
         title = video.title
         duration = video.length
         link = video.watch_url
         return title, duration, link
     else:
-        videosResult = Search(query)
+        videosResult = Search(query, "WEB")
         for Result in videosResult.videos:
             title = Result.title
             duration = Result.length
@@ -28,7 +28,7 @@ def searchYt(query, is_videoId=False):
 
 def searchPlaylist(query):
     query = str(query)
-    playlistResult = Playlist(query)
+    playlistResult = Playlist(query, "WEB")
     title = playlistResult.title
     duration = playlistResult.length
     return title, duration
