@@ -5,7 +5,7 @@ Copyright ©️ 2025
 
 
 from Player import app
-from Player.Core import userbot
+from Player.Core import Userbot
 from Player.Utils.YtDetails import searchYt, extract_video_id
 from Player.Utils.Queue import QUEUE, add_to_queue
 from Player.Misc import SUDOERS
@@ -78,7 +78,7 @@ async def _aPlay(_, message):
                 )
                 return
             await m.edit("Rukja...Tera Audio Play karne vala hu...")
-            Status, Text = await userbot.playAudio(chat_id, input_filename)
+            Status, Text = await Userbot.playAudio(chat_id, input_filename)
             if Status == False:
                 await m.edit(Text)
             else:
@@ -129,7 +129,7 @@ async def _aPlay(_, message):
                 )
                 return
             # await asyncio.sleep(1)
-            Status, Text = await userbot.playAudio(chat_id, songlink)
+            Status, Text = await Userbot.playAudio(chat_id, songlink)
             if Status == False:
                 await m.edit(Text)
             if duration is None:
@@ -161,7 +161,7 @@ async def _raPlay(_, message):
         if resp == 0:
             await m.edit(f"❌ yt-dl issues detected\n\n» `{songlink}`")
         else:
-            Status, Text = await userbot.playAudio(msg_id, songlink)
+            Status, Text = await Userbot.playAudio(msg_id, songlink)
             if Status == False:
                 await m.edit(Text)
             if duration is None:
