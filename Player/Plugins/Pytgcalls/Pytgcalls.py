@@ -9,7 +9,7 @@ from pytgcalls.types import Update, MediaStream
 
 from Player import call, app
 from Player.Utils.Queue import QUEUE, get_queue, clear_queue, pop_an_item
-from Player.Utils.lLop import get_loop, set_loop
+from Player.Utils.Loop import get_loop, set_loop
 
 import time
 
