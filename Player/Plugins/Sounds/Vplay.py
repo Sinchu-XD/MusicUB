@@ -4,7 +4,7 @@
 
 
 from Player import app
-from Player.Core import userbot
+from Player.Core import Userbot
 from Player.Utils.YtDetails import searchYt, extract_video_id
 from Player.Utils.Queue import QUEUE, add_to_queue
 from Player.Misc import SUDOERS
@@ -87,7 +87,7 @@ async def _vPlay(_, message):
                 )
                 return
             await m.edit("Rukja...Tera Video Play kar raha hu...")
-            Status, Text = await userbot.playVideo(chat_id, input_filename)
+            Status, Text = await Userbot.playVideo(chat_id, input_filename)
             if Status == False:
                 await m.edit(Text)
             else:
@@ -139,7 +139,7 @@ async def _vPlay(_, message):
                 )
                 return
             # await asyncio.sleep(2)
-            Status, Text = await userbot.playVideo(chat_id, ytlink)
+            Status, Text = await Userbot.playVideo(chat_id, ytlink)
             # Check if the video ended
             if Status == False:
                 await m.edit(Text)
