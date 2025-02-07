@@ -1,0 +1,8 @@
+pyrofork
+git+https://github.com/pytgcalls/pytgcalls
+yt-dlp
+tgcrypto
+pytubefix
+speedtest-cli
+ffprobe
+httpx
