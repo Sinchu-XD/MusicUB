@@ -6,7 +6,7 @@ Copyright ©️ 2025
 
 from httpx import delete
 from Player import app, call
-from Player.Core import userbot
+from Player.Core import Userbot
 from Player.Utils.Queue import QUEUE, pop_an_item, get_queue, clear_queue
 from Player.Utils.Loop import get_loop
 from Player.Misc import SUDOERS
