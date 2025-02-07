@@ -11,7 +11,7 @@ from Player import LOGGER
 from Player.Plugins import ALL_MODULES
 from Player import app, call
 
-loop = asyncio.get_event_loop()
+
 
 
 async def init():
@@ -27,6 +27,3 @@ async def init():
     await idle()
 
 
-if __name__ == "__main__":
-    loop.run_until_complete(init())
-    LOGGER("Player").info("Stopping Music Player! GoodBye")
