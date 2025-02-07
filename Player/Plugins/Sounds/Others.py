@@ -123,7 +123,7 @@ async def _resume(_, message):
         await message.reply_text("You forgot to pass an argument")
     else:
         msg_id = message.text.split(" ", 1)[1]
-        Text = await userbot.resume(msg_id)
+        Text = await Userbot.resume(msg_id)
         await message.reply_text(Text)
 
 
@@ -133,7 +133,7 @@ async def _mute(_, message):
         reply = message.edit
     else:
         reply = message.reply_text
-    Text = await userbot.mute(message.chat.id)
+    Text = await Userbot.mute(message.chat.id)
     await reply(Text)
 
 
@@ -143,13 +143,13 @@ async def _mute(_, message):
         await message.reply_text("You forgot to pass an argument")
     else:
         msg_id = message.text.split(" ", 1)[1]
-        Text = await userbot.mute(msg_id)
+        Text = await Userbot.mute(msg_id)
         await message.reply_text(Text)
 
 
 @app.on_message(filters.command(UNMUTE_COMMAND, PREFIX))
 async def _unmute(_, message):
-    Text = await userbot.unmute(message.chat.id)
+    Text = await Userbot.unmute(message.chat.id)
     await message.reply_text(Text)
 
 
@@ -159,7 +159,7 @@ async def _unmute(_, message):
         await message.reply_text("You forgot to pass an argument")
     else:
         msg_id = message.text.split(" ", 1)[1]
-        Text = await userbot.unmute(msg_id)
+        Text = await Userbot.unmute(msg_id)
         await message.reply_text(Text)
 
 
@@ -167,9 +167,9 @@ async def _unmute(_, message):
 async def _volume(_, message):
     try:
         vol = int(message.text.split()[1])
-        Text = await userbot.changeVolume(message.chat.id, vol)
+        Text = await Userbot.changeVolume(message.chat.id, vol)
     except:
-        Text = await userbot.changeVolume(message.chat.id)
+        Text = await Userbot.changeVolume(message.chat.id)
     await message.reply_text(Text)
 
 
