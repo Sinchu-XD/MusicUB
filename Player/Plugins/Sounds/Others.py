@@ -9,9 +9,9 @@ from pyrogram.enums import ChatMembersFilter
 
 from Player import app
 from Player.Utils.Queue import clear_queue
-from Player.utils.Loop import get_loop, set_loop
+from Player.Utils.Loop import get_loop, set_loop
 from Player.Core import userbot
-from Player.Nisc import SUDOERS
+from Player.Misc import SUDOERS
 import config
 
 
