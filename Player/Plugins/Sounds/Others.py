@@ -10,7 +10,7 @@ from pyrogram.enums import ChatMembersFilter
 from Player import app
 from Player.Utils.Queue import clear_queue
 from Player.Utils.Loop import get_loop, set_loop
-from Player.Core import userbot
+from Player.Core import Userbot
 from Player.Misc import SUDOERS
 import config
 
@@ -47,7 +47,7 @@ async def _stop(_, message):
     if (message.from_user.id) in SUDOERS or (message.from_user.id) in [
         admin.user.id for admin in administrators
     ]:
-        Text = await userbot.stop(message.chat.id)
+        Text = await Userbot.stop(message.chat.id)
         try:
             clear_queue(message.chat.id)
         except:
@@ -65,7 +65,7 @@ async def _stop(_, message):
         await message.reply_text("You forgot to pass an argument")
     else:
         msg_id = message.text.split(" ", 1)[1]
-        Text = await userbot.stop(msg_id)
+        Text = await Userbot.stop(msg_id)
         await message.reply_text(Text)
 
 
@@ -80,7 +80,7 @@ async def _pause(_, message):
     if (message.from_user.id) in SUDOERS or (message.from_user.id) in [
         admin.user.id for admin in administrators
     ]:
-        Text = await userbot.pause(message.chat.id)
+        Text = await Userbot.pause(message.chat.id)
         await message.reply_text(Text)
     else:
         return await message.reply_text(
@@ -94,7 +94,7 @@ async def _pause(_, message):
         await message.reply_text("You forgot to pass an argument")
     else:
         msg_id = message.text.split(" ", 1)[1]
-        Text = await userbot.pause(msg_id)
+        Text = await Userbot.pause(msg_id)
         await message.reply_text(Text)
 
 
@@ -109,7 +109,7 @@ async def _resume(_, message):
     if (message.from_user.id) in SUDOERS or (message.from_user.id) in [
         admin.user.id for admin in administrators
     ]:
-        Text = await userbot.resume(message.chat.id)
+        Text = await Userbot.resume(message.chat.id)
         await message.reply_text(Text)
     else:
         return await message.reply_text(
