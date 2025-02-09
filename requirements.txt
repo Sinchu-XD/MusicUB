@@ -1,8 +1,8 @@
 pyrofork
 git+https://github.com/pytgcalls/pytgcalls
-yt-dlp
+youtube-search-python
+yt-dlp==2025.1.12
 tgcrypto
-pytubefix
 speedtest-cli
 ffprobe
-httpx
+httpx==0.26.0
