@@ -11,7 +11,8 @@ from Player.Utils.Queue import QUEUE, add_to_queue, clear_queue
 from Player.Plugins.Sounds.Play import ytdl
 
 from pyrogram import filters
-
+import asyncio
+import random
 import time
 
 import config
@@ -26,21 +27,17 @@ PLAYLIST_COMMAND = ["PL", "PLAYLIST"]
 async def _aPlay(_, message):
     start_time = time.time()
     chat_id = message.chat.id
-    if len(message.command) < 2 and not message.reply_to_message:
+    if len(message.command) < 2:
         await message.reply_text("PLease enter song name or yt link")
     else:
         m = await message.reply_text("Searching for your song")
-        if message.reply_to_message:
-            query = message.reply_to_message.text
-        else:
-            query = message.text.split(maxsplit=1)[1]
+        query = message.text.split(maxsplit=1)[1]
         video_id = extract_playlist_id(query)
-        link = query
         try:
             if video_id is None:
-                return await m.edit("Invalid YouTube Playlist URL")
-            title, videoCount = searchPlaylist(query)
-            if (title, videoCount) == (None, None):
+                video_id = query
+            title, videoCount, link = searchPlaylist(video_id)
+            if (title, videoCount, link) == (None, None, None):
                 return await m.edit("No results found")
             videoCount = int(videoCount)
             total_videos = videoCount
