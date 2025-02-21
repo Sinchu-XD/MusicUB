@@ -8,7 +8,7 @@ from Player import app
 from Player.Core import Userbot
 from Player.Utils.YtDetails import searchPlaylist, extract_playlist_id
 from Player.Utils.Queue import QUEUE, add_to_queue, clear_queue
-from Player.Plugins.Sounds.Play import get_youtube_stream
+from Player.Plugins.Sounds.Play import ytdl
 
 from pyrogram import filters
 import asyncio
@@ -47,7 +47,7 @@ async def _aPlay(_, message):
 
         await m.edit("Found the match... Downloading your song...")
         format = "bestaudio"
-        resp, songlinks = await get_youtube_stream(stream_link)
+        resp, songlinks = await ytdl(format, link)
         if resp == 0:
             await m.edit(f"❌ yt-dl issues detected\n\n» `{songlink}`")
         else:
