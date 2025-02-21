@@ -8,7 +8,7 @@ from Player import app
 from Player.Core import Userbot
 from Player.Utils.YtDetails import searchPlaylist, extract_playlist_id
 from Player.Utils.Queue import QUEUE, add_to_queue, clear_queue
-from Player.Plugins.Sounds.Play import get_stream_url
+from Player.Plugins.Sounds.Play import get_youtube_stream
 
 from pyrogram import filters
 import asyncio
