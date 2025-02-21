@@ -124,7 +124,7 @@ async def _aPlay(_, message):
         video_id = extract_video_id(query)
         try:
             video_id = None
-            url = f"https://www.youtube.com/watch?v={vidid}"
+            url = f"https://www.youtube.com/watch?v={vid_id}"
             title, duration, link = searchYt(video_id)
             if (title, duration, link) == (None, None, None):
                 return await m.edit("No results found")
