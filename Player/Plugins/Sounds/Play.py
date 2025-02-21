@@ -39,9 +39,7 @@ async def ytdl(format: str, link: str):
         xyz = info['url']
         return xyz
         
-    downloaded_file = await loops.run_in_executor(
-        None, get_stream_url
-    )
+    downloaded_file = await loops.run_in_executor(None, get_stream_url)
     return downloaded_file
 
 
