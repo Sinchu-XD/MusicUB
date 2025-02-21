@@ -15,7 +15,7 @@ from pyrogram import filters
 import asyncio
 import random
 import time
-from Player.Utils.Youtube import get_youtube_stream
+from Player.Utils.YouTube import get_youtube_stream
 import config
 
 PLAY_COMMAND = ["P", "PLAY"]
