@@ -9,7 +9,7 @@ from Player.Core import Userbot
 from Player.Utils.YtDetails import searchYt, extract_video_id
 from Player.Utils.Queue import QUEUE, add_to_queue
 from Player.Misc import SUDOERS
-import yt_dlp
+from yt_dlp import YoutubeDL
 from pyrogram import filters
 
 import asyncio
