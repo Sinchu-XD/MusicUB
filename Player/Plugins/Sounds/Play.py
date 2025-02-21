@@ -122,10 +122,9 @@ async def _aPlay(_, message):
         m = await message.reply_text("Rukja...Tera gaana dhund raha hu...")
         query = message.text.split(maxsplit=1)[1]
         video_id = extract_video_id(query)
-        video_id = vidid
         try:
-            video_id = None
-            url = f"https://www.youtube.com/watch?v={vidid}"
+            if video_id is None:
+                video_id = query
             title, duration, link = searchYt(video_id)
             if (title, duration, link) == (None, None, None):
                 return await m.edit("No results found")
@@ -134,8 +133,7 @@ async def _aPlay(_, message):
             return
 
         await m.edit("Rukja...Tera gaana download kar raha hu...")
-        stream_link = url if url else result["link"]
-        stream_file = await get_youtube_stream(stream_link)
+        stream_file = await get_youtube_stream(link)
         if stream_file == 0:
             await m.edit(f"❌ yt-dl issues detected\n\n» `{songlink}`")
         else:
