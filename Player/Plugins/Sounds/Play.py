@@ -26,7 +26,6 @@ RPREFIX = config.RPREFIX
 
 
 async def ytdl(format: str, link: str):
-    stdout, stderr = await bash
         ydl_optssx = {
             "outtmpl": "downloads/%(id)s.%(ext)s",
             "geo_bypass": True,
