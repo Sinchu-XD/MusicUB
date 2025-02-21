@@ -25,30 +25,28 @@ PREFIX = config.PREFIX
 RPREFIX = config.RPREFIX
 
 
-def cookiefile():
-    cookie_dir = "Player/cookie"
-    cookies_files = [f for f in os.listdir(cookie_dir) if f.endswith(".txt")]
+async def get_youtube_stream(link):
+    loops = asyncio.get_running_loop()
+    def get_stream_url():
+        ydl_optssx = {
+            "format": "best",
+            "outtmpl": "downloads/%(id)s.%(ext)s",
+            "geo_bypass": True,
+            "nocheckcertificate": True,
+            "quiet": True,
+            "no_warnings": True,
+            "cookiefile": "cookies.txt",
+        }
+        x = yt_dlp.YoutubeDL(ydl_optssx)
+        info = x.extract_info(link, False)
+        xyz = info['url']
+        return xyz
+        
+    downloaded_file = await loops.run_in_executor(
+        None, get_stream_url
+    )
+    return downloaded_file
 
-    cookie_file = os.path.join(cookie_dir, cookies_files[0])
-    return cookie_file
-
-async def ytdl(format: str, link: str):
-    ydl_optssx = {
-                "format": "bestaudio/best",
-                "cookiefile": cookiefile(),
-                "outtmpl": "downloads/%(id)s.%(ext)s",
-                "geo_bypass": True,
-                "nocheckcertificate": True,
-                "quiet": True,
-                "no_warnings": True,
-            }
-            x = YoutubeDL(ydl_optssx)
-            info = x.extract_info(link, False)
-            xyz = os.path.join("downloads", f"{info['id']}.{info['ext']}")
-            if os.path.exists(xyz):
-                return xyz
-            x.download([link])
-            return xyz
 
 
 
@@ -136,7 +134,7 @@ async def _aPlay(_, message):
 
         await m.edit("Rukja...Tera gaana download kar raha hu...")
         format = "bestaudio"
-        resp, songlink = await ytdl(format, link)
+        resp, songlink = await get_youtube_stream(stream_link)
         if resp == 0:
             await m.edit(f"❌ yt-dl issues detected\n\n» `{songlink}`")
         else:
