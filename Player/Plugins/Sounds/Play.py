@@ -25,11 +25,9 @@ PREFIX = config.PREFIX
 RPREFIX = config.RPREFIX
 
 
-async def get_youtube_stream(link):
-    loops = asyncio.get_running_loop()
-    def get_stream_url():
+async def ytdl(format: str, link: str):
+    stdout, stderr = await bash
         ydl_optssx = {
-            "format": "best",
             "outtmpl": "downloads/%(id)s.%(ext)s",
             "geo_bypass": True,
             "nocheckcertificate": True,
