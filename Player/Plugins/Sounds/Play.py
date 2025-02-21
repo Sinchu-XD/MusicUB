@@ -26,6 +26,8 @@ RPREFIX = config.RPREFIX
 
 
 async def ytdl(format: str, link: str):
+    loops = asyncio.get_running_loop()
+    def get_stream_url():
         ydl_optssx = {
             "outtmpl": "downloads/%(id)s.%(ext)s",
             "geo_bypass": True,
