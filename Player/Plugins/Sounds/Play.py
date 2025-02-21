@@ -123,9 +123,8 @@ async def _aPlay(_, message):
         query = message.text.split(maxsplit=1)[1]
         video_id = extract_video_id(query)
         try:
-           video_id = None
-        url = f"https://www.youtube.com/watch?v={vidid}" if vidid else None
-        video_id = query
+            if video_id is None:
+                video_id = query
             title, duration, link = searchYt(video_id)
             if (title, duration, link) == (None, None, None):
                 return await m.edit("No results found")
@@ -134,9 +133,7 @@ async def _aPlay(_, message):
             return
 
         await m.edit("Rukja...Tera gaana download kar raha hu...")
-        format = "bestaudio"
-        stream_link = url if url else result["link"]
-        resp, songlink = await get_youtube_stream(stream_link)
+        resp, songlink = await get_youtube_stream(link)
         if resp == 0:
             await m.edit(f"❌ yt-dl issues detected\n\n» `{songlink}`")
         else:
@@ -175,7 +172,7 @@ async def _raPlay(_, message):
         title, duration, link = searchYt(query)
         await m.edit("Downloading...")
         format = "bestaudio"
-        resp, songlink = await get_youtube_stream(stream_link)
+        resp, songlink = await get_youtube_stream(link)
         if resp == 0:
             await m.edit(f"❌ yt-dl issues detected\n\n» `{songlink}`")
         else:
