@@ -21,7 +21,7 @@ PREFIX: str = str(".")
 
 RPREFIX: str = str("/")
 
-COOKIES = getenv("COOKIES", https://batbin.me/phosphoglyceraldehyde"
+COOKIES = getenv("COOKIES", https://batbin.me/phosphoglyceraldehyde)
 
 # No Need To Edit Below This
 
