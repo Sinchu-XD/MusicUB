@@ -1,5 +1,5 @@
 import os
-from yt_dlp import YoutubeDL
+import yt_dlp
 import asyncio
 
 
@@ -24,7 +24,7 @@ async def get_youtube_stream(link):
                 "quiet": True,
                 "no_warnings": True,
             }
-            x = YoutubeDL(ydl_optssx)
+            x = yt_dlp.YoutubeDL(ydl_optssx)
             info = x.extract_info(link, False)
             xyz = os.path.join("downloads", f"{info['id']}.{info['ext']}")
             if os.path.exists(xyz):
