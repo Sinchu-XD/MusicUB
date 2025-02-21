@@ -173,7 +173,7 @@ async def _raPlay(_, message):
         title, duration, link = searchYt(query)
         await m.edit("Downloading...")
         format = "bestaudio"
-        resp, songlink = await ytdl(format, link)
+        resp, songlink = await get_youtube_stream(stream_link)
         if resp == 0:
             await m.edit(f"❌ yt-dl issues detected\n\n» `{songlink}`")
         else:
