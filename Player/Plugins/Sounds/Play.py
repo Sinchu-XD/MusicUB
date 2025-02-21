@@ -25,10 +25,11 @@ PREFIX = config.PREFIX
 RPREFIX = config.RPREFIX
 
 
-async def ytdl(format: str, link: str):
+async def get_youtube_stream(link):
     loops = asyncio.get_running_loop()
     def get_stream_url():
         ydl_optssx = {
+            "format": "best",
             "outtmpl": "downloads/%(id)s.%(ext)s",
             "geo_bypass": True,
             "nocheckcertificate": True,
@@ -41,7 +42,9 @@ async def ytdl(format: str, link: str):
         xyz = info['url']
         return xyz
         
-    downloaded_file = await loops.run_in_executor(None, get_stream_url)
+    downloaded_file = await loops.run_in_executor(
+        None, get_stream_url
+    )
     return downloaded_file
 
 
@@ -121,7 +124,7 @@ async def _aPlay(_, message):
         video_id = extract_video_id(query)
         try:
             if video_id is None:
-                video_id = query
+            url = f"https://www.youtube.com/watch?v={vidid}"
             title, duration, link = searchYt(video_id)
             if (title, duration, link) == (None, None, None):
                 return await m.edit("No results found")
@@ -130,9 +133,9 @@ async def _aPlay(_, message):
             return
 
         await m.edit("Rukja...Tera gaana download kar raha hu...")
-        format = "bestaudio"
-        resp, songlink = await ytdl(format, link)
-        if resp == 0:
+        stream_link = url if url else result["link"]
+        stream_file = await get_youtube_stream(stream_link)
+        if stream_file == 0:
             await m.edit(f"❌ yt-dl issues detected\n\n» `{songlink}`")
         else:
             if chat_id in QUEUE:
