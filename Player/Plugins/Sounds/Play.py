@@ -131,7 +131,7 @@ async def _aPlay(_, message):
 
         await m.edit("Rukja...Tera gaana download kar raha hu...")
         format = "bestaudio"
-        resp, songlink = await ytdl(link)
+        resp, songlink = await ytdl(format, link)
         if resp == 0:
             await m.edit(f"❌ yt-dl issues detected\n\n» `{songlink}`")
         else:
