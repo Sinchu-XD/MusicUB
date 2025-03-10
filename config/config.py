@@ -17,9 +17,9 @@ OWNER_ID: list[int] = [int(os.getenv("OWNER_ID", 7143123520))]
 
 LOG_GROUP_ID: int = int(os.getenv("LOG_GROUP_ID", --1002369363228))
 
-PREFIX: str = str(".")
+PREFIX: str = str("/")
 
-RPREFIX: str = str("/")
+RPREFIX: str = str("-")
 
 
 
