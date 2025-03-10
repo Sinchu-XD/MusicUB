@@ -147,6 +147,8 @@ async def _aPlay(_, message):
                 f"Tera gaana play kar rha hu aaja vc\n\nSongName:- [{title[:19]}]({link})\nDuration:- {duration}\nTime taken to play:- {total_time_taken}",
                 disable_web_page_preview=True,
             )
+            await asyncio.sleep(5)
+            await m.delete()
 
 
 @app.on_message((filters.command(PLAY_COMMAND, [PREFIX, RPREFIX])) & SUDOERS)
