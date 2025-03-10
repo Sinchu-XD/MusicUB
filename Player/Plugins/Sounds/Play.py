@@ -128,13 +128,15 @@ async def _aPlay(_, message):
         format = "bestaudio"
         resp, songlink = await ytdl(format, link)
         if resp == 0:
-            return await m.edit(f"❌ yt-dl issues detected\n\n» `{songlink}`")
+            await m.edit(f"❌ yt-dl issues detected\n\n» `{songlink}`")
         else:
             if chat_id in QUEUE:
                 queue_num = add_to_queue(chat_id, title[:19], duration, songlink, link)
-                return await m.edit(
+                await m.edit(
                     f"# {queue_num}\n{title[:19]}\nTera gaana queue me daal diya hu"
                 )
+                await asyncio.sleep(5)
+                return await m.delete()
             Status, Text = await Userbot.playAudio(chat_id, songlink)
             if Status == False:
                 return await m.edit(Text)
@@ -147,8 +149,8 @@ async def _aPlay(_, message):
                 f"Tera gaana play kar rha hu aaja vc\n\nSongName:- [{title[:19]}]({link})\nDuration:- {duration}\nTime taken to play:- {total_time_taken}",
                 disable_web_page_preview=True,
             )
-            await asyncio.sleep(5)
-            await m.delete()
+        await asyncio.sleep(5)
+        await m.delete()
 
 
 @app.on_message((filters.command(PLAY_COMMAND, [PREFIX, RPREFIX])) & SUDOERS)
