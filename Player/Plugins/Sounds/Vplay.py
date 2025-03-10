@@ -142,7 +142,7 @@ async def _vPlay(_, message):
             Status, Text = await Userbot.playVideo(chat_id, ytlink)
             # Check if the video ended
             if Status == False:
-                await m.edit(Text)
+                return await m.edit(Text)
             if duration is None:
                 duration = "Playing From LiveStream"
             add_to_queue(chat_id, title[:19], duration, ytlink, link)
