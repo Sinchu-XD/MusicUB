@@ -65,7 +65,7 @@ async def _aPlay(_, message):
 
             Status, Text = await Userbot.playAudio(chat_id, songlinkplay)
             if Status == False:
-                await m.edit(Text)
+                return await m.edit(Text)
             finish_time = time.time()
             total_time_taken = str(int(finish_time - start_time)) + "s"
             await m.edit(
