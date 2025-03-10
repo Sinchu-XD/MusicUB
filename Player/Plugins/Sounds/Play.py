@@ -11,7 +11,7 @@ from Player.Utils.Queue import QUEUE, add_to_queue
 from Player.Misc import SUDOERS
 
 from pyrogram import filters
-
+import os
 import asyncio
 import random
 import time
@@ -25,9 +25,23 @@ PREFIX = config.PREFIX
 RPREFIX = config.RPREFIX
 
 
+def cookies():
+    folder_path = f"{os.getcwd()}/cookies"
+    txt_files = glob.glob(os.path.join(folder_path, "*.txt"))
+    if not txt_files:
+        raise FileNotFoundError("No .txt files found in the specified folder.")
+    cookie_txt_file = random.choice(txt_files)
+    return f"""cookies/{str(cookie_txt_file).split("/")[-1]}"""
+
+
 async def ytdl(format: str, link: str):
     stdout, stderr = await bash(
-        f'yt-dlp --geo-bypass -g -f "{format}" {link}'
+        "yt-dlp",
+         "-g",
+         "-f",
+         "best",
+         f"--cookies {cookies()}",
+         link,
     )
     if stdout:
         return 1, stdout
