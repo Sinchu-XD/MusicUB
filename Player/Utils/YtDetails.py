@@ -17,13 +17,6 @@ def searchYt(query):
         duration = Result["result"][0]["duration"]
         link = Result["result"][0]["link"]
         return title, duration, link
-    else:
-        videosResult = Search(query, use_po_token=True)
-        for Result in videosResult.videos:
-            title = Result.title
-            duration = Result.length
-            link = Result.watch_url
-            return title, duration, link
     return None, None, None
 
 
