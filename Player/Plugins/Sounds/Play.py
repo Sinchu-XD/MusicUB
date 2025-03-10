@@ -59,7 +59,7 @@ async def bash(cmd):
 async def processReplyToMessage(message):
     msg = message.reply_to_message
     if msg.audio or msg.voice:
-        m = await message.reply_text("Rukja...Tera Audio Download kar raha hu...")
+        m = await message.reply_text("**𝓦𝓪𝓲𝓽 𝓑𝓪𝓫𝔂... 𝓓𝓸𝔀𝓷𝓵𝓸𝓪𝓭𝓲𝓷𝓰 𝓨𝓸𝓾𝓻 𝓢𝓸𝓷𝓰 ❤️**.")
         audio_original = await msg.download()
         input_filename = audio_original
         return input_filename, m
@@ -84,10 +84,10 @@ async def _aPlay(_, message):
             input_filename, m = await processReplyToMessage(message)
             if input_filename is None:
                 return await message.reply_text(
-                    "Audio pe reply kon karega mai? ya phir song link kon dalega mai? 🤔"
+                    "**𝙶𝚒𝚟𝚎 𝙼𝚎 𝚂𝚘𝚗𝚐 𝙻𝚒𝚗𝚔 𝙾𝚛 𝚁𝚎𝚙𝚕𝚢 𝚃𝚘 𝚅𝚘𝚒𝚌𝚎 𝙽𝚘𝚝𝚎😒**"
                 )
                 
-            await m.edit("Rukja...Tera Audio Play karne vala hu...")
+            await m.edit("𝑊𝑎𝑖𝑡 𝑁𝑎 𝑌𝑟𝑟𝑟 😒..")
             Status, Text = await Userbot.playAudio(chat_id, input_filename)
             if Status == False:
                 await m.edit(Text)
@@ -101,18 +101,18 @@ async def _aPlay(_, message):
                         message.reply_to_message.link,
                     )
                     return await m.edit(
-                        f"# {queue_num}\n{message.reply_to_message.audio.title[:19]}\nTera gaana queue me daal diya hu"
+                        f"# {queue_num}\n{message.reply_to_message.audio.title[:19]}\n**ʏᴏᴜʀ ꜱᴏɴɢ ᴀᴅᴅᴇᴅ ɪɴ Qᴜᴇᴜᴇ\nᴘʟᴇᴀꜱᴇ ᴡᴀɪᴛ 😵‍💫**"
                     )
                 finish_time = time.time()
                 total_time_taken = str(int(finish_time - start_time)) + "s"
                 await m.edit(
-                    f"Tera gaana play kar rha hu aaja vc\n\nSongName:- [{message.reply_to_message.audio.title[:19]}]({message.reply_to_message.link})\nDuration:- {message.reply_to_message.audio.duration}\nTime taken to play:- {total_time_taken}",
+                    f"**ѕσηg ιѕ ρℓαуιηg ιη ν¢**\n\n**SongName**:- [{message.reply_to_message.audio.title[:19]}]({message.reply_to_message.link})\n**Duration**:- {message.reply_to_message.audio.duration}\n**Response Time**:- {total_time_taken}",
                     disable_web_page_preview=True,
                 )
     elif (len(message.command)) < 2:
-        await message.reply_text("Song name kon dalega mai? 🤔")
+        await message.reply_text("**𝑊𝑎𝑖𝑡 𝑁𝑎 𝑌𝑟𝑟𝑟 😒**")
     else:
-        m = await message.reply_text("Rukja...Tera gaana dhund raha hu...")
+        m = await message.reply_text("**Wait Na Yrrr 😒**")
         query = message.text.split(maxsplit=1)[1]
         video_id = extract_video_id(query)
         try:
@@ -124,7 +124,7 @@ async def _aPlay(_, message):
         except Exception as e:
             return await message.reply_text(f"Error:- <code>{e}</code>")
 
-        await m.edit("Rukja...Tera gaana download kar raha hu...")
+        await m.edit("**ᴡᴀɪᴛ ɴᴀ ʏʀʀʀ\n\nꜱᴇᴀʀᴄʜɪɴɢ ʏᴏᴜʀ ꜱᴏɴɢ 🌚❤️..**")
         format = "bestaudio"
         resp, songlink = await ytdl(format, link)
         if resp == 0:
@@ -133,7 +133,7 @@ async def _aPlay(_, message):
             if chat_id in QUEUE:
                 queue_num = add_to_queue(chat_id, title[:19], duration, songlink, link)
                 await m.edit(
-                    f"# {queue_num}\n{title[:19]}\nTera gaana queue me daal diya hu"
+                    f"# {queue_num}\n{title[:19]}\n**ʏᴏᴜʀ ꜱᴏɴɢ ᴀᴅᴅᴇᴅ ɪɴ Qᴜᴇᴜᴇ\n\nᴘʟᴇᴀꜱᴇ ᴡᴀɪᴛ 😵‍💫**"
                 )
                 await asyncio.sleep(5)
                 return await m.delete()
@@ -141,12 +141,12 @@ async def _aPlay(_, message):
             if Status == False:
                 return await m.edit(Text)
             if duration is None:
-                duration = "Playing From LiveStream"
+                duration = "**Playing From LiveStream**"
             add_to_queue(chat_id, title[:19], duration, songlink, link)
             finish_time = time.time()
             total_time_taken = str(int(finish_time - start_time)) + "s"
             await m.edit(
-                f"Tera gaana play kar rha hu aaja vc\n\nSongName:- [{title[:19]}]({link})\nDuration:- {duration}\nTime taken to play:- {total_time_taken}",
+                f"**ѕσηg ιѕ ρℓαуιηg ιη ν¢**\n\n**SongName**:- [{title[:19]}]({link})\n**Duration**:- {duration}\n**Respose Time**:- {total_time_taken}",
                 disable_web_page_preview=True,
             )
         await asyncio.sleep(5)
