@@ -1,6 +1,6 @@
 #!/bin/bash
 
-clear
+
 echo "		Initialising Bot ..."
-sleep 1s
-python3 -m Player
+. venv/bin/activate
+python3 -m Player >> /dev/null
