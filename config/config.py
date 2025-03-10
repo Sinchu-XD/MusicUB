@@ -11,11 +11,11 @@ API_ID: int = int(os.getenv("API_ID", 7249983))
 
 API_HASH: str = os.getenv("API_HASH", "be8ea36c220d5e879c91ad9731686642")
 
-SESSION_STRING: str = os.getenv("SESSION_STRING", "BQBuoD8AuTI0qg2FHVUmNjJn_prTBuZPGkRs76iKazfwNytYFXeN4bZJ3N_NAh7eFnic_mRIuTP2mXyFlBFR0XxTIjaXiB26hRtg_qfZ-dWT2UslBACBpn7ifYB4YPnx7wVM7t05HSdp1S0F72PhIrA1UCwYroWkbMdn8Xa3IU1AbqEabViWxHJ09mwRYmiybRgwU-EQgLG-PgsIRK7iqHRrufOuGCgW_sxOWuuI8c6Z_qO3OntrzAtoFkPboIHRS6CLddEI0p6RqY7_zSJjBC5IyjmVS--9jKbhFpb6uVDXJ9a7eaxFLv7Rq9N9_wMNylqAgcTPUufybNWTOxl_ao_xaIDjwgAAAAFklkDwAA")
+SESSION_STRING: str = os.getenv("SESSION_STRING", "BQBuoD8AtOwxLV-QRgi1IWpNidBHfwrIGV_5Imu1W5c_gOrWNumbb_zoZpp3NDSadfXkdFUk_bIc_UGDGnj4vTXt3VtLpWW9_lnmdjarZ4UuR9IkomRyM-FkdCoCTbUBzw_6a4j1z_fjGiWxW98WZ6CF1EVy3AfHFRBqrcn6-z4B2R-FhgPeew_CYk8vmXEpjYu4JK9EEGF8k-abTqI0GuGJ5W6pWNqa7QmB6rWPODMDkH21_DAgo8tsTVQId01dGrWso24MihswteFdRAzhA4Xho1_OXxN7amFL0WYsXEqRFh5tpIhW4jZ8KIMteqgfkgDsRRYjYCppGIs5tW7xwrS9AnzPewAAAAHjq--iAA")
 
 OWNER_ID: list[int] = [int(os.getenv("OWNER_ID", 7143123520))]
 
-LOG_GROUP_ID: int = int(os.getenv("LOG_GROUP_ID", -4694535872))
+LOG_GROUP_ID: int = int(os.getenv("LOG_GROUP_ID", --1002369363228))
 
 PREFIX: str = str(".")
 
