@@ -25,6 +25,14 @@ PREFIX = config.PREFIX
 
 RPREFIX = config.RPREFIX
 
+def cookies():
+    folder_path = f"{os.getcwd()}/cookies"
+    txt_files = glob.glob(os.path.join(folder_path, "*.txt"))
+    if not txt_files:
+        raise FileNotFoundError("No .txt files found in the specified folder.")
+    cookie_txt_file = random.choice(txt_files)
+    return f"""cookies/{str(cookie_txt_file).split("/")[-1]}"""
+    
 
 async def ytdl(link):
     proc = await asyncio.create_subprocess_exec(
@@ -32,6 +40,7 @@ async def ytdl(link):
         "-g",
         "-f",
         "best[height<=?720][width<=?1280]",
+        f"--cookies {cookies()}"
         f"{link}",
         stdout=asyncio.subprocess.PIPE,
         stderr=asyncio.subprocess.PIPE,
