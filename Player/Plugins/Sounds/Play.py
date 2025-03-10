@@ -83,10 +83,10 @@ async def _aPlay(_, message):
         if message.reply_to_message.audio or message.reply_to_message.voice:
             input_filename, m = await processReplyToMessage(message)
             if input_filename is None:
-                await message.reply_text(
+                return await message.reply_text(
                     "Audio pe reply kon karega mai? ya phir song link kon dalega mai? 🤔"
                 )
-                return
+                
             await m.edit("Rukja...Tera Audio Play karne vala hu...")
             Status, Text = await Userbot.playAudio(chat_id, input_filename)
             if Status == False:
@@ -100,10 +100,9 @@ async def _aPlay(_, message):
                         message.reply_to_message.audio.file_id,
                         message.reply_to_message.link,
                     )
-                    await m.edit(
+                    return await m.edit(
                         f"# {queue_num}\n{message.reply_to_message.audio.title[:19]}\nTera gaana queue me daal diya hu"
                     )
-                    return
                 finish_time = time.time()
                 total_time_taken = str(int(finish_time - start_time)) + "s"
                 await m.edit(
@@ -121,27 +120,24 @@ async def _aPlay(_, message):
                 video_id = query
             title, duration, link = searchYt(video_id)
             if (title, duration, link) == (None, None, None):
-                return await m.edit("No results found")
+                await m.edit("No results found")
         except Exception as e:
-            await message.reply_text(f"Error:- <code>{e}</code>")
-            return
+            return await message.reply_text(f"Error:- <code>{e}</code>")
 
         await m.edit("Rukja...Tera gaana download kar raha hu...")
         format = "bestaudio"
         resp, songlink = await ytdl(format, link)
         if resp == 0:
-            await m.edit(f"❌ yt-dl issues detected\n\n» `{songlink}`")
+            return await m.edit(f"❌ yt-dl issues detected\n\n» `{songlink}`")
         else:
             if chat_id in QUEUE:
                 queue_num = add_to_queue(chat_id, title[:19], duration, songlink, link)
-                await m.edit(
+                return await m.edit(
                     f"# {queue_num}\n{title[:19]}\nTera gaana queue me daal diya hu"
                 )
-                return
-            # await asyncio.sleep(1)
             Status, Text = await Userbot.playAudio(chat_id, songlink)
             if Status == False:
-                await m.edit(Text)
+                return await m.edit(Text)
             if duration is None:
                 duration = "Playing From LiveStream"
             add_to_queue(chat_id, title[:19], duration, songlink, link)
@@ -157,9 +153,9 @@ async def _aPlay(_, message):
 async def _raPlay(_, message):
     start_time = time.time()
     if (message.reply_to_message) is not None:
-        await message.reply_text("Currently this is not supported")
+        return await message.reply_text("Currently this is not supported")
     elif (len(message.command)) < 3:
-        await message.reply_text("You Forgot To Pass An Argument")
+        return await message.reply_text("You Forgot To Pass An Argument")
     else:
         m = await message.reply_text("Searching Your Query...")
         query = message.text.split(" ", 2)[2]
@@ -169,11 +165,11 @@ async def _raPlay(_, message):
         format = "bestaudio"
         resp, songlink = await ytdl(format, link)
         if resp == 0:
-            await m.edit(f"❌ yt-dl issues detected\n\n» `{songlink}`")
+            return await m.edit(f"❌ yt-dl issues detected\n\n» `{songlink}`")
         else:
             Status, Text = await Userbot.playAudio(msg_id, songlink)
             if Status == False:
-                await m.edit(Text)
+                return await m.edit(Text)
             if duration is None:
                 duration = "Playing From LiveStream"
             finish_time = time.time()
