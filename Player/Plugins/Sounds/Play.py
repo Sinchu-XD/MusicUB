@@ -37,12 +37,7 @@ def cookies():
 
 async def ytdl(format: str, link: str):
     stdout, stderr = await bash(
-        "yt-dlp",
-         "-g",
-         "-f",
-         "best",
-         f"--cookies {cookies()}",
-         link,
+        f'yt-dlp --geo-bypass -g -f --cookies {cookies()} -f "{format}" {link}'
     )
     if stdout:
         return 1, stdout
