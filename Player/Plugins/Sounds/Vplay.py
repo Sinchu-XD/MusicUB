@@ -52,18 +52,6 @@ async def ytdl(link):
         return 0, stderr.decode()
 
 
-async def bash(cmd):
-    process = await asyncio.create_subprocess_shell(
-        cmd,
-        stdout=asyncio.subprocess.PIPE,
-        stderr=asyncio.subprocess.PIPE,
-    )
-    stdout, stderr = await process.communicate()
-    err = stderr.decode().strip()
-    out = stdout.decode().strip()
-    return out, err
-
-
 async def processReplyToMessage(message):
     msg = message.reply_to_message
     if msg.video or msg.video_note:
@@ -91,32 +79,34 @@ async def _vPlay(_, message):
         if message.reply_to_message.video or message.reply_to_message.video_note:
             input_filename, m = await processReplyToMessage(message)
             if input_filename is None:
-                await message.reply_text(
+                return await message.reply_text(
                     "Video pe reply kon karega mai? ya phir video link kon dalega mai? 🤔"
                 )
-                return
+                
             await m.edit("Rukja...Tera Video Play kar raha hu...")
             Status, Text = await Userbot.playVideo(chat_id, input_filename)
             if Status == False:
                 await m.edit(Text)
+            
             else:
+                video = message.reply_to_message.video or message.reply_to_message.video_note
                 await message.delete()
                 if chat_id in QUEUE:
                     queue_num = add_to_queue(
                         chat_id,
-                        message.reply_to_message.video.title[:19],
-                        message.reply_to_message.video.duration,
-                        message.reply_to_message.video.file_id,
+                        video.title[:19],
+                        video.duration,
+                        video.file_id,
                         message.reply_to_message.link,
                     )
                     await m.edit(
-                        f"# {queue_num}\n{message.reply_to_message.video.title[:19]}\nTera video queue me daal diya hu"
+                        f"# {queue_num}\n{video.title[:19]}\nTera video queue me daal diya hu"
                     )
                     return
                 finish_time = time.time()
                 total_time_taken = str(int(finish_time - start_time)) + "s"
                 await m.edit(
-                    f"Tera video play kar rha hu aaja vc\n\nVideoName:- [{message.reply_to_message.video.title[:19]}]({message.reply_to_message.link})\nDuration:- {message.reply_to_message.video.duration}\nTime taken to play:- {total_time_taken}",
+                    f"Tera video play kar rha hu aaja vc\n\nVideoName:- [{video.title[:19]}]({message.reply_to_message.link})\nDuration:- {video.duration}\nTime taken to play:- {total_time_taken}",
                     disable_web_page_preview=True,
                 )
 

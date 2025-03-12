@@ -94,22 +94,25 @@ async def _aPlay(_, message):
             Status, Text = await Userbot.playAudio(chat_id, input_filename)
             if Status == False:
                 await m.edit(Text)
+            
+            audio = message.reply_to_message.audio or message.reply_to_message.voice
+
             else:
                 if chat_id in QUEUE:
                     queue_num = add_to_queue(
                         chat_id,
-                        message.reply_to_message.audio.title[:19],
-                        message.reply_to_message.audio.duration,
-                        message.reply_to_message.audio.file_id,
+                        audio.title[:19],
+                        audio.duration,
+                        audio.file_id,
                         message.reply_to_message.link,
                     )
                     return await m.edit(
-                        f"# {queue_num}\n{message.reply_to_message.audio.title[:19]}\n**ʏᴏᴜʀ ꜱᴏɴɢ ᴀᴅᴅᴇᴅ ɪɴ Qᴜᴇᴜᴇ\nᴘʟᴇᴀꜱᴇ ᴡᴀɪᴛ 😵‍💫**"
+                        f"# {queue_num}\n{audio.title[:19]}\n**ʏᴏᴜʀ ꜱᴏɴɢ ᴀᴅᴅᴇᴅ ɪɴ Qᴜᴇᴜᴇ\nᴘʟᴇᴀꜱᴇ ᴡᴀɪᴛ 😵‍💫**"
                     )
                 finish_time = time.time()
                 total_time_taken = str(int(finish_time - start_time)) + "s"
                 await m.edit(
-                    f"**ѕσηg ιѕ ρℓαуιηg ιη ν¢**\n\n**SongName**:- [{message.reply_to_message.audio.title[:19]}]({message.reply_to_message.link})\n**Duration**:- {message.reply_to_message.audio.duration}\n**Requested By**:- {mention}\n\n**Response Time**:- {total_time_taken}",
+                    f"**ѕσηg ιѕ ρℓαуιηg ιη ν¢**\n\n**SongName**:- [{audio.title[:19]}]({message.reply_to_message.link})\n**Duration**:- {audio.duration}\n**Requested By**:- {mention}\n\n**Response Time**:- {total_time_taken}",
                     disable_web_page_preview=True,
                 )
     elif (len(message.command)) < 2:
