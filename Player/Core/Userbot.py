@@ -5,7 +5,7 @@ Copyright ©️ 2025
 
 
 from Player import call
-from pytgcalls.types import MediaStream
+from pytgcalls.types import MediaStream, VideoQuality, AudioQuality
 
 audio_file = "http://docs.evostream.com/sample_content/assets/sintel1m720p.mp4"
 
@@ -16,6 +16,7 @@ async def playAudio(chat_id, audio_file=audio_file):
             chat_id,
             MediaStream(
                 audio_file,
+                audio_parameters=AudioQuality.HIGH,
                 video_flags=MediaStream.Flags.IGNORE,
             ),
         )
@@ -29,7 +30,9 @@ async def playVideo(chat_id, video_file=audio_file):
         await call.play(
             chat_id,
             MediaStream(
-                video_file,
+                media_path=video_file,
+                audio_parameters=AudioQuality.HIGH,
+                video_parameters=VideoQuality.FHD_1080p
             ),
         )
         return True, None
