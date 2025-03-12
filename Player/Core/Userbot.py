@@ -16,7 +16,7 @@ async def playAudio(chat_id, audio_file=audio_file):
             chat_id,
             MediaStream(
                 audio_file,
-                audio_parameters=AudioQuality.HIGH,
+                audio_parameters=AudioQuality.STUDIO,
                 video_flags=MediaStream.Flags.IGNORE,
             ),
         )
@@ -31,8 +31,8 @@ async def playVideo(chat_id, video_file=audio_file):
             chat_id,
             MediaStream(
                 media_path=video_file,
-                audio_parameters=AudioQuality.HIGH,
-                video_parameters=VideoQuality.FHD_1080p
+                audio_parameters=AudioQuality.STUDIO,
+                video_parameters=VideoQuality.UHD_4K
             ),
         )
         return True, None
