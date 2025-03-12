@@ -100,13 +100,13 @@ async def _vPlay(_, message):
                         message.reply_to_message.link,
                     )
                     await m.edit(
-                        f"# {queue_num}\n{video.title[:19]}\nTera video queue me daal diya hu"
+                        f"# {queue_num}\n{video.title[:19] or "Unknown"}\nTera video queue me daal diya hu"
                     )
                     return
                 finish_time = time.time()
                 total_time_taken = str(int(finish_time - start_time)) + "s"
                 await m.edit(
-                    f"Tera video play kar rha hu aaja vc\n\nVideoName:- [{video.title[:19]}]({message.reply_to_message.link})\nDuration:- {video.duration}\nTime taken to play:- {total_time_taken}",
+                    f"Tera video play kar rha hu aaja vc\n\nVideoName:- [{video.title[:19] or "Unknown"}]({message.reply_to_message.link})\nDuration:- {video.duration}\nTime taken to play:- {total_time_taken}",
                     disable_web_page_preview=True,
                 )
 
