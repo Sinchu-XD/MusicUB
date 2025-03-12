@@ -90,23 +90,24 @@ async def _vPlay(_, message):
             
             else:
                 video = message.reply_to_message.video or message.reply_to_message.video_note
+                video_title = message.reply_to_message.text or "Unknown"
                 await message.delete()
                 if chat_id in QUEUE:
                     queue_num = add_to_queue(
                         chat_id,
-                        video.title[:19],
+                        video_title[:19],
                         video.duration,
                         video.file_id,
                         message.reply_to_message.link,
                     )
                     await m.edit(
-                        f"# {queue_num}\n{video.title[:19] if video.title else 'Unknown'}\nTera video queue me daal diya hu"
+                        f"# {queue_num}\n{video_title[:19]}\nTera video queue me daal diya hu"
                     )
                     return
                 finish_time = time.time()
                 total_time_taken = str(int(finish_time - start_time)) + "s"
                 await m.edit(
-                    f"Tera video play kar rha hu aaja vc\n\nVideoName:- [{video.title[:19] if video.title else 'Unknown'}]({message.reply_to_message.link})\nDuration:- {video.duration}\nTime taken to play:- {total_time_taken}",
+                    f"Tera video play kar rha hu aaja vc\n\nVideoName:- [{video_title[:19}]({message.reply_to_message.link})\nDuration:- {video.duration}\nTime taken to play:- {total_time_taken}",
                     disable_web_page_preview=True,
                 )
 
