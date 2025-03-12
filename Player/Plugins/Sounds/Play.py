@@ -94,10 +94,8 @@ async def _aPlay(_, message):
             Status, Text = await Userbot.playAudio(chat_id, input_filename)
             if Status == False:
                 await m.edit(Text)
-            
-            audio = message.reply_to_message.audio or message.reply_to_message.voice
-
             else:
+                audio = message.reply_to_message.audio or message.reply_to_message.voice
                 if chat_id in QUEUE:
                     queue_num = add_to_queue(
                         chat_id,
