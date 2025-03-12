@@ -79,6 +79,9 @@ async def playWithLinks(link):
 async def _aPlay(_, message):
     start_time = time.time()
     chat_id = message.chat.id
+    user_id = message.from_user.id
+    user_name = message.from_user.first_name
+    mention = f"[{user_name}](tg://user?id={user_id})"
     if (message.reply_to_message) is not None:
         if message.reply_to_message.audio or message.reply_to_message.voice:
             input_filename, m = await processReplyToMessage(message)
@@ -106,7 +109,7 @@ async def _aPlay(_, message):
                 finish_time = time.time()
                 total_time_taken = str(int(finish_time - start_time)) + "s"
                 await m.edit(
-                    f"**ѕσηg ιѕ ρℓαуιηg ιη ν¢**\n\n**SongName**:- [{message.reply_to_message.audio.title[:19]}]({message.reply_to_message.link})\n**Duration**:- {message.reply_to_message.audio.duration}\n**Response Time**:- {total_time_taken}",
+                    f"**ѕσηg ιѕ ρℓαуιηg ιη ν¢**\n\n**SongName**:- [{message.reply_to_message.audio.title[:19]}]({message.reply_to_message.link})\n**Duration**:- {message.reply_to_message.audio.duration}\n**Requested By**:- {mention}\n\n**Response Time**:- {total_time_taken}",
                     disable_web_page_preview=True,
                 )
     elif (len(message.command)) < 2:
@@ -146,7 +149,7 @@ async def _aPlay(_, message):
             finish_time = time.time()
             total_time_taken = str(int(finish_time - start_time)) + "s"
             await m.edit(
-                f"**ѕσηg ιѕ ρℓαуιηg ιη ν¢**\n\n**SongName**:- [{title[:19]}]({link})\n**Duration**:- {duration}\n**Respose Time**:- {total_time_taken}",
+                f"**ѕσηg ιѕ ρℓαуιηg ιη ν¢**\n\n**SongName**:- [{title[:19]}]({link})\n**Duration**:- {duration}\n**Requested By**:- {mention}\n\n**Respose Time**:- {total_time_taken}",
                 disable_web_page_preview=True,
             )
         await asyncio.sleep(5)
@@ -179,6 +182,6 @@ async def _raPlay(_, message):
             finish_time = time.time()
             total_time_taken = str(int(finish_time - start_time)) + "s"
             await m.edit(
-                f"Tera gaana play kar rha hu aaja vc\n\nSongName:- [{title[:19]}]({link})\nDuration:- {duration}\nTime taken to play:- {total_time_taken}",
-                disable_web_page_preview=True,
+                f"**ѕσηg ιѕ ρℓαуιηg ιη ν¢**\n\n**SongName**:- [{message.reply_to_message.audio.title[:19]}]({message.reply_to_message.link})\n**Duration**:- {message.reply_to_message.audio.duration}\n**Requested By**:- {mention}\n\n**Response Time**:- {total_time_taken}",
+                    disable_web_page_preview=True,
             )
