@@ -40,7 +40,7 @@ async def ytdl(link):
         "-g",
         "-f",
         "best[height<=?720][width<=?1280]",
-        f"--cookies {cookies()}"
+        f"--cookies {cookies()}",
         f"{link}",
         stdout=asyncio.subprocess.PIPE,
         stderr=asyncio.subprocess.PIPE,
