@@ -113,7 +113,7 @@ async def _aPlay(_, message):
                     disable_web_page_preview=True,
                 )
     elif (len(message.command)) < 2:
-        await message.reply_text("**𝑊𝑎𝑖𝑡 𝑁𝑎 𝑌𝑟𝑟𝑟 😒**")
+        await message.reply_text("**𝑊𝑎𝑖𝑡 𝙶𝚒𝚟𝚎 𝙼𝚎 𝚂𝚘𝚗𝚐 𝙻𝚒𝚗𝚔 𝙾𝚛 𝚁𝚎𝚙𝚕𝚢 𝚃𝚘 𝚅𝚘𝚒𝚌𝚎 𝙽𝚘𝚝𝚎**")
     else:
         m = await message.reply_text("**Wait Na Yrrr 😒**")
         query = message.text.split(maxsplit=1)[1]
