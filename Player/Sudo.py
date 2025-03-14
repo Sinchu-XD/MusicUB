@@ -1,6 +1,6 @@
 import json
 import os
-from pyrogram import Client, filters
+from pyrogram import filters
 from pyrogram.types import Message
 from Player import app
 from config import config
