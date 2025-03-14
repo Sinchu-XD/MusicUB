@@ -27,7 +27,7 @@ HELP_MESSAGE = f"""
 - `{PREFIX}mute` - Mute the bot in the voice chat
 - `{PREFIX}unmute` - Unmute the bot in the voice chat
 - `{PREFIX}skip` - Skip the current song
-- `{PREFIX}stop` - Stop the music player
+- `{PREFIX}end` - Stop the music player
 - `{PREFIX}chup` - Stop the music player
 - `{PREFIX}volume` - Adjust the volume
 - `{PREFIX}vol` - Adjust the volume
