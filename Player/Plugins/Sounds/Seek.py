@@ -7,7 +7,7 @@ from pytgcalls.types import MediaStream, AudioQuality
 playing_tracks = {}
 
 async def play_audio(chat_id, audio_url, seek_time=0):
-    """ Function to play audio from a specific timestamp """
+    """ Plays an audio file from a specific timestamp """
     try:
         if seek_time > 0:
             audio_url += f"#t={seek_time}"  # Append timestamp for seeking
@@ -19,7 +19,7 @@ async def play_audio(chat_id, audio_url, seek_time=0):
                 audio_parameters=AudioQuality.STUDIO
             ),
         )
-        playing_tracks[chat_id] = audio_url  # Store the track being played
+        playing_tracks[chat_id] = {"url": audio_url, "seek_time": seek_time}  # Save playing track & time
         return True
     except Exception as e:
         return f"❌ Error: `{e}`"
@@ -27,22 +27,22 @@ async def play_audio(chat_id, audio_url, seek_time=0):
 
 @app.on_message(filters.command("seek"))
 async def seek_audio(client, message):
-    """ Command to seek audio """
-    chat_id = message.chat.id
+    """ Command: /seek <seconds> - Seek forward or rewind """
     if len(message.command) < 2:
-        await message.reply_text("❌ **Usage:** /seek <seconds>")
+        await message.reply("❌ **Usage:** /seek <seconds>")
         return
     
+    chat_id = message.chat.id
     if chat_id not in playing_tracks:
-        await message.reply_text("❌ **No song is currently playing!**")
+        await message.reply("❌ **No song is currently playing!** Start with `/play <URL>`")
         return
 
     try:
         seek_time = int(message.command[1])  # Convert seconds to integer
-        audio_url = playing_tracks[chat_id]  # Get current playing URL
+        audio_url = playing_tracks[chat_id]["url"]  # Get current playing URL
 
         await call.stop(chat_id)  # Stop the current stream
-        await play_audio(chat_id, audio_url, seek_time)  # Replay from new position
-        await message.reply_text(f"⏩ **Seeked to:** {seek_time} seconds")
+        await play_audio(chat_id, audio_url, seek_time)  # Restart from new position
+        await message.reply(f"⏩ **Seeked to:** {seek_time} seconds")
     except Exception as e:
-        await message.reply_text(f"❌ **Error:** `{e}`")
+        await message.reply(f"❌ **Error:** `{e}`")
