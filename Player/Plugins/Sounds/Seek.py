@@ -19,7 +19,9 @@ async def play_audio(chat_id, audio_url, seek_time=0):
                 audio_parameters=AudioQuality.STUDIO
             ),
         )
-        playing_tracks[chat_id] = {"url": audio_url, "seek_time": seek_time}  # Save playing track & time
+
+        # ✅ Save the playing song
+        playing_tracks[chat_id] = {"url": audio_url, "seek_time": seek_time}
         return True
     except Exception as e:
         return f"❌ Error: `{e}`"
