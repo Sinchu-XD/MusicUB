@@ -4,6 +4,8 @@ from pyrogram import filters
 from Player import app, call
 from pytgcalls.types import MediaStream, AudioQuality
 
+current_chat = None
+
 
 @app.on_message(filters.command("seek"))
 async def seek_music(client, message):
