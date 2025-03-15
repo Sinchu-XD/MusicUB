@@ -4,6 +4,8 @@ from Player import app, call
 from pytgcalls.types import MediaStream, AudioQuality
 
 
+playing_tracks = {}
+
 async def play_audio(chat_id, audio_url, seek_time=0):
     """ Function to play audio from a specific timestamp """
     try:
