@@ -1,3 +1,4 @@
+"""
 import asyncio
 from pyrogram import filters
 from Player import app, call
@@ -48,3 +49,6 @@ async def seek_audio(client, message):
         await message.reply(f"⏩ **Seeked to:** {seek_time} seconds")
     except Exception as e:
         await message.reply(f"❌ **Error:** `{e}`")
+"""
+
+### For Read Only
