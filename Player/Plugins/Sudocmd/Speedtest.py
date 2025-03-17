@@ -45,52 +45,33 @@ async def testspeed():
 )
 async def speedtest_function(client, message):
     msg = await message.reply_text("⚡ Running speed test, please wait...")
-    
-    loop = asyncio.get_event_loop()
-    result, download_speed, upload_speed = await loop.run_in_executor(None, testspeed)
+
+    # ✅ Directly await `testspeed()`
+    result, download_speed, upload_speed = await testspeed()
 
     if isinstance(result, str):  # If an error occurred
         return await msg.edit(f"❌ **Speed Test Failed**\nError: `{result}`")
 
-    # Safe extraction of values
-    isp = result.get("client", {}).get("isp", "Unknown")
-    country = result.get("client", {}).get("country", "Unknown")
-    isp_rating = result.get("client", {}).get("isprating", "N/A")
-
-    server_name = result.get("server", {}).get("name", "Unknown")
-    server_country = result.get("server", {}).get("country", "Unknown")
-    server_cc = result.get("server", {}).get("cc", "")
-    server_sponsor = result.get("server", {}).get("sponsor", "Unknown")
-    latency = result.get("server", {}).get("latency", "N/A")
-    ping = result.get("ping", "N/A")
-
-    share_link = result.get("share", None)
-
     output = f"""🚀 **Speed Test Results** 🚀
 
-__**Client:**__
-🌐 **ISP:** `{isp}`
-🌍 **Country:** `{country}`
-⭐ **ISP Rating:** `{isp_rating}`
+🌐 **ISP:** `{result['client'].get('isp', 'Unknown')}`
+🌍 **Country:** `{result['client'].get('country', 'Unknown')}`
+⭐ **ISP Rating:** `{result['client'].get('isprating', 'N/A')}`
 
-__**Server:**__
-🏢 **Name:** `{server_name}`
-📌 **Location:** `{server_country}, {server_cc}`
-🔰 **Sponsor:** `{server_sponsor}`
-⚡ **Latency:** `{latency} ms`
-📡 **Ping:** `{ping} ms`
+🏢 **Server:** `{result['server'].get('name', 'Unknown')}`
+📌 **Location:** `{result['server'].get('country', 'Unknown')}, {result['server'].get('cc', '')}`
+🔰 **Sponsor:** `{result['server'].get('sponsor', 'Unknown')}`
+⚡ **Latency:** `{result['server'].get('latency', 'N/A')} ms`
+📡 **Ping:** `{result.get('ping', 'N/A')} ms`
 
-__**Speed:**__
 ⬇️ **Download:** `{download_speed:.2f} Mbps`
 ⬆️ **Upload:** `{upload_speed:.2f} Mbps`
 """
 
+    share_link = result.get("share", None)
+
     if share_link:
-        await app.send_photo(
-            chat_id=message.chat.id,
-            photo=share_link,
-            caption=output
-        )
+        await app.send_photo(chat_id=message.chat.id, photo=share_link, caption=output)
     else:
         await msg.edit(output)
 
