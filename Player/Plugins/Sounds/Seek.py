@@ -1,39 +1,68 @@
-
-import asyncio
+from Player import app
+from Player.Core import Userbot
 from pyrogram import filters
-from Player import app, call
-from pytgcalls.types import MediaStream, AudioQuality
+import os
+import asyncio
+import time
+import subprocess
 
-current_chat = None
+SEEK_COMMAND = ["seek"]
+
+PREFIX = config.PREFIX
+RPREFIX = config.RPREFIX
 
 
-@app.on_message(filters.command("seek"))
-async def seek_music(client, message):
+async def trim_audio(input_path, output_path, seek_time):
+    """ Trims the audio using ffmpeg from a given seek time. """
+    cmd = [
+        "ffmpeg",
+        "-y",
+        "-i", input_path,
+        "-ss", str(seek_time),
+        "-acodec", "copy",
+        output_path
+    ]
+    process = await asyncio.create_subprocess_exec(
+        *cmd, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
+    )
+    await process.communicate()
+    return output_path
+
+
+@app.on_message((filters.command(SEEK_COMMAND, [PREFIX, RPREFIX])) & filters.group)
+async def seek_audio(_, message):
     chat_id = message.chat.id
-    
-    if chat_id not in call.active_calls:
-        return await message.reply("❌ No song is currently playing!")
+    user_id = message.from_user.id
+    user_name = message.from_user.first_name
+    mention = f"[{user_name}](tg://user?id={user_id})"
 
-    print(call.active_calls)  # Debugging active calls
-    
+    if len(message.command) < 2:
+        return await message.reply_text("**Usage:** /seek <seconds>")
+
     try:
-        await call.seek_stream(chat_id, 30)  # Seek to 30 seconds
-        await message.reply("✅ Seeked to 30 seconds!")
-    except Exception as e:
-        await message.reply(f"❌ Error: {e}")
+        seek_time = int(message.command[1])
+        if seek_time < 0:
+            return await message.reply_text("❌ **Invalid Seek Time! Use Positive Value.**")
 
-@app.on_message(filters.command("rewind"))
-async def rewind_music(client, message):
-    global current_chat
-    if current_chat:
-        try:
-            seconds = int(message.command[1])
-            await call.seek_stream(current_chat, -seconds)
-            await message.reply(f"⏪ Rewinded by {seconds} seconds!")
-        except Exception as e:
-            await message.reply(f"❌ Error: {e}")
-    else:
-        await message.reply("❌ No song is currently playing!")
+        if chat_id not in QUEUE or not QUEUE[chat_id]:
+            return await message.reply_text("❌ **No song is currently playing!**")
 
+        song_info = QUEUE[chat_id][0]  # Get the currently playing song
+        song_path = song_info["file_path"]
 
-### For Read Only
+        new_song_path = f"{song_path}_seeked.mp3"
+        await message.reply_text(f"⏩ Seeking to `{seek_time}` seconds...")
+
+        trimmed_song_path = await trim_audio(song_path, new_song_path, seek_time)
+
+        Status, Text = await Userbot.playAudio(chat_id, trimmed_song_path)
+        if Status == False:
+            return await message.reply_text(f"❌ Error: {Text}")
+
+        await message.reply_text(
+            f"✅ **Skipped to {seek_time} seconds!**\n🎵 **Now Playing:** {song_info['title']}\n🎤 **Requested by:** {mention}"
+        )
+
+    except ValueError:
+        return await message.reply_text("❌ **Invalid Seek Time! Enter a number (in seconds).**")
+
