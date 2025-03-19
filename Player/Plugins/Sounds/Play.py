@@ -35,7 +35,7 @@ def cookies():
     return os.path.join(folder_path, os.path.basename(cookie_txt_file))
 
 async def ytdl(format: str, link: str):
-    cookie_path = cookies()  
+    cookie_path = "cookies/cookies.txt"  # Ensure this matches the correct path
     stdout, stderr = await bash(
         f'yt-dlp --geo-bypass --cookies "{cookie_path}" -g -f "{format}" {link}'
     )
