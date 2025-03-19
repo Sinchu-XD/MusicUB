@@ -27,21 +27,22 @@ RPREFIX = config.RPREFIX
 
 
 def cookies():
-    folder_path = f"{os.getcwd()}/cookies"
+    folder_path = os.path.abspath(f"{os.getcwd()}/cookies")  
     txt_files = glob.glob(os.path.join(folder_path, "*.txt"))
     if not txt_files:
-        raise FileNotFoundError("No .txt files found in the specified folder.")
+        raise FileNotFoundError("No .txt files found in the cookies folder.")
     cookie_txt_file = random.choice(txt_files)
-    return f"""cookies/{str(cookie_txt_file).split("/")[-1]}"""
+    return os.path.join(folder_path, os.path.basename(cookie_txt_file))
 
 
 async def ytdl(format: str, link: str):
     stdout, stderr = await bash(
-        f'yt-dlp --geo-bypass -g -f --cookies {cookies()} -f "{format}" {link}'
+        f'yt-dlp --geo-bypass --cookies-from-browser chrome -g -f "{format}" {link}'
     )
     if stdout:
         return 1, stdout
     return 0, stderr
+
 
 
 async def bash(cmd):
