@@ -5,6 +5,8 @@ import os
 import asyncio
 import time
 import subprocess
+import config
+
 
 SEEK_COMMAND = ["seek"]
 
