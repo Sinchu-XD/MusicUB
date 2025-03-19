@@ -33,7 +33,7 @@ async def playVideo(chat_id, video_file=audio_file):
                 audio_parameters=AudioQuality.STUDIO,
                 video_parameters=VideoQuality.UHD_4K,
                 video_file,
-            ),
+            )
         )
         return True, None
     except Exception as e:
