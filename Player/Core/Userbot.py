@@ -6,6 +6,8 @@ Copyright ©️ 2025
 from Player import call
 from pytgcalls.types import MediaStream, VideoQuality, AudioQuality
 from Player.Utils.Queue import QUEUE  # Import Queue
+import asyncio
+
 
 audio_file = "http://docs.evostream.com/sample_content/assets/sintel1m720p.mp4"
 
