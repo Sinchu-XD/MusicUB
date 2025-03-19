@@ -34,11 +34,10 @@ def cookies():
     cookie_txt_file = random.choice(txt_files)
     return os.path.join(folder_path, os.path.basename(cookie_txt_file))
 
-
 async def ytdl(format: str, link: str):
-    cookie_path = cookies()  # Get the correct absolute path
+    cookie_path = cookies()  
     stdout, stderr = await bash(
-        f'yt-dlp --geo-bypass -g --cookies "{cookie_path}" -f "{format}" {link}'
+        f'yt-dlp --geo-bypass --cookies "{cookie_path}" -g -f "{format}" {link}'
     )
     if stdout:
         return 1, stdout
