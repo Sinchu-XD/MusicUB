@@ -36,8 +36,9 @@ def cookies():
 
 
 async def ytdl(format: str, link: str):
+    cookie_path = cookies()  # Get the correct absolute path
     stdout, stderr = await bash(
-        f'yt-dlp --geo-bypass --cookies-from-browser chrome -g -f "{format}" {link}'
+        f'yt-dlp --geo-bypass -g --cookies "{cookie_path}" -f "{format}" {link}'
     )
     if stdout:
         return 1, stdout
