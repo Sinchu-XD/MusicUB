@@ -1,3 +1,4 @@
+"""
 from Player import app
 from Player.Core import Userbot
 from pyrogram import filters
@@ -80,3 +81,4 @@ async def seek_audio(_, message):
     except ValueError:
         return await message.reply_text("❌ **Invalid Seek Time! Enter a number (in seconds).**")
         
+"""
