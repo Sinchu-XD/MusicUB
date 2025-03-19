@@ -13,7 +13,7 @@ audio_file = "http://docs.evostream.com/sample_content/assets/sintel1m720p.mp4"
 
 async def check_queue_and_leave(chat_id):
     """Checks if queue is empty and makes the bot leave VC."""
-    await asyncio.sleep(3)  # Small delay to ensure the song is actually finished
+    
 
     if chat_id in QUEUE and len(QUEUE[chat_id]) == 0:
         del QUEUE[chat_id]
