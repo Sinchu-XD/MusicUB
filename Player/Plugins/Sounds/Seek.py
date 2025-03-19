@@ -6,6 +6,7 @@ import asyncio
 import time
 import subprocess
 import config
+from Player.Utils.Queue import QUEUE
 
 
 SEEK_COMMAND = ["seek"]
