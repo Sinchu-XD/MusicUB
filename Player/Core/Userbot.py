@@ -11,14 +11,6 @@ import asyncio
 
 audio_file = "http://docs.evostream.com/sample_content/assets/sintel1m720p.mp4"
 
-async def check_queue_and_leave(chat_id):
-    """Checks if queue is empty and makes the bot leave VC."""
-    
-
-    if chat_id in QUEUE and len(QUEUE[chat_id]) == 0:
-        del QUEUE[chat_id]
-        await call.leave_call(chat_id)
-        print(f"✅ Bot left VC in chat {chat_id}")
 
 async def playAudio(chat_id, audio_file=audio_file):
     """Plays an audio file in VC."""
@@ -32,10 +24,7 @@ async def playAudio(chat_id, audio_file=audio_file):
             ),
         )
 
-        # Check and leave VC when song ends
-        await check_queue_and_leave(chat_id)
-        return True, None
-
+        
     except Exception as e:
         return False, f"Error:- <code>{e}</code>"
 
@@ -52,10 +41,7 @@ async def playVideo(chat_id, video_file=audio_file):
             ),
         )
         
-        # Check and leave VC when video ends
-        await check_queue_and_leave(chat_id)
-        return True, None
-
+        
     except Exception as e:
         return False, f"Error:- <code>{e}</code>"
 
