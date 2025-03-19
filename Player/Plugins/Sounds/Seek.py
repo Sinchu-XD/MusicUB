@@ -45,20 +45,21 @@ async def seek_audio(_, message):
         if chat_id not in QUEUE or not QUEUE[chat_id]:
             return await message.reply_text("❌ **No song is currently playing!**")
 
-        # 🔍 DEBUGGING: Print queue structure (Only for debugging, remove later)
+        # 🔍 DEBUGGING: Print queue structure
         print(f"Queue Structure for {chat_id}: {QUEUE[chat_id]}")
 
-        # Extract song info
-        song_info = QUEUE[chat_id][0] if isinstance(QUEUE[chat_id], list) else QUEUE[chat_id]
+        # Extract song info - Handling multiple queue formats
+        song_info = None
+        if isinstance(QUEUE[chat_id], dict):
+            song_info = QUEUE[chat_id]  # Direct dictionary case
+        elif isinstance(QUEUE[chat_id], list) and isinstance(QUEUE[chat_id][0], dict):
+            song_info = QUEUE[chat_id][0]  # First item in queue (list of dicts)
 
-        # Ensure song_info is a dictionary and contains 'file_path'
-        if not isinstance(song_info, dict):
-            return await message.reply_text("❌ **Invalid queue format. Please check the bot setup.**")
-
-        song_path = song_info.get("file_path")
-        if not song_path:
+        # Check if song_info is valid
+        if not song_info or "file_path" not in song_info:
             return await message.reply_text("❌ **Unable to find the currently playing song file.**")
 
+        song_path = song_info["file_path"]
         new_song_path = f"{song_path}_seeked.mp3"
 
         await message.reply_text(f"⏩ Seeking to `{seek_time}` seconds...")
