@@ -26,13 +26,6 @@ PREFIX = config.PREFIX
 RPREFIX = config.RPREFIX
 
 
-def cookies():
-    folder_path = os.path.abspath(f"{os.getcwd()}/cookies")  
-    txt_files = glob.glob(os.path.join(folder_path, "*.txt"))
-    if not txt_files:
-        raise FileNotFoundError("No .txt files found in the cookies folder.")
-    cookie_txt_file = random.choice(txt_files)
-    return os.path.join(folder_path, os.path.basename(cookie_txt_file))
 
 async def ytdl(format: str, link: str):
     cookie_path = "cookies/cookies.txt"  # Ensure this matches the correct path
