@@ -148,8 +148,19 @@ async def _aPlay(_, message):
                 f"**ѕσηg ιѕ ρℓαуιηg ιη ν¢**\n\n**SongName**:- [{title[:19]}]({link})\n**Duration**:- {duration}\n**Requested By**:- {mention}\n\n**Respose Time**:- {total_time_taken}",
                 disable_web_page_preview=True,
             )
-        await asyncio.sleep(5)
-        await m.delete()
+        await asyncio.sleep(2)
+        await check_queue_and_leave(chat_id)  # Check if the queue is empty after playing
+
+
+    async def check_queue_and_leave(chat_id):
+        """Check if the queue is empty and leave VC if necessary."""
+        await asyncio.sleep(3)
+        if chat_id in QUEUE and len(QUEUE[chat_id]) == 0:
+            del QUEUE[chat_id]
+            await Userbot.stopAudio(chat_id)
+            await asyncio.sleep(2)
+            await Userbot.leaveVC(chat_id)
+            print(f"Bot left VC in chat {chat_id}")
 
 
 @app.on_message((filters.command(PLAY_COMMAND, [PREFIX, RPREFIX])) & SUDOERS)
