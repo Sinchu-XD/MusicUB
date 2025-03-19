@@ -45,20 +45,27 @@ async def seek_audio(_, message):
         if chat_id not in QUEUE or not QUEUE[chat_id]:
             return await message.reply_text("❌ **No song is currently playing!**")
 
-        # Ensure the first item in queue is a dictionary
-        song_info = QUEUE[chat_id][0] if isinstance(QUEUE[chat_id], list) else QUEUE[chat_id]
-        
-        if not isinstance(song_info, dict) or "file_path" not in song_info:
-            return await message.reply_text("❌ **Unable to find current playing song file.**")
+        # 🔍 DEBUGGING: Print queue structure (Only for debugging, remove later)
+        print(f"Queue Structure for {chat_id}: {QUEUE[chat_id]}")
 
-        song_path = song_info["file_path"]
+        # Extract song info
+        song_info = QUEUE[chat_id][0] if isinstance(QUEUE[chat_id], list) else QUEUE[chat_id]
+
+        # Ensure song_info is a dictionary and contains 'file_path'
+        if not isinstance(song_info, dict):
+            return await message.reply_text("❌ **Invalid queue format. Please check the bot setup.**")
+
+        song_path = song_info.get("file_path")
+        if not song_path:
+            return await message.reply_text("❌ **Unable to find the currently playing song file.**")
+
         new_song_path = f"{song_path}_seeked.mp3"
 
         await message.reply_text(f"⏩ Seeking to `{seek_time}` seconds...")
 
         trimmed_song_path = await trim_audio(song_path, new_song_path, seek_time)
 
-        # Stop current playback and play the trimmed file
+        # Stop current playback before playing the new file
         await Userbot.stopAudio(chat_id)  
         Status, Text = await Userbot.playAudio(chat_id, trimmed_song_path)
 
