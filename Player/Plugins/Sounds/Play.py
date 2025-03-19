@@ -49,15 +49,6 @@ async def bash(cmd):
     out = stdout.decode().strip()
     return out, err
 
-async def check_queue_and_leave(chat_id):
-        """Check if the queue is empty and leave VC if necessary."""
-        await asyncio.sleep(3)
-        if chat_id in QUEUE and len(QUEUE[chat_id]) == 0:
-            del QUEUE[chat_id]
-            await Userbot.stopAudio(chat_id)
-            await asyncio.sleep(2)
-            await Userbot.leaveVC(chat_id)
-            print(f"Bot left VC in chat {chat_id}")
 
 async def processReplyToMessage(message):
     msg = message.reply_to_message
@@ -158,7 +149,7 @@ async def _aPlay(_, message):
                 disable_web_page_preview=True,
             )
         await asyncio.sleep(2)
-        await check_queue_and_leave(chat_id)  # Check if the queue is empty after playing
+        await m.delete()
 
 
     
@@ -193,3 +184,5 @@ async def _raPlay(_, message):
                 f"**ѕσηg ιѕ ρℓαуιηg ιη ν¢**\n\n**SongName**:- [{message.reply_to_message.audio.title[:19]}]({message.reply_to_message.link})\n**Duration**:- {message.reply_to_message.audio.duration}\n**Requested By**:- {mention}\n\n**Response Time**:- {total_time_taken}",
                     disable_web_page_preview=True,
             )
+        await asyncio.sleep(2)
+        await m.delete()
