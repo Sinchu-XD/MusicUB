@@ -1,16 +1,11 @@
 from Player import app
 from Player.Core import Userbot
 from pyrogram import filters
-import os
 import asyncio
-import time
-import subprocess
 import config
 from Player.Utils.Queue import QUEUE
 
-
 SEEK_COMMAND = ["seek"]
-
 PREFIX = config.PREFIX
 RPREFIX = config.RPREFIX
 
@@ -50,22 +45,30 @@ async def seek_audio(_, message):
         if chat_id not in QUEUE or not QUEUE[chat_id]:
             return await message.reply_text("❌ **No song is currently playing!**")
 
-        song_info = QUEUE[chat_id][0]  # Get the currently playing song
-        song_path = song_info["file_path"]
+        # Ensure the first item in queue is a dictionary
+        song_info = QUEUE[chat_id][0] if isinstance(QUEUE[chat_id], list) else QUEUE[chat_id]
+        
+        if not isinstance(song_info, dict) or "file_path" not in song_info:
+            return await message.reply_text("❌ **Unable to find current playing song file.**")
 
+        song_path = song_info["file_path"]
         new_song_path = f"{song_path}_seeked.mp3"
+
         await message.reply_text(f"⏩ Seeking to `{seek_time}` seconds...")
 
         trimmed_song_path = await trim_audio(song_path, new_song_path, seek_time)
 
+        # Stop current playback and play the trimmed file
+        await Userbot.stopAudio(chat_id)  
         Status, Text = await Userbot.playAudio(chat_id, trimmed_song_path)
+
         if Status == False:
             return await message.reply_text(f"❌ Error: {Text}")
 
         await message.reply_text(
-            f"✅ **Skipped to {seek_time} seconds!**\n🎵 **Now Playing:** {song_info['title']}\n🎤 **Requested by:** {mention}"
+            f"✅ **Skipped to {seek_time} seconds!**\n🎵 **Now Playing:** {song_info.get('title', 'Unknown')}\n🎤 **Requested by:** {mention}"
         )
 
     except ValueError:
         return await message.reply_text("❌ **Invalid Seek Time! Enter a number (in seconds).**")
-
+        
