@@ -60,7 +60,7 @@ async def kang_sticker(client: Client, message: Message):
 # 🔹 Quotly Command - Generate Stylish Quotes
 import os
 import base64
-
+import aiohttp
 
 # API Endpoint
 QUOTLY_API = "https://bot.lyo.su/quote/generate"
