@@ -1,7 +1,7 @@
 import os
 import requests
 from pyrogram import Client, filters
-from pyrogram.types import Message, InputStickerSet, InputSticker
+from pyrogram.types import Message, InputSticker
 from Player import app
 
 
@@ -22,10 +22,17 @@ async def kang_sticker(client: Client, message: Message):
     user = await client.get_me()
     pack_name = f"LookAbhi_{user.id}"
 
-    # Check if sticker pack exists
-    existing_packs = await client.invoke("stickers.getStickerSet", name=pack_name)
-    if not existing_packs:
-        # Create a new sticker pack
+    try:
+        # Create or add sticker to pack
+        await client.invoke(
+            "stickers.addStickerToSet",
+            user_id=user.id,
+            name=pack_name,
+            sticker=InputSticker(sticker=file_path, emoji=sticker_emoji)
+        )
+        await message.reply_text(f"✅ Sticker Added! [View Pack](https://t.me/addstickers/{pack_name})")
+    except Exception:
+        # If the pack doesn't exist, create a new one
         await client.invoke(
             "stickers.createStickerSet",
             user_id=user.id,
@@ -34,15 +41,6 @@ async def kang_sticker(client: Client, message: Message):
             stickers=[InputSticker(sticker=file_path, emoji=sticker_emoji)]
         )
         await message.reply_text(f"✅ New Sticker Pack Created! [Click Here](https://t.me/addstickers/{pack_name})")
-    else:
-        # Add sticker to existing pack
-        await client.invoke(
-            "stickers.addStickerToSet",
-            user_id=user.id,
-            name=pack_name,
-            sticker=InputSticker(sticker=file_path, emoji=sticker_emoji)
-        )
-        await message.reply_text(f"✅ Sticker Added! [View Pack](https://t.me/addstickers/{pack_name})")
 
     os.remove(file_path)
 
