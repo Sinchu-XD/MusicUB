@@ -21,29 +21,25 @@ RPREFIX = config.RPREFIX
 
 PLAYLIST_COMMAND = ["PL", "PLAYLIST"]
 
-
 @app.on_message((filters.command(PLAYLIST_COMMAND, [PREFIX, RPREFIX])) & filters.group)
 async def _aPlay(_, message):
     start_time = time.time()
     chat_id = message.chat.id
 
-    # Ensure command has query
     if len(message.command) < 2:
         return await message.reply_text("❌ Please enter a playlist name or YouTube playlist link.")
 
     m = await message.reply_text("🔍 Searching for your playlist...")
 
     query = message.text.split(maxsplit=1)[1]
-    video_id = extract_playlist_id(query)
+    video_id = extract_playlist_id(query)  
+
+    if not video_id:
+        return await m.edit("❌ Invalid playlist link. Please provide a valid YouTube playlist URL.")
 
     try:
-        if video_id is None:
-            video_id = query  # Assume query is a title if not a playlist link
-
-        # Fetch playlist details
         title, videoCount, link = searchPlaylist(video_id)
 
-        # Check if playlist is found
         if not title or not videoCount or not link:
             return await m.edit("❌ No results found. Please check the playlist link or try a different query.")
 
@@ -53,21 +49,23 @@ async def _aPlay(_, message):
     except Exception as e:
         return await m.edit(f"⚠️ Error fetching playlist: <code>{e}</code>")
 
-    await m.edit(f"✅ Found Playlist: **{title}**\n🎵 Fetching songs...")
+    await m.edit(f"✅ Playlist Found: **{title}**\n🎵 Fetching songs...")
+
+    # Ensure the link is valid before downloading
+    if not link.startswith("http"):
+        return await m.edit("❌ The extracted playlist link is invalid. Please check and try again.")
 
     format = "bestaudio"
     resp, songlinks = await ytdl(format, link)
 
-    if resp == 0:
-        return await m.edit(f"❌ yt-dl issue detected\n\n» `{songlinks}`")
+    if resp == 0 or not songlinks:
+        return await m.edit(f"❌ yt-dlp error detected\n\n» `{songlinks}`")
 
-    # Split multiple URLs from yt-dlp
     songlinks = songlinks.strip().split("\n")
-    
-    if not songlinks or len(songlinks) == 0:
-        return await m.edit("❌ Playlist is empty or songs could not be retrieved.")
 
-    # Play first song and queue the rest
+    if not songlinks:
+        return await m.edit("❌ The playlist is empty or could not be retrieved.")
+
     songlinkplay = songlinks[0]
 
     for songlink in songlinks:
@@ -76,7 +74,6 @@ async def _aPlay(_, message):
         add_to_queue(chat_id, title[:19], videoCount, songlink, link)
         videoCount -= 1
 
-    # Play the first song
     Status, Text = await Userbot.playAudio(chat_id, songlinkplay)
 
     if not Status:
