@@ -122,11 +122,14 @@ async def quote_message(client, message):
 
     file_path = await fetch_quote(content)
 
-    if file_path:
-        await message.reply_photo(file_path, caption="✨ Here is your quote!")
-        os.remove(file_path)
-    else:
-        await message.reply_text("❌ Failed to generate the quote.")
+    if os.path.exists(file_path) and os.path.getsize(file_path) > 0:
+    converted_file = file_path.replace(".webp", ".png")
+    Image.open(file_path).save(converted_file, "PNG")
+    await message.reply_photo(converted_file, caption="✨ Here is your quote!")
+    os.remove(file_path)
+    os.remove(converted_file)
+else:
+    await message.reply_text("❌ Quote generation failed. Please try again.")
 
     await msg.delete()
 
