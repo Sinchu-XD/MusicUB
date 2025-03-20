@@ -150,7 +150,7 @@ async def generate_response(message, category, emoji, unit=""):
     percentage = random.randint(1, 100)
     text = f"**{emoji} {user.mention} is {percentage}% {category}{unit}!**"
 
-    await message.reply_photo(photo=IMAGES[category], caption=text, reply_markup=BUTTON)
+    await message.reply_photo(photo=IMAGES[category], caption=text)
 
 
 @app.on_message(filters.command("horny"))
