@@ -5,7 +5,7 @@ from pyrogram.raw.functions.messages import GetStickerSet
 from pyrogram.raw.types import InputStickerSetShortName, InputDocument, InputStickerSetItem
 from pyrogram.enums import ChatType
 from pyrogram.types import Message
-
+import random
 from Player import app
 
 
