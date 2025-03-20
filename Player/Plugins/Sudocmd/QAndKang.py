@@ -64,30 +64,28 @@ async def quotly(client: Client, message: Message):
         return await message.reply_text("❌ Reply to a message to create a quote!")
 
     msg_text = message.reply_to_message.text or message.reply_to_message.caption
-
     if not msg_text:
         return await message.reply_text("❌ Cannot quote an empty message!")
 
-    url = "https://api.quotly.xyz/generate"
-    data = {"quote": msg_text, "author": message.reply_to_message.from_user.first_name}
+    url = "https://api.quotable.io/random"  # Alternative API
 
     try:
-        response = requests.post(url, json=data, timeout=10)
-
+        response = requests.get(url, timeout=10)
         if response.status_code == 200:
-            await message.reply_photo(response.content)
+            quote_data = response.json()
+            quote_text = f"**{quote_data['content']}**\n\n- {quote_data['author']}"
+            await message.reply_text(quote_text)
         else:
             await message.reply_text(f"❌ API Error {response.status_code}: {response.text}")
 
     except requests.exceptions.ConnectionError:
-        await message.reply_text("❌ Unable to connect to Quotly API. The service may be down!")
+        await message.reply_text("❌ Unable to connect to the API. Try again later!")
 
     except requests.exceptions.Timeout:
         await message.reply_text("⏳ API request timed out. Try again later!")
 
     except Exception as e:
         await message.reply_text(f"⚠️ Unexpected error: {str(e)}")
-
 # Start UserBot
 print("🚀 UserBot is Running!")
 
