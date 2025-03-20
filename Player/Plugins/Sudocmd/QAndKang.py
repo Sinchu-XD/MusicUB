@@ -123,13 +123,13 @@ async def quote_message(client, message):
     file_path = await fetch_quote(content)
 
     try:
-        await message.reply_photo(converted_file, caption="✨ Here is your quote!")
+        await message.reply_photo(file_path, caption="✨ Here is your quote!")
     except Exception as e:
-        await message.reply_document(converted_file, caption="✨ Here is your quote!")
+        await message.reply_document(file_path, caption="✨ Here is your quote!")
     
     # Cleanup
     os.remove(file_path)
-    os.remove(converted_file)
+    
 
     await msg.delete()
 
