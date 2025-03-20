@@ -70,13 +70,23 @@ async def quotly(client: Client, message: Message):
 
     url = "https://api.quotly.xyz/generate"
     data = {"quote": msg_text, "author": message.reply_to_message.from_user.first_name}
-    
-    response = requests.post(url, json=data)
 
-    if response.status_code == 200:
-        await message.reply_photo(response.content)
-    else:
-        await message.reply_text("❌ Failed to generate a quote!")
+    try:
+        response = requests.post(url, json=data, timeout=10)
+
+        if response.status_code == 200:
+            await message.reply_photo(response.content)
+        else:
+            await message.reply_text(f"❌ API Error {response.status_code}: {response.text}")
+
+    except requests.exceptions.ConnectionError:
+        await message.reply_text("❌ Unable to connect to Quotly API. The service may be down!")
+
+    except requests.exceptions.Timeout:
+        await message.reply_text("⏳ API request timed out. Try again later!")
+
+    except Exception as e:
+        await message.reply_text(f"⚠️ Unexpected error: {str(e)}")
 
 # Start UserBot
 print("🚀 UserBot is Running!")
