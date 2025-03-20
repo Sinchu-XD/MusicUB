@@ -32,6 +32,8 @@ async def _aPlay(_, message):
     query = message.text.split(maxsplit=1)[1]
     video_id = extract_playlist_id(query)
 
+    print(f"DEBUG: Extracted Playlist ID: {video_id}")  # Debugging
+
     if not video_id:  
         # If no playlist ID is found, assume it's a normal search query
         video_id = query  
@@ -39,6 +41,8 @@ async def _aPlay(_, message):
 
     try:
         title, videoCount, link = searchPlaylist(video_id)
+
+        print(f"DEBUG: Title: {title}, Video Count: {videoCount}, Link: {link}")  # Debugging
 
         if not title or not videoCount or not link:
             return await m.edit("❌ No results found. Please check the playlist link or try a different search.")
@@ -57,6 +61,8 @@ async def _aPlay(_, message):
 
     format = "bestaudio"
     resp, songlinks = await ytdl(format, link)
+
+    print(f"DEBUG: yt-dlp Response: {resp}, Song Links: {songlinks}")  # Debugging
 
     if resp == 0 or not songlinks:
         return await m.edit(f"❌ yt-dlp error detected\n\n» `{songlinks}`")
