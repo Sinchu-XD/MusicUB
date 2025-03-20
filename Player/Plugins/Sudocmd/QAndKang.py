@@ -133,6 +133,55 @@ async def quote_message(client, message):
 
     await msg.delete()
 
+# Image URLs
+IMAGES = {
+    "horny": "https://telegra.ph/file/daad931db960ea40c0fca.gif",
+    "gay": "https://telegra.ph/file/a23e9fd851fb6bc771686.gif",
+    "lezbian": "https://telegra.ph/file/5609b87f0bd461fc36acb.gif",
+    "boob": "https://i.gifer.com/8ZUg.gif",
+    "cock": "https://telegra.ph/file/423414459345bf18310f5.gif",
+    "cute": "https://64.media.tumblr.com/d701f53eb5681e87a957a547980371d2/tumblr_nbjmdrQyje1qa94xto1_500.gif",
+}
+
+# Command Handlers
+async def generate_response(message, category, emoji, unit=""):
+    """Generates a random response with a percentage and an image."""
+    user = message.from_user
+    percentage = random.randint(1, 100)
+    text = f"**{emoji} {user.mention} is {percentage}% {category}{unit}!**"
+
+    await message.reply_photo(photo=IMAGES[category], caption=text, reply_markup=BUTTON)
+
+
+@app.on_message(filters.command("horny"))
+async def horny_cmd(client, message):
+    await generate_response(message, "horny", "🔥")
+
+
+@app.on_message(filters.command("gay"))
+async def gay_cmd(client, message):
+    await generate_response(message, "gay", "🍷")
+
+
+@app.on_message(filters.command("lezbian"))
+async def lezbian_cmd(client, message):
+    await generate_response(message, "lezbian", "💜")
+
+
+@app.on_message(filters.command("boob"))
+async def boob_cmd(client, message):
+    await generate_response(message, "boob", "🍒", " boob size")
+
+
+@app.on_message(filters.command("cock"))
+async def cock_cmd(client, message):
+    await generate_response(message, "cock", "🍆", "cm")
+
+
+@app.on_message(filters.command("cute"))
+async def cute_cmd(client, message):
+    await generate_response(message, "cute", "🍑")
+
 
 # Start UserBot
 print("🚀 UserBot is Running!")
