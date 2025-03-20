@@ -66,13 +66,30 @@ import base64
 QUOTLY_API = "https://bot.lyo.su/quote/generate"
 
 
+async def fetch_quote(content):
+    """Fetch the quote image from API"""
+    async with aiohttp.ClientSession() as session:
+        async with session.post(API_URL, json=content) as resp:
+            data = await resp.json()
+            if data.get("ok"):
+                image_data = base64.b64decode(data["result"]["image"])
+                file_path = "quote.webp"
+                with open(file_path, "wb") as f:
+                    f.write(image_data)
+                return file_path
+            return None
+
 @app.on_message(filters.command("q") & filters.reply)
-async def quottly(client, message):
-    msg = await message.reply_text("⚡ Generating Quote...")
+async def quote_message(client, message):
+    """Handle /q command to generate a quote"""
     reply = message.reply_to_message
-    sender = reply.from_user
-    
-    # Prepare Quote Data
+
+    if not reply:
+        return await message.reply_text("❌ Please reply to a message to create a quote!")
+
+    msg = await message.reply_text("⏳ Generating quote...")
+
+    user = reply.from_user
     content = {
         "type": "quote",
         "format": "webp",
@@ -82,36 +99,32 @@ async def quottly(client, message):
         "scale": 2,
         "messages": [
             {
+                "entities": [],
                 "chatId": reply.chat.id,
                 "avatar": True,
                 "from": {
-                    "id": sender.id,
-                    "first_name": sender.first_name or "Deleted Account",
-                    "username": sender.username,
-                    "language_code": "en"
+                    "id": user.id,
+                    "first_name": user.first_name,
+                    "last_name": user.last_name,
+                    "username": user.username,
+                    "language_code": "en",
+                    "title": user.first_name,
+                    "name": f"{user.first_name} {user.last_name or ''}".strip(),
+                    "type": "private",
                 },
-                "text": reply.text or "",
+                "text": reply.text or "🖼 Media Message",
             }
         ],
     }
-    
-    try:
-        response = requests.post(QUOTLY_API, json=content, timeout=10)
-        response.raise_for_status()
-        data = response.json()
-        
-        if data.get("ok"):
-            file_path = "quote.webp"
-            with open(file_path, "wb") as file:
-                file.write(base64.b64decode(data["result"]["image"]))
-            
-            await message.reply_document(file_path, caption="Here's your quote!")
-            os.remove(file_path)
-        else:
-            await msg.edit("❌ Failed to generate a quote!")
-    except requests.exceptions.RequestException as e:
-        await msg.edit(f"❌ API Error: {str(e)}")
-    
+
+    file_path = await fetch_quote(content)
+
+    if file_path:
+        await message.reply_photo(file_path, caption="✨ Here is your quote!")
+        os.remove(file_path)
+    else:
+        await message.reply_text("❌ Failed to generate the quote.")
+
     await msg.delete()
 
 
