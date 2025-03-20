@@ -14,7 +14,7 @@ STICKER_PACK_TITLE = "LookAbhi Stickers"
 
 
 # 🔹 Kang Command - Steal Stickers & Add to User's Pack
-@app.on_message(filters.command("kang") & filters.me)
+@app.on_message(filters.command("kang") & (filters.group | filters.private))
 async def kang_sticker(client: Client, message: Message):
     if not message.reply_to_message or not message.reply_to_message.sticker:
         return await message.reply_text("❌ Reply to a sticker to kang it!")
@@ -24,7 +24,7 @@ async def kang_sticker(client: Client, message: Message):
     sticker_emoji = sticker.emoji if sticker.emoji else "🔥"
 
     user = await client.get_me()
-    pack_name = f"LookAbhi_{user.id}"
+    pack_name = f"{STICKER_PACK_NAME}_{user.id}"  # Unique pack name for each user
 
     try:
         # Check if the sticker pack exists
@@ -33,40 +33,32 @@ async def kang_sticker(client: Client, message: Message):
     except Exception:
         pack_exists = False
 
-    # Upload sticker file
-    sticker_file = await client.invoke(
-        "upload.getFile",
-        file=file_path
-    )
-    sticker_doc = InputDocument(
-        id=sticker_file.id,
-        access_hash=sticker_file.access_hash,
-        file_reference=sticker_file.file_reference
-    )
-
     if pack_exists:
         # Add sticker to existing pack
-        await client.invoke(
-            "stickers.addStickerToSet",
+        await client.add_sticker_to_set(
             user_id=user.id,
-            stickers=[InputStickerSetItem(document=sticker_doc, emoji=sticker_emoji)],
-            name=pack_name
+            name=pack_name,
+            png_sticker=file_path,
+            emojis=sticker_emoji
         )
         await message.reply_text(f"✅ Sticker Added! [View Pack](https://t.me/addstickers/{pack_name})")
     else:
         # Create a new sticker pack
-        await client.invoke(
-            "stickers.createStickerSet",
+        await client.create_sticker_set(
             user_id=user.id,
-            title=STICKER_PACK_TITLE,
             name=pack_name,
-            stickers=[InputStickerSetItem(document=sticker_doc, emoji=sticker_emoji)]
+            title=STICKER_PACK_TITLE,
+            png_sticker=file_path,
+            emojis=sticker_emoji
         )
         await message.reply_text(f"✅ New Sticker Pack Created! [Click Here](https://t.me/addstickers/{pack_name})")
 
-    os.remove(file_path)
+    os.remove(file_path)  # Cleanup temp file
+
+
+
 # 🔹 Quotly Command - Generate Stylish Quotes
-@app.on_message(filters.command("quote") & filters.me)
+@app.on_message(filters.command("q") & (filters.group | filters.private))
 async def quotly(client: Client, message: Message):
     if not message.reply_to_message:
         return await message.reply_text("❌ Reply to a message to create a quote!")
