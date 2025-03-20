@@ -11,9 +11,7 @@ from Player.Plugins.Sounds.Play import ytdl
 
 from pyrogram import filters
 import asyncio
-import random
 import time
-
 import config
 
 PREFIX = config.PREFIX
@@ -32,16 +30,18 @@ async def _aPlay(_, message):
     m = await message.reply_text("🔍 Searching for your playlist...")
 
     query = message.text.split(maxsplit=1)[1]
-    video_id = extract_playlist_id(query)  
+    video_id = extract_playlist_id(query)
 
-    if not video_id:
-        return await m.edit("❌ Invalid playlist link. Please provide a valid YouTube playlist URL.")
+    if not video_id:  
+        # If no playlist ID is found, assume it's a normal search query
+        video_id = query  
+        await m.edit("🔄 No direct playlist link found. Searching YouTube instead...")
 
     try:
         title, videoCount, link = searchPlaylist(video_id)
 
         if not title or not videoCount or not link:
-            return await m.edit("❌ No results found. Please check the playlist link or try a different query.")
+            return await m.edit("❌ No results found. Please check the playlist link or try a different search.")
 
         videoCount = int(videoCount)
         total_videos = videoCount
@@ -51,7 +51,7 @@ async def _aPlay(_, message):
 
     await m.edit(f"✅ Playlist Found: **{title}**\n🎵 Fetching songs...")
 
-    # Ensure the link is valid before downloading
+    # Validate if the link is correct
     if not link.startswith("http"):
         return await m.edit("❌ The extracted playlist link is invalid. Please check and try again.")
 
