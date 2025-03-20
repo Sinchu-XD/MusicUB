@@ -11,11 +11,8 @@ from Player import LOGGER
 from Player.Plugins import ALL_MODULES
 from Player import app, call
 
-loop = asyncio.get_event_loop()
-
 
 async def init():
-
     await app.start()
     LOGGER("Player").info("Account Started Successfully")
 
@@ -28,7 +25,7 @@ async def init():
 
 
 if __name__ == "__main__":
-    loop.run_until_complete(init())
-    LOGGER("Player").info("Stopping Music Bot! GoodBye")
-
-
+    try:
+        asyncio.run(init())  # ✅ This avoids event loop conflicts
+    except KeyboardInterrupt:
+        LOGGER("Player").info("Stopping Music Bot! GoodBye")
