@@ -66,7 +66,7 @@ from random import choice
 import aiohttp
 
 # API Endpoint
-QUOTLY_API = "https://bot.lyo.su/quote/generate"
+API_URL = "https://bot.lyo.su/quote/generate"
 
 
 async def fetch_quote(content):
