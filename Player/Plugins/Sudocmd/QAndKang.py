@@ -88,4 +88,4 @@ async def quotly(client: Client, message: Message):
 
 # Start UserBot
 print("🚀 UserBot is Running!")
-app.run()
+
