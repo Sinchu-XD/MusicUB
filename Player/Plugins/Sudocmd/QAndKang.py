@@ -58,8 +58,11 @@ async def kang_sticker(client: Client, message: Message):
 
 
 # 🔹 Quotly Command - Generate Stylish Quotes
-import os
 import base64
+import json
+import os
+from asyncio import sleep
+from random import choice
 import aiohttp
 
 # API Endpoint
