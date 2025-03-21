@@ -1,3 +1,4 @@
+"""
 import os
 import requests
 from pyrogram import Client, filters
@@ -186,3 +187,4 @@ async def cute_cmd(client, message):
 # Start UserBot
 print("🚀 UserBot is Running!")
 
+"""
