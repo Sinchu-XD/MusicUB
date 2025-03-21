@@ -71,7 +71,7 @@ API_URL = "https://bot.lyo.su/quote/generate"
 
 
 async def fetch_quote(content):
-    """Fetch the quote image from API"""
+    '''Fetch the quote image from API'''
     async with aiohttp.ClientSession() as session:
         async with session.post(API_URL, json=content) as resp:
             data = await resp.json()
@@ -85,7 +85,7 @@ async def fetch_quote(content):
 
 @app.on_message(filters.command("q") & filters.reply)
 async def quote_message(client, message):
-    """Handle /q command to generate a quote"""
+    '''Handle /q command to generate a quote'''
     reply = message.reply_to_message
 
     if not reply:
@@ -146,7 +146,7 @@ IMAGES = {
 
 # Command Handlers
 async def generate_response(message, category, emoji, unit=""):
-    """Generates a random response with a percentage and an image."""
+    '''Generates a random response with a percentage and an image.'''
     user = message.from_user
     percentage = random.randint(1, 100)
     text = f"**{emoji} {user.mention} is {percentage}% {category}{unit}!**"
