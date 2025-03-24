@@ -6,7 +6,7 @@ Copyright ©️ 2025
 import asyncio
 from pyrogram import Client, filters
 from pytgcalls import PyTgCalls
-from pytgcalls.types import GroupCallMember, GroupCallParticipant
+from pytgcalls.types import GroupCallParticipant
 
 from Player.Core.Bot import MusicBot, MusicUser
 from .logging import LOGGER
@@ -29,7 +29,9 @@ async def participant_change_handler(_, chat_id: int, participants: list[GroupCa
 async def check_listeners(chat_id):
     await asyncio.sleep(5)  # Delay to prevent false triggers
     participants = await call.get_participants(chat_id)
-    listeners = [p for p in participants if isinstance(p, GroupCallMember) and not p.is_self]
+
+    # Exclude the bot itself
+    listeners = [p for p in participants if not p.is_self]
 
     if not listeners:
         await app.send_message(chat_id, "**Mujhe Akela Mat Chhodo Guys**\n\n** Mujhe Akele Dar Lagta Hai..**")
