@@ -48,6 +48,7 @@ async def check_participants(chat_id):
             break  # Stop checking for this chat
 
 # Start participant monitoring when a call starts
-@call.on_stream_start()
-async def on_start(client: Client, chat_id: int):
+async def start_monitoring(chat_id):
+    """Start monitoring when the bot joins the VC."""
+    await asyncio.sleep(2)  # Wait before checking
     asyncio.create_task(check_participants(chat_id))
