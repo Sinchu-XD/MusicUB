@@ -18,7 +18,7 @@ app = MusicBot
 call = MusicUser
 
 # Notify when a user joins VC
-@call.on_participants_change()
+@call.on_participant_list_updated()
 async def participant_change_handler(_, chat_id: int, participants: list[GroupCallParticipant]):
     for participant in participants:
         if not participant.is_self:
