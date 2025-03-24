@@ -17,33 +17,37 @@ sudo()
 app = MusicBot
 call = MusicUser
 
-# Notify when a user joins VC
-@call.on_participant_list_updated()
-async def participant_change_handler(_, chat_id: int, participants: list[GroupCallParticipant]):
-    for participant in participants:
-        if not participant.is_self:
-            user = await app.get_users(participant.user_id)
-            await app.send_message(chat_id, f"👤 **{user.first_name} Joined The Voice Chat!**\n\n** ABHISHEK Aapka VC Me Swagat Karta Hai**")
+participants_cache = {}
 
-# Function to check VC listeners and leave if empty
-async def check_listeners(chat_id):
-    await asyncio.sleep(5)  # Delay to prevent false triggers
-    participants = await call.get_participants(chat_id)
+async def check_participants(chat_id):
+    """Check for user join/leave events in VC."""
+    global participants_cache
 
-    # Exclude the bot itself
-    listeners = [p for p in participants if not p.is_self]
+    while True:
+        await asyncio.sleep(5)  # Check every 5 seconds
+        participants = await call.get_participants(chat_id)
 
-    if not listeners:
-        await app.send_message(chat_id, "**Mujhe Akela Mat Chhodo Guys**\n\n** Mujhe Akele Dar Lagta Hai..**")
-        
+        # Exclude bot itself
+        listeners = [p for p in participants if not p.is_self]
+        count = len(listeners)
 
-# Notify when a user leaves VC
-@call.on_participant_list_updated()
-async def participant_leave_handler(_, chat_id: int, participants: list[GroupCallParticipant]):
-    for participant in participants:
-        if not participant.is_self:
-            user = await app.get_users(participant.user_id)
-            await app.send_message(chat_id, f"👋 {user.first_name} ** Aap Mujhe Akela Chhod Ke Mt Jaao Yrr Please**")
+        if chat_id not in participants_cache:
+            participants_cache[chat_id] = count
 
-    # Check if VC is empty after someone leaves
-    await check_listeners(chat_id)
+        if count > participants_cache[chat_id]:  # Someone joined
+            await app.send_message(chat_id, "✅ Someone joined the VC!")
+
+        elif count < participants_cache[chat_id]:  # Someone left
+            await app.send_message(chat_id, "⚠️ Someone left the VC!")
+
+        participants_cache[chat_id] = count  # Update cache
+
+        if count == 0:  # No one left in VC
+            await app.send_message(chat_id, "⚠️ No one is in VC! Leaving...")
+            await call.leave_group_call(chat_id)
+            break  # Stop checking for this chat
+
+# Start participant monitoring when a call starts
+@call.on_stream_start()
+async def on_start(client: Client, chat_id: int):
+    asyncio.create_task(check_participants(chat_id))
