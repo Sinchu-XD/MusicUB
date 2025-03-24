@@ -68,6 +68,29 @@ async def playWithLinks(link):
 
     return 0
 
+playing_status = {}
+
+async def check_listeners(chat_id):
+    while True:
+        await asyncio.sleep(10)  # Check every 10 seconds
+
+        if chat_id in playing_status and playing_status[chat_id]:  
+            participants = await vc.get_participants(chat_id)
+            listeners = [p for p in participants if isinstance(p, GroupCallMember) and not p.is_self]
+
+            if not listeners:  # No one is in VC
+                await app.send_message(chat_id, "**Mujhe Akela Mat Chhodo Guys**\n\n **Mujhe Akele Dar Lagta Hai**")
+                await vc.leave_group_call(chat_id)
+                playing_status[chat_id] = False
+                break
+
+# Notify when a user joins VC
+@vc.on_participants_change()
+async def participant_change_handler(_, chat_id: int, participants: list[GroupCallParticipant]):
+    for participant in participants:
+        if not participant.is_self:  # Ignore the bot itself
+            user = await app.get_users(participant.user_id)
+            await app.send_message(chat_id, f"** {user.first_name} Joined The Voice Chat!**\n\n** ABHISHEK Aapka VC Me Swagat Karta Hai**")
 
 @app.on_message((filters.command(PLAY_COMMAND, [PREFIX, RPREFIX])) & filters.group)
 async def _aPlay(_, message):
