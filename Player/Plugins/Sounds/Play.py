@@ -4,7 +4,7 @@ Copyright ©️ 2025
 """
 
 
-from Player import app
+from Player import app, call
 from Player.Core import Userbot
 from Player.Utils.YtDetails import searchYt, extract_video_id
 from Player.Utils.Queue import QUEUE, add_to_queue
@@ -80,12 +80,12 @@ async def check_listeners(chat_id):
 
             if not listeners:  # No one is in VC
                 await app.send_message(chat_id, "**Mujhe Akela Mat Chhodo Guys**\n\n **Mujhe Akele Dar Lagta Hai**")
-                await vc.leave_group_call(chat_id)
+                await call.leave_group_call(chat_id)
                 playing_status[chat_id] = False
                 break
 
 # Notify when a user joins VC
-@vc.on_participants_change()
+@call.on_participants_change()
 async def participant_change_handler(_, chat_id: int, participants: list[GroupCallParticipant]):
     for participant in participants:
         if not participant.is_self:  # Ignore the bot itself
