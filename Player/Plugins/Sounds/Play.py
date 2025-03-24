@@ -85,7 +85,7 @@ async def check_listeners(chat_id):
                 break
 
 # Notify when a user joins VC
-@call.on_participants_change()
+@app.on_participants_change()
 async def participant_change_handler(_, chat_id: int, participants: list[GroupCallParticipant]):
     for participant in participants:
         if not participant.is_self:  # Ignore the bot itself
