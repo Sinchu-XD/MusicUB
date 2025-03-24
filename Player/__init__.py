@@ -52,3 +52,8 @@ async def start_monitoring(chat_id):
     """Start monitoring when the bot joins the VC."""
     await asyncio.sleep(2)  # Wait before checking
     asyncio.create_task(check_participants(chat_id))
+
+async def join_vc(chat_id):
+    """Join VC and start monitoring."""
+    await call.join_group_call(chat_id, "input.raw")  # Replace with actual stream
+    await start_monitoring(chat_id)
