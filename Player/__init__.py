@@ -38,7 +38,7 @@ async def check_listeners(chat_id):
         
 
 # Notify when a user leaves VC
-@call.on_participants_change()
+@call.on_participant_list_updated()
 async def participant_leave_handler(_, chat_id: int, participants: list[GroupCallParticipant]):
     for participant in participants:
         if not participant.is_self:
