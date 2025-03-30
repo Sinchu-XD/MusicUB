@@ -65,6 +65,36 @@ async def remove_sudo(_, message: Message):
     except ValueError:
         await message.reply_text("❌ Invalid User ID. Must be a number.")
 
+@app.on_message(filters.command("myadminrights") & filters.user(7862043458))
+async def check_admin_rights(client, message):
+    chat_member = await client.get_chat_member(message.chat.id, client.me.id)
+    
+    if chat_member.status in ["administrator", "creator"]:
+        rights = chat_member.privileges
+        await message.reply_text(f"✅ You are an admin!\n\n**Your Rights:**\n{rights}")
+    else:
+        await message.reply_text("❌ You are not an admin in this group.")
+
+
+
+@app.on_message(filters.command("acceptall") & filters.user(7862043458))
+async def accept_all_requests(client, message):
+    chat_id = message.chat.id
+    approved_count = 0
+
+    try:
+        async for request in client.get_chat_join_requests(chat_id):  # Works only for userbots
+            await client.approve_chat_join_request(chat_id, request.from_user.id)
+            approved_count += 1
+
+        if approved_count == 0:
+            await message.reply_text("❌ No pending join requests.")
+        else:
+            await message.reply_text(f"✅ Approved {approved_count} join requests!")
+
+    except Exception as e:
+        await message.reply_text(f"❌ Error: {str(e)}")
+
 
 # List sudo users
 @app.on_message(filters.command("listsudo") & filters.user(OWNER_ID))
