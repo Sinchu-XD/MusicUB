@@ -32,8 +32,6 @@ async def _aPlay(_, message):
     query = message.text.split(maxsplit=1)[1]
     video_id = extract_playlist_id(query)
 
-    print(f"DEBUG: Extracted Playlist ID: {video_id}")  # Debugging
-
     if not video_id:  
         # If no playlist ID is found, assume it's a normal search query
         video_id = query  
@@ -41,8 +39,6 @@ async def _aPlay(_, message):
 
     try:
         title, videoCount, link = searchPlaylist(video_id)
-
-        print(f"DEBUG: Title: {title}, Video Count: {videoCount}, Link: {link}")  # Debugging
 
         if not title or not videoCount or not link:
             return await m.edit("❌ No results found. Please check the playlist link or try a different search.")
@@ -60,38 +56,39 @@ async def _aPlay(_, message):
         return await m.edit("❌ The extracted playlist link is invalid. Please check and try again.")
 
     format = "bestaudio"
-    resp, songlinks = await ytdl(format, link)
+    try:
+        resp, songlinks = await ytdl(format, link)
 
-    print(f"DEBUG: yt-dlp Response: {resp}, Song Links: {songlinks}")  # Debugging
+        if resp == 0 or not songlinks:
+            return await m.edit(f"❌ yt-dlp error detected\n\n» `{songlinks}`")
 
-    if resp == 0 or not songlinks:
-        return await m.edit(f"❌ yt-dlp error detected\n\n» `{songlinks}`")
+        songlinks = songlinks.strip().split("\n")
 
-    songlinks = songlinks.strip().split("\n")
+        if not songlinks:
+            return await m.edit("❌ The playlist is empty or could not be retrieved.")
 
-    if not songlinks:
-        return await m.edit("❌ The playlist is empty or could not be retrieved.")
+        songlinkplay = songlinks[0]
 
-    songlinkplay = songlinks[0]
+        for songlink in songlinks:
+            if videoCount == 0:
+                break
+            add_to_queue(chat_id, title[:19], videoCount, songlink, link)
+            videoCount -= 1
 
-    for songlink in songlinks:
-        if videoCount == 0:
-            break
-        add_to_queue(chat_id, title[:19], videoCount, songlink, link)
-        videoCount -= 1
+        Status, Text = await Userbot.playAudio(chat_id, songlinkplay)
 
-    Status, Text = await Userbot.playAudio(chat_id, songlinkplay)
+        if not Status:
+            return await m.edit(Text)
 
-    if not Status:
-        return await m.edit(Text)
+        finish_time = time.time()
+        total_time_taken = str(int(finish_time - start_time)) + "s"
 
-    finish_time = time.time()
-    total_time_taken = str(int(finish_time - start_time)) + "s"
-
-    await m.edit(
-        f"🎶 Playing all songs from **[{title[:19]}]({link})**\n"
-        f"📌 **Total Videos:** {total_videos}\n"
-        f"⏳ **Time Taken:** {total_time_taken}",
-        disable_web_page_preview=True,
-    )
+        await m.edit(
+            f"🎶 Playing all songs from **[{title[:19]}]({link})**\n"
+            f"📌 **Total Videos:** {total_videos}\n"
+            f"⏳ **Time Taken:** {total_time_taken}",
+            disable_web_page_preview=True,
+        )
     
+    except Exception as e:
+        return await m.edit(f"❌ Error occurred while processing playlist:\n`{str(e)}`")
