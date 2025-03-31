@@ -8,7 +8,7 @@ from Player.Core import Userbot
 from Player.Utils.YtDetails import searchPlaylist, extract_playlist_id
 from Player.Utils.Queue import QUEUE, add_to_queue, clear_queue
 from Player.Plugins.Sounds.Play import ytdl
-
+import os
 from pyrogram import filters
 import asyncio
 import time
@@ -18,6 +18,38 @@ PREFIX = config.PREFIX
 RPREFIX = config.RPREFIX
 
 PLAYLIST_COMMAND = ["PL", "PLAYLIST"]
+
+
+async def ytdl_playlist(format: str, playlist_link: str):
+    """
+    Fetch direct audio links for all videos in a YouTube playlist.
+    """
+    cookie_path = "cookies/cookies.txt"
+
+    if not os.path.exists(cookie_path):
+        return 0, f"❌ Cookie file not found: {cookie_path}"
+
+    command = f'yt-dlp --geo-bypass --cookies "{cookie_path}" -g -f "{format}" --yes-playlist {playlist_link}'
+    
+    stdout, stderr = await bash(command)
+
+    if stderr:
+        return 0, f"❌ yt-dlp Error: {stderr}"
+    if stdout:
+        return 1, stdout.split("\n")  # Return list of links
+    
+    return 0, "❌ Unknown error occurred."
+
+async def bash(cmd):
+    process = await asyncio.create_subprocess_shell(
+        cmd,
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE,
+    )
+    stdout, stderr = await process.communicate()
+    
+    return stdout.decode().strip(), stderr.decode().strip()
+    
 
 @app.on_message((filters.command(PLAYLIST_COMMAND, [PREFIX, RPREFIX])) & filters.group)
 async def _aPlay(_, message):
@@ -57,7 +89,7 @@ async def _aPlay(_, message):
 
     format = "bestaudio"
     try:
-        resp, songlinks = await ytdl(format, link)
+        resp, songlinks = await ytdl_playlist(format, link)
 
         if resp == 0 or not songlinks:
             return await m.edit(f"❌ yt-dlp error detected\n\n» `{songlinks}`")
