@@ -142,10 +142,10 @@ async def seek_audio(_, message):
         await call.play(
             chat_id=chat_id,
             stream=MediaStream(
-                media_path=stream_url,
+                media_path=songlink,
                 audio_parameters=AudioQuality.HIGH,
                 video_parameters=MediaStream.Flags.IGNORE,
-                ffmpeg_parameters=f"-ss {text}" if text else None,
+                ffmpeg_parameters=f"-ss {text}" if text else "25fix",
             ),
         )
         return await message.reply_text("Done.")
