@@ -79,6 +79,23 @@ def get_playlist_videos(playlist_id):
     return videos
 
 
+async def ytdl(format: str, link: str):
+    ydl_opts = {
+        'format': format,
+        'geo_bypass': True,
+        'noplaylist': True,
+        'quiet': True,
+        'cookiefile': "cookies/cookies.txt",
+        'nocheckcertificate': True,
+    }
+    
+    try:
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            info = ydl.extract_info(link, download=False)
+            return (1, info['url']) if 'url' in info else (0, "No URL found")
+    except Exception as e:
+        return (0, str(e))
+
 def get_video_duration(video_id):
     """Fetch video duration using YouTube API v3."""
     video_url = f"{YOUTUBE_API_URL}/videos"
