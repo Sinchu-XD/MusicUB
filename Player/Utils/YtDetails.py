@@ -1,14 +1,9 @@
-"""
-Telegram @Itz_Your_4Bhi @NotReallyAbhi
-Copyright ©️ 2025
-"""
-
 import requests
 import os
 from urllib.parse import urlparse, parse_qs
 import yt_dlp
 import asyncio
-
+import re
 
 # ✅ Replace with your YouTube API Key
 YOUTUBE_API_KEY = "AIzaSyAO-vb96xq-xyaYRTy9lF21rIINu67Snzg"
@@ -81,8 +76,6 @@ def get_playlist_videos(playlist_id):
     return videos
 
 
-
-
 def get_video_duration(video_id):
     """Fetch video duration using YouTube API v3."""
     video_url = f"{YOUTUBE_API_URL}/videos"
@@ -99,16 +92,11 @@ def get_video_duration(video_id):
         return "Unknown"
 
     duration_iso = data["items"][0]["contentDetails"]["duration"]
-
-from yt_dlp import YoutubeDL
-
-
-
+    return parse_duration(duration_iso)
 
 
 def parse_duration(duration):
     """Convert YouTube's ISO 8601 duration format (PT#M#S) to MM:SS."""
-    import re
     matches = re.match(r"PT(?:(\d+)M)?(?:(\d+)S)?", duration)
     minutes = int(matches[1]) if matches[1] else 0
     seconds = int(matches[2]) if matches[2] else 0
@@ -129,7 +117,8 @@ def extract_video_id(url):
         return parsed_url.path[1:]
 
     query_params = parse_qs(parsed_url.query)
-    return queryasync def ytdl(format: str, link: str):
+    return query_params.get("v", [None])[0]
+
 
 async def ytdl(format: str, link: str):
     ydl_opts = {
@@ -137,7 +126,7 @@ async def ytdl(format: str, link: str):
         'geo_bypass': True,
         'noplaylist': True,
         'quiet': True,
-        'cookiefile': "cookies/cookies.txt",  # Ensure cookies are used
+        'cookiefile': COOKIES_FILE,  # Ensure cookies are used
         'nocheckcertificate': True,
         'force_generic_extractor': True,  # Force using a generic extractor if needed
         'extractor_retries': 3,  # Retry fetching if it fails
@@ -154,6 +143,7 @@ async def ytdl(format: str, link: str):
                 return (0, "No URL found", 0)
     except Exception as e:
         return (0, str(e), 0)
+
 
 def get_direct_audio_url(video_url):
     """Fetch the direct audio URL using yt-dlp with cookies."""
@@ -172,11 +162,8 @@ def get_direct_audio_url(video_url):
         return f"❌ yt-dlp Error: {str(e)}"
 
 
-
 # ✅ Example Usage:
 if __name__ == "__main__":
-    
-
     # ✅ Playlist Example
     playlist_url = "https://www.youtube.com/playlist?list=YOUR_PLAYLIST_ID"
     playlist_id = extract_playlist_id(playlist_url)
@@ -190,3 +177,4 @@ if __name__ == "__main__":
             print(f"🎵 {title} ({duration}) - {audio_url}")
     else:
         print("❌ No videos found!")
+        
