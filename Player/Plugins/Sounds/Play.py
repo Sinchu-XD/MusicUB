@@ -46,7 +46,9 @@ async def ytdl(format: str, link: str):
         return (0, str(e))
 
 
-if msg.audio or msg.voice:
+async def processReplyToMessage(message):
+    msg = message.reply_to_message
+    if msg.audio or msg.voice:
         m = await message.reply_text("**𝓦𝓪𝓲𝓽 𝓑𝓪𝓫𝔂... 𝓓𝓸𝔀𝓷𝓵𝓸𝓪𝓭𝓲𝓷𝓰 𝓨𝓸𝓾𝓻 𝓢𝓸𝓷𝓰 ❤️**.")
         audio_original = await msg.download()
         input_filename = audio_original
