@@ -42,7 +42,7 @@ async def playVideo(chat_id, video_file=audio_file):
         return False, f"Error: <code>{e}</code>"
 
 async def play_song(chat_id: int, url: str) -> str:
-    """Play audio in the voice chat using PyTgCalls v2.1.1."""
+    """Use For Jio Saavn"""
     try:
         await call.play(
             chat_id,
