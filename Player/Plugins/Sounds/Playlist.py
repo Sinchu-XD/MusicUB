@@ -5,11 +5,10 @@ Copyright ©️ 2025
 
 from Player import app
 from Player.Core import Userbot
-from Player.Utils.YtDetails import extract_playlist_id, get_playlist_videos, get_direct_audio_url
+from Player.Utils.YtDetails import extract_playlist_id, get_playlist_videos
 from Player.Utils.Queue import QUEUE, add_to_queue, clear_queue
-from Player.Plugins.Sounds.Play import ytdl
+from Player.Utils.YTDL import ytdl  # ✅ Import ytdl function
 from pyrogram import filters
-
 import asyncio
 import time
 import config
@@ -52,16 +51,17 @@ async def _aPlay(_, message):
     for index, (title, duration, link) in enumerate(videos, start=1):
         add_to_queue(chat_id, title[:19], duration, link, link)
         if index == 1:
-            first_song = link
+            first_song = link  # ✅ Get first song for playback
 
     if not first_song:
         return await m.edit("❌ Unable to fetch first song from playlist.")
 
-    # ✅ Fetch direct audio URL using yt-dlp with cookies
-    direct_audio_url = ytdl(first_song)
+    # ✅ Get direct audio URL
+    status, direct_audio_url = await ytdl("bestaudio", first_song)
 
-    if "❌ yt-dlp Error" in direct_audio_url:
-        return await m.edit(direct_audio_url)
+    # ✅ Check for errors
+    if status == 0 or not direct_audio_url:
+        return await m.edit(f"❌ yt-dlp Error: {direct_audio_url}")
 
     # ✅ Play the first song in VC
     Status, Text = await Userbot.playAudio(chat_id, direct_audio_url)
