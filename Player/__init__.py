@@ -16,3 +16,6 @@ sudo()
 
 app = MusicBot
 call = MusicUser
+
+
+seek_chats = {}

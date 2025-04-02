@@ -5,7 +5,7 @@ Copyright ©️ 2025
 
 import config
 
-from Player import app, call
+from Player import app, call, seek_chats
 from Player.Utils.Loop import get_loop
 from Player.Utils.Delete import delete_messages
 from Player.Utils.Queue import QUEUE, get_queue
@@ -16,7 +16,6 @@ from pytgcalls.types import MediaStream, AudioQuality
 PREFIX = config.PREFIX
 RPREFIX = config.RPREFIX
 
-seek_chats = {}
 
 @app.on_message((filters.command("seek", [PREFIX, RPREFIX])) & filters.group)
 async def seek_audio(_, message):

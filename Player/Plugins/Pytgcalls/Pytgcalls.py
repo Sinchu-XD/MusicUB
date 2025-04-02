@@ -6,9 +6,9 @@ Copyright ©️ 2025
 import time
 
 from pytgcalls import PyTgCalls, filters
-from pytgcalls.types import Update, MediaStream
+from pytgcalls.types import Update, MediaStream, ChatUpdate
 
-from Player import call, app
+from Player import call, app, seek_chats
 from Player.Utils.YtDetails import ytdl
 from Player.Utils.Loop import get_loop, set_loop
 from Player.Utils.Queue import QUEUE, get_queue, clear_queue, pop_an_item
@@ -86,6 +86,7 @@ async def _skip(chat_id):
 async def handler(client: PyTgCalls, update: Update):
     start_time = time.time()
     chat_id = update.chat_id
+    del seek_chats[chat_id]
     resp = await _skip(chat_id)
     if resp == 1:
         pass
@@ -107,3 +108,11 @@ async def stop(chat_id):
         )
     except:
         pass
+
+@call.on_update(filters.chat_update(ChatUpdate.Status.LEFT_CALL))
+def on_left_call(client, update):
+    chat_id = update.chat_id
+    await stop(chat_id)
+    clear_queue(chat_id)
+    set_loop(chat_id, 0)
+    del seek_chats[chat_id]
