@@ -9,7 +9,7 @@ from pytgcalls.types import MediaStream, VideoQuality, AudioQuality
 audio_file = "http://docs.evostream.com/sample_content/assets/sintel1m720p.mp4"
 
 
-async def playAudio(chat_id, audio_file=audio_file):
+async def play_audio(chat_id, audio_file=audio_file):
     """Plays an audio file in the given chat."""
     try:
         await call.play(
@@ -25,7 +25,7 @@ async def playAudio(chat_id, audio_file=audio_file):
         return False, f"Error: <code>{e}</code>"
 
 
-async def playVideo(chat_id, video_file=audio_file):
+async def play_video(chat_id, video_file=audio_file):
     """Plays a video file in the given chat."""
     try:
         await call.play(
@@ -33,7 +33,7 @@ async def playVideo(chat_id, video_file=audio_file):
             MediaStream(
                 media_path=video_file,
                 audio_parameters=AudioQuality.STUDIO,
-                video_parameters=VideoQuality.UHD_4K,  # Corrected this part
+                video_parameters=VideoQuality.UHD_4K,
             ),
         )
         return True, None
@@ -44,7 +44,7 @@ async def playVideo(chat_id, video_file=audio_file):
 async def pause(chat_id):
     """Pauses the stream."""
     try:
-        await call.pause_stream(chat_id)
+        await call.set_is_paused(chat_id, True)  # Updated Method ✅
         return "⏸ Stream Paused"
     except Exception as e:
         return f"Error: <code>{e}</code>"
@@ -53,7 +53,7 @@ async def pause(chat_id):
 async def resume(chat_id):
     """Resumes the paused stream."""
     try:
-        await call.resume_stream(chat_id)
+        await call.set_is_paused(chat_id, False)  # Updated Method ✅
         return "▶️ Stream Resumed"
     except Exception as e:
         return f"Error: <code>{e}</code>"
@@ -62,7 +62,7 @@ async def resume(chat_id):
 async def mute(chat_id):
     """Mutes the stream."""
     try:
-        await call.mute_stream(chat_id)
+        await call.set_is_mute(chat_id, True)  # Updated Method ✅
         return "🔇 Stream Muted"
     except Exception as e:
         return f"Error: <code>{e}</code>"
@@ -71,16 +71,16 @@ async def mute(chat_id):
 async def unmute(chat_id):
     """Unmutes the stream."""
     try:
-        await call.unmute_stream(chat_id)
+        await call.set_is_mute(chat_id, False)  # Updated Method ✅
         return "🔊 Stream Unmuted"
     except Exception as e:
         return f"Error: <code>{e}</code>"
 
 
-async def changeVolume(chat_id, volume: int = 200):
+async def change_volume(chat_id, volume: int = 200):
     """Changes the stream volume."""
     try:
-        await call.change_volume_call(chat_id, volume)
+        await call.change_volume(chat_id, volume)  # Updated Method ✅
         return f"🎧 Volume Changed To: {volume}%"
     except Exception as e:
         return f"Error: <code>{e}</code>"
@@ -89,8 +89,7 @@ async def changeVolume(chat_id, volume: int = 200):
 async def stop(chat_id):
     """Stops the stream and leaves the voice chat."""
     try:
-        await call.leave_call(chat_id)
+        await call.leave(chat_id)  # Updated Method ✅
         return "🛑 Stream Ended"
     except Exception as e:
         return f"Error: <code>{e}</code>"
-        
