@@ -106,7 +106,7 @@ async def _aPlay(_, message):
 
 
         format = "bestaudio"
-        resp, songlink = await ytdl(format, link)
+        resp, songlink, duration = await ytdl(format, link)  # ✅ Fix
         if resp == 0:
             await m.edit(f"❌ yt-dl issues detected\n\n» `{songlink}`")
         else:
@@ -118,16 +118,18 @@ async def _aPlay(_, message):
                 
                 return
                 asyncio.create_task(delete_messages(message, m))
+                
+            durations = f"{duration // 60}:{duration % 60:02d}" if duration else "Unknown"
             Status, Text = await Userbot.playAudio(chat_id, songlink)
             if Status == False:
                 return await m.edit(Text)
             if duration is None:
                 duration = "**Playing From LiveStream**"
-            add_to_queue(chat_id, title[:19], duration, songlink, link)
+            add_to_queue(chat_id, title[:19], durations, songlink, link)
             finish_time = time.time()
             total_time_taken = str(int(finish_time - start_time)) + "s"
             await m.edit(
-                f"**ѕσηg ιѕ ρℓαуιηg ιη ν¢**\n\n**SongName**:- [{title[:19]}]({link})\n**Duration**:- {duration}\n**Requested By**:- {mention}\n\n**Respose Time**:- {total_time_taken}",
+                f"**ѕσηg ιѕ ρℓαуιηg ιη ν¢**\n\n**SongName**:- [{title[:19]}]({link})\n**Duration**:- {durations}\n**Requested By**:- {mention}\n\n**Respose Time**:- {total_time_taken}",
                 disable_web_page_preview=True,
             )
         asyncio.create_task(delete_messages(message, m))
@@ -162,10 +164,11 @@ async def playforce(_, message):
     
     await m.edit("**Fetching Song Details...**")
     format = "bestaudio"
-    resp, songlink = await ytdl(format, link)
+    resp, songlink, duration = await ytdl(format, link)  # ✅ Fix
+
     if resp == 0:
         return await m.edit(f"❌ yt-dl issues detected\n\n» `{songlink}`")
-    
+    durations = f"{duration // 60}:{duration % 60:02d}" if duration else "Unknown"
     Status, Text = await Userbot.playAudio(chat_id, songlink)
     if Status == False:
         return await m.edit(Text)
@@ -176,7 +179,7 @@ async def playforce(_, message):
     await m.edit(
         f"**𝑆𝑜𝑛𝑔 𝐹𝑜𝑟𝑐𝑒 𝑃𝑙𝑎𝑦𝑖𝑛𝑔 𝑖𝑛 𝑉𝐶**\n\n"
         f"**𝑆𝑜𝑛𝑔**: [{title[:19]}]({link})\n"
-        f"**𝐷𝑢𝑟𝑎𝑡𝑖𝑜𝑛**: {duration}\n"
+        f"**𝐷𝑢𝑟𝑎𝑡𝑖𝑜𝑛**: {durations}\n"
         f"**𝑅𝑒𝑞𝑢𝑒𝑠𝑡𝑒𝑑 𝐵𝑦**: {mention}\n\n"
         f"**𝑅𝑒𝑠𝑝𝑜𝑛𝑠𝑒 𝑇𝑖𝑚𝑒**: {total_time_taken}",
         disable_web_page_preview=True,
