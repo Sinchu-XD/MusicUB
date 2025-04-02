@@ -78,6 +78,7 @@ async def _aPlay(_, message):
         input_filename, m = await processReplyToMessage(message)
         if input_filename is None:
             return await message.reply_text("**𝙶𝚒𝚟𝚎 𝙼𝚎 𝚂𝚘𝚗𝚐 𝙻𝚒𝚗𝚔 𝙾𝚛 𝚁𝚎𝚙𝚕𝚢 𝚃𝚘 𝚅𝚘𝚒𝚌𝚎 𝙽𝚘𝚝𝚎😒**")
+            return
 
         await m.edit("Processing your request...")
         Status, Text = await Userbot.playAudio(chat_id, input_filename)
