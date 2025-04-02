@@ -1,7 +1,7 @@
 from pyrogram import filters
 from Player import app
 from Player.Utils.JioSaavn import get_song
-from Player.Core.Userbot import play_song
+from Player.Core.Userbot import playAudio
 
 @app.on_message(filters.command(["jplay", "jsaavn"]) & filters.me)
 async def jio_play(_, message):
@@ -20,6 +20,6 @@ async def jio_play(_, message):
         caption=f"🎵 **{song['title']}**\n👤 {song['artist']}\n🔗 [Listen on JioSaavn]({song['url']})"
     )
 
-    response = await play_song(message.chat.id, song["media_url"])
+    response = await playAudio(message.chat.id, song["media_url"])
     await message.reply_text(response)
   
