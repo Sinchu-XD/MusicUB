@@ -129,12 +129,12 @@ async def stop(chat_id):
 @app.on_message((filters.command("seek", [PREFIX, RPREFIX])) & filters.group)
 async def seek_audio(_, message):
     chat_id = message.chat.id
-    try:
-        text = msg.command[1]
-    except:
-        text = None
     if chat_id not in QUEUE:
         return await message.reply_text("No song playing...")
+    try:
+        text = int(msg.text.split()[0])
+    except:
+        await message.reply_text("Usage: /seek time")
 
     chat_queue = get_queue(chat_id)
     songlink = chat_queue[0][3]
@@ -149,5 +149,16 @@ async def seek_audio(_, message):
             ),
         )
         return await message.reply_text("Done.")
+    except Exception as e:
+        return await message.reply_text(f"Error: <code>{e}</code>")
+
+@app.on_message((filters.command("stats", [PREFIX, RPREFIX])) & filters.group)
+async def get_stats(_, message):
+    chat_id = message.chat.id
+    if chat_id not in QUEUE:
+        return await message.reply_text("No song playing...")
+    try:
+        time = await call.time(chat_id)
+        await message.reply_text(f"Current Played: {time}")
     except Exception as e:
         return await message.reply_text(f"Error: <code>{e}</code>")
