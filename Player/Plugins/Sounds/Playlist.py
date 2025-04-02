@@ -57,7 +57,7 @@ async def _aPlay(_, message):
         return await m.edit("❌ Unable to fetch first song from playlist.")
 
     # ✅ Get direct audio URL
-    status, direct_audio_url = await ytdl("bestaudio", first_song)
+    status, direct_audio_url, duration = await ytdl("bestaudio", first_song)  # Fixed
 
     # ✅ Check for errors
     if status == 0 or not direct_audio_url:
