@@ -102,33 +102,7 @@ def get_video_duration(video_id):
 
 from yt_dlp import YoutubeDL
 
-async def ytdl(format, link):
-    ydl_opts = {
-        'format': format,
-        'quiet': True,
-        'noplaylist': True,
-        'extractaudio': True,
-        'audioquality': 1,
-        'cookiefile': "cookies/cookies.txt",
-        'outtmpl': 'downloads/%(id)s.%(ext)s',
-    }
 
-    try:
-        with YoutubeDL(ydl_opts) as ydl:
-            info = await asyncio.to_thread(ydl.extract_info, link)
-            if 'formats' in info:
-                # Find the best audio quality
-                songlink = next((f['url'] for f in info['formats'] if f['format_id'] == 'bestaudio'), None)
-                if songlink:
-                    duration = info.get('duration', None)
-                    return 1, songlink, duration
-                else:
-                    return 0, None, None  # No audio found
-            else:
-                return 0, None, None  # Invalid link or no formats available
-    except Exception as e:
-        print(f"Error: {e}")
-        return 0, None, None
 
 
 
@@ -155,10 +129,31 @@ def extract_video_id(url):
         return parsed_url.path[1:]
 
     query_params = parse_qs(parsed_url.query)
-    return query_params.get("v", [None])[0]
+    return queryasync def ytdl(format: str, link: str):
 
+async def ytdl(format: str, link: str):
+    ydl_opts = {
+        'format': format,
+        'geo_bypass': True,
+        'noplaylist': True,
+        'quiet': True,
+        'cookiefile': "cookies/cookies.txt",  # Ensure cookies are used
+        'nocheckcertificate': True,
+        'force_generic_extractor': True,  # Force using a generic extractor if needed
+        'extractor_retries': 3,  # Retry fetching if it fails
+    }
+    
+    try:
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            info = ydl.extract_info(link, download=False)
+            if 'url' in info:
+                duration = info.get('duration', 0)  # Fetch duration safely
+                return (1, info['url'], duration)
 
-
+            else:
+                return (0, "No URL found", 0)
+    except Exception as e:
+        return (0, str(e), 0)
 
 def get_direct_audio_url(video_url):
     """Fetch the direct audio URL using yt-dlp with cookies."""
