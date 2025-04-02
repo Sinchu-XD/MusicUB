@@ -137,7 +137,7 @@ async def seek_audio(_, message):
         return await message.reply_text("No song playing...")
 
     chat_queue = get_queue(chat_id)
-    songlink = chat_queue[0][4]
+    songlink = chat_queue[0][3]
     try:
         await call.play(
             chat_id=chat_id,
@@ -145,7 +145,7 @@ async def seek_audio(_, message):
                 media_path=songlink,
                 audio_parameters=AudioQuality.HIGH,
                 video_flags=MediaStream.Flags.IGNORE,
-                ffmpeg_parameters=f"-ss {text}" if text else "25fix",
+                ffmpeg_parameters=f"-ss {text}" if text else "25",
             ),
         )
         return await message.reply_text("Done.")
