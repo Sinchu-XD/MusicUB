@@ -129,6 +129,7 @@ async def _aPlay(_, message):
         else:
             if chat_id in QUEUE:
                 queue_num = add_to_queue(chat_id, title[:19], duration, songlink, link)
+                return
 
 
 
