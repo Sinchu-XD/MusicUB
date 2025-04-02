@@ -10,7 +10,7 @@ from Player.Core import Userbot
 from Player.Utils.Queue import QUEUE, pop_an_item, get_queue, clear_queue
 from Player.Utils.Loop import get_loop
 from Player.Misc import SUDOERS
-
+from Player.Utils.Delete import delete_messages
 from pytgcalls.types import MediaStream
 
 # from pytgcalls.types.input_stream import AudioPiped
@@ -19,7 +19,7 @@ from pytgcalls.types import MediaStream
 
 from pyrogram import filters
 from pyrogram.enums import ChatMembersFilter
-
+import asyncio
 import time
 
 import config
@@ -52,6 +52,7 @@ async def _aSkip(_, message):
             return await m.edit_text(
                 f"Loop is enabled for the current song. Please disable it with {PREFIX}endloop to skip the song."
             )
+            asyncio.create_task(delete_messages(message, m))
         if chat_id in QUEUE:
             chat_queue = get_queue(chat_id)
             if len(chat_queue) == 1:
@@ -61,6 +62,7 @@ async def _aSkip(_, message):
                     f"There is no next track. I'm leaving the voice chat..."
                 )
                 return
+                asyncio.create_task(delete_messages(message, m))
             try:
                 title = chat_queue[1][1]
                 duration = chat_queue[1][2]
@@ -82,6 +84,7 @@ async def _aSkip(_, message):
                     f"Playing Your Song\n\nSongName:- [{title}]({link})\nDuration:- {duration}\nTime taken to play:- {total_time_taken}",
                     disable_web_page_preview=True,
                 )
+                asyncio.create_task(delete_messages(message, m))
                 # return [title, duration, link, finish_time]
             except Exception as e:
                 await m.delete()
@@ -94,6 +97,7 @@ async def _aSkip(_, message):
         return await message.reply_text(
             "Abe saale... (Maaf karna wo gusse me thora sa idhar udhar ho jata hu) terepe perms naa hai admins ko bol..."
         )
+        asyncio.create_task(delete_messages(message, m))
 
 @app.on_message(filters.command("queue", [PREFIX, RPREFIX]) & filters.group)
 async def _queue(_, message):
