@@ -103,25 +103,28 @@ from yt_dlp import YoutubeDL
 async def ytdl(format, link):
     ydl_opts = {
         'format': format,
-        'geo_bypass': True,
-        'noplaylist': True,
         'quiet': True,
-        'cookiefile': "cookies/cookies.txt",  # Ensure cookies are used
-        'nocheckcertificate': True,
-        'force_generic_extractor': True,  # Force using a generic extractor if needed
-        'extractor_retries': 3,  # Retry fetching if it fails
+        'noplaylist': True,
+        'extractaudio': True,
+        'audioquality': 1,
+        'outtmpl': 'downloads/%(id)s.%(ext)s',
     }
 
     try:
-        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+        with YoutubeDL(ydl_opts) as ydl:
             info = await asyncio.to_thread(ydl.extract_info, link)
             if 'formats' in info:
+                # Find the best audio quality
                 songlink = next((f['url'] for f in info['formats'] if f['format_id'] == 'bestaudio'), None)
-                duration = info.get('duration', None)
-                return 1, songlink, duration
+                if songlink:
+                    duration = info.get('duration', None)
+                    return 1, songlink, duration
+                else:
+                    return 0, None, None  # No audio found
             else:
-                return 0, None, None
+                return 0, None, None  # Invalid link or no formats available
     except Exception as e:
+        print(f"Error: {e}")
         return 0, None, None
 
 
