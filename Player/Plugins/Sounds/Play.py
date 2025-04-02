@@ -98,6 +98,7 @@ async def _aPlay(_, message):
                     return await m.edit(
                         f"# {queue_num}\n{audio_title[:19]}\n**ʏᴏᴜʀ ꜱᴏɴɢ ᴀᴅᴅᴇᴅ ɪɴ Qᴜᴇᴜᴇ\nᴘʟᴇᴀꜱᴇ ᴡᴀɪᴛ 😵‍💫**"
                     )
+                    asyncio.create_task(delete_messages(message, m))
 
                 finish_time = time.time()
                 total_time_taken = str(int(finish_time - start_time)) + "s"
@@ -135,6 +136,7 @@ async def _aPlay(_, message):
                 )
                 
                 return
+                asyncio.create_task(delete_messages(message, m))
             Status, Text = await Userbot.playAudio(chat_id, songlink)
             if Status == False:
                 return await m.edit(Text)
