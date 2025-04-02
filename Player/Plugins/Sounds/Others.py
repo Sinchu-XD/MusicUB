@@ -6,10 +6,11 @@ Copyright ©️ 2025
 
 from pyrogram import filters
 from pyrogram.enums import ChatMembersFilter
-
+import asyncio
 from Player import app
 from Player.Utils.Queue import clear_queue
 from Player.Utils.Loop import get_loop, set_loop
+from Player.Utils.Delete import delete_messages
 from Player.Core import Userbot
 from Player.Misc import SUDOERS
 import config
@@ -47,16 +48,17 @@ async def _stop(_, message):
     if (message.from_user.id) in SUDOERS or (message.from_user.id) in [
         admin.user.id for admin in administrators
     ]:
-        Text = await Userbot.stop(message.chat.id)
+        m = await Userbot.stop(message.chat.id)
         try:
             clear_queue(message.chat.id)
         except:
             pass
-        await message.reply_text(Text)
+        await message.reply_text(m)
     else:
         return await message.reply_text(
             "Abe saale... (Maaf karna wo gusse me thora sa idhar udhar ho jata hu) terepe perms naa hai admins ko bol..."
         )
+        asyncio.create_task(delete_messages(message, m))
 
 
 @app.on_message(filters.command(STOP_COMMAND, RPREFIX))
@@ -65,8 +67,9 @@ async def _stop(_, message):
         await message.reply_text("You forgot to pass an argument")
     else:
         msg_id = message.text.split(" ", 1)[1]
-        Text = await Userbot.stop(msg_id)
-        await message.reply_text(Text)
+        m = await Userbot.stop(msg_id)
+        await message.reply_text(m)
+        asyncio.create_task(delete_messages(message, m))
 
 
 @app.on_message(filters.command(PAUSE_COMMAND, PREFIX))
@@ -80,12 +83,13 @@ async def _pause(_, message):
     if (message.from_user.id) in SUDOERS or (message.from_user.id) in [
         admin.user.id for admin in administrators
     ]:
-        Text = await Userbot.pause(message.chat.id)
-        await message.reply_text(Text)
+        m = await Userbot.pause(message.chat.id)
+        await message.reply_text(m)
     else:
         return await message.reply_text(
             "Abe saale... (Maaf karna wo gusse me thora sa idhar udhar ho jata hu) terepe perms naa hai admins ko bol..."
         )
+        asyncio.create_task(delete_messages(message, m))
 
 
 @app.on_message(filters.command(PAUSE_COMMAND, RPREFIX))
@@ -94,8 +98,9 @@ async def _pause(_, message):
         await message.reply_text("You forgot to pass an argument")
     else:
         msg_id = message.text.split(" ", 1)[1]
-        Text = await Userbot.pause(msg_id)
-        await message.reply_text(Text)
+        m = await Userbot.pause(msg_id)
+        await message.reply_text(m)
+        asyncio.create_task(delete_messages(message, m))
 
 
 @app.on_message(filters.command(RESUME_COMMAND, PREFIX))
@@ -109,12 +114,13 @@ async def _resume(_, message):
     if (message.from_user.id) in SUDOERS or (message.from_user.id) in [
         admin.user.id for admin in administrators
     ]:
-        Text = await Userbot.resume(message.chat.id)
-        await message.reply_text(Text)
+        m = await Userbot.resume(message.chat.id)
+        await message.reply_text(m)
     else:
         return await message.reply_text(
             "Abe saale... (Maaf karna wo gusse me thora sa idhar udhar ho jata hu) terepe perms naa hai admins ko bol..."
         )
+        asyncio.create_task(delete_messages(messag, m))
 
 
 @app.on_message(filters.command(RESUME_COMMAND, RPREFIX))
@@ -123,8 +129,9 @@ async def _resume(_, message):
         await message.reply_text("You forgot to pass an argument")
     else:
         msg_id = message.text.split(" ", 1)[1]
-        Text = await Userbot.resume(msg_id)
-        await message.reply_text(Text)
+        m = await Userbot.resume(msg_id)
+        await message.reply_text(m)
+        asyncio.create_task(delete_messages(message, m))
 
 
 @app.on_message(filters.command(MUTE_COMMAND, PREFIX))
@@ -133,8 +140,9 @@ async def _mute(_, message):
         reply = message.edit
     else:
         reply = message.reply_text
-    Text = await Userbot.mute(message.chat.id)
-    await reply(Text)
+    m = await Userbot.mute(message.chat.id)
+    await reply(m)
+    asyncio.create_task(delete_messages(message, m))
 
 
 @app.on_message(filters.command(MUTE_COMMAND, RPREFIX))
@@ -143,14 +151,16 @@ async def _mute(_, message):
         await message.reply_text("You forgot to pass an argument")
     else:
         msg_id = message.text.split(" ", 1)[1]
-        Text = await Userbot.mute(msg_id)
-        await message.reply_text(Text)
+        m = await Userbot.mute(msg_id)
+        await message.reply_text(m)
+        asyncio.create_task(delete_messages(message, m))
 
 
 @app.on_message(filters.command(UNMUTE_COMMAND, PREFIX))
 async def _unmute(_, message):
-    Text = await Userbot.unmute(message.chat.id)
-    await message.reply_text(Text)
+    m = await Userbot.unmute(message.chat.id)
+    await message.reply_text(m)
+    asyncio.create_task(delete_messages(message, m))
 
 
 @app.on_message(filters.command(UNMUTE_COMMAND, RPREFIX))
@@ -159,18 +169,20 @@ async def _unmute(_, message):
         await message.reply_text("You forgot to pass an argument")
     else:
         msg_id = message.text.split(" ", 1)[1]
-        Text = await Userbot.unmute(msg_id)
-        await message.reply_text(Text)
+        m = await Userbot.unmute(msg_id)
+        await message.reply_text(m)
+        asyncio.create_task(delete_messages(message, m))
 
 
 @app.on_message(filters.command(VOLUME_COMMAND, PREFIX))
 async def _volume(_, message):
     try:
         vol = int(message.text.split()[1])
-        Text = await Userbot.changeVolume(message.chat.id, vol)
+        m = await Userbot.changeVolume(message.chat.id, vol)
     except:
-        Text = await Userbot.changeVolume(message.chat.id)
-    await message.reply_text(Text)
+        m = await Userbot.changeVolume(message.chat.id)
+    await message.reply_text(m)
+    asyncio.create_task(delete_messages(message, m))
 
 
 @app.on_message(filters.command(LOOP_COMMAND, PREFIX))
@@ -187,9 +199,9 @@ async def _loop(_, message):
         loop = await get_loop(message.chat.id)
         if loop == 0:
             try:
-                await set_loop(message.chat.id, 5)
+                await set_loop(message.chat.id, 1)
                 await message.reply_text(
-                    "Loop enabled. Now current song will be played 5 times"
+                    "Loop enabled. Now current song will be played 1 times"
                 )
             except Exception as e:
                 return await message.reply_text(f"Error:- <code>{e}</code>")
@@ -200,6 +212,7 @@ async def _loop(_, message):
         return await message.reply_text(
             "Abe saale... (Maaf karna wo gusse me thora sa idhar udhar ho jata hu) terepe perms naa hai admins ko bol..."
         )
+        asyncio.create_task(delete_messages(message))
 
 
 @app.on_message(filters.command(LOOPEND_COMMAND, PREFIX))
@@ -226,3 +239,4 @@ async def _endLoop(_, message):
         return await message.reply_text(
             "Abe saale... (Maaf karna wo gusse me thora sa idhar udhar ho jata hu) terepe perms naa hai admins ko bol..."
   )
+        asyncio.create_task(delete_messages(message))
