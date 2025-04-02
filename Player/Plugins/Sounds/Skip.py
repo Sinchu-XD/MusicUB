@@ -53,22 +53,24 @@ async def _aSkip(_, message):
             # Fetch next song details
             next_song_data = get_queue(chat_id)[1]
             title = next_song_data[1]
-            duration = next_song_data[2]
             link = next_song_data[3]
 
-            # Try fetching the audio URL
+            # Try fetching the audio URL and duration
             retry_count = 0
             max_retries = 3
-            status, songlink = (0, "")
+            status, songlink, duration = (0, "", 0)
 
             while retry_count < max_retries and status == 0:
-                status, songlink = await ytdl("bestaudio", link)
+                status, songlink, duration = await ytdl("bestaudio", link)
                 if status == 0:
                     await asyncio.sleep(2)  # Wait before retrying
                     retry_count += 1
 
             if not status:
                 return await m.edit_text(f"❌ **Failed to fetch next song.**\n🛑 `{songlink}`\n🎤 **Requested by:** {user_mention}")
+
+            # Convert duration to readable format (MM:SS)
+            duration_formatted = f"{duration // 60}:{duration % 60:02d}" if duration else "Unknown"
 
             # Play next song
             await call.play(
@@ -87,7 +89,7 @@ async def _aSkip(_, message):
             await app.send_message(
                 chat_id,
                 f"🎶 **Now Playing:** [{title}]({link})\n"
-                f"⏳ **Duration:** {duration}\n"
+                f"⏳ **Duration:** {duration_formatted}\n"
                 f"⚡ **Time Taken:** {total_time_taken}\n"
                 f"🎤 **Requested by:** {user_mention}",
                 disable_web_page_preview=True,
@@ -99,8 +101,8 @@ async def _aSkip(_, message):
 
     else:
         return await message.reply_text(f"❌ **You don’t have permission to skip songs.** Ask an admin.\n🎤 **Requested by:** {user_mention}")
-
-
+            
+            
 @app.on_message(filters.command("queue", [PREFIX, RPREFIX]) & filters.group)
 async def _queue(_, message):
     chat_id = message.chat.id
