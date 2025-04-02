@@ -46,18 +46,12 @@ async def ytdl(format: str, link: str):
         return (0, str(e))
 
 
-async def processReplyToMessage(message):
-    msg = message.reply_to_message
-    if not msg or not (msg.audio or msg.voice):
-        return None
-
-    m = await message.reply_text("**𝓦𝓪𝓲𝓽... 𝓓𝓸𝔀𝓷𝓵𝓸𝓪𝓭𝓲𝓷𝓰 𝓨𝓸𝓾𝓻 𝓢𝓸𝓷𝓰 ❤️**.")
-    
-    # Run the download in a separate thread to avoid blocking the event loop
-    loop = asyncio.get_running_loop()
-    audio_original = await loop.run_in_executor(None, msg.download)
-
-    return audio_original, m
+if msg.audio or msg.voice:
+        m = await message.reply_text("**𝓦𝓪𝓲𝓽 𝓑𝓪𝓫𝔂... 𝓓𝓸𝔀𝓷𝓵𝓸𝓪𝓭𝓲𝓷𝓰 𝓨𝓸𝓾𝓻 𝓢𝓸𝓷𝓰 ❤️**.")
+        audio_original = await msg.download()
+        input_filename = audio_original
+        return input_filename, m
+    return None
 
 
 
