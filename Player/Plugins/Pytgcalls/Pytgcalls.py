@@ -8,8 +8,9 @@ from pytgcalls import PyTgCalls, filters
 from pytgcalls.types import Update, MediaStream
 
 from Player import call, app
-from Player.Utils.Queue import QUEUE, get_queue, clear_queue, pop_an_item
+from Player.Utils.YtDetails import ytdl
 from Player.Utils.Loop import get_loop, set_loop
+from Player.Utils.Queue import QUEUE, get_queue, clear_queue, pop_an_item
 
 import time
 
@@ -49,8 +50,24 @@ async def _skip(chat_id):
             try:
                 title = chat_queue[1][1]
                 duration = chat_queue[1][2]
-                songlink = chat_queue[1][3]
-                link = chat_queue[1][4]
+                link = chat_queue[1][3]
+                # link = chat_queue[1][4]
+
+                retry_count = 0
+                max_retries = 3
+                status, songlink, duration = (0, "", 0)
+
+                while retry_count < max_retries and status == 0:
+                    status, songlink, duration = await ytdl("bestaudio", link)
+                    if status == 0:
+                        await asyncio.sleep(2)  # Wait before retrying
+                        retry_count += 1
+
+                duration_formatted = f"{duration // 60}:{duration % 60:02d}" if duration else "Unknown"
+
+                if not status:
+                    return [2, f"❌ **Failed to fetch next song.**"]
+
                 await call.play(
                     chat_id,
                     MediaStream(
