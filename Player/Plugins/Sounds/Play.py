@@ -25,17 +25,24 @@ PREFIX = config.PREFIX
 RPREFIX = config.RPREFIX
 
 
+import yt_dlp
+
 async def ytdl(format: str, link: str):
-    cmd = (
-        f'yt-dlp --geo-bypass --cookies "cookies/cookies.txt" -g '
-        f'--extract-audio --audio-format best --concurrent-fragments 5 '
-        f'-f "{format}" {link} --no-check-certificate --rm-cache-dir'
-    )
-    process = await asyncio.create_subprocess_shell(
-        cmd, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
-    )
-    stdout, stderr = await process.communicate()
-    return (1, stdout.decode().strip()) if stdout else (0, stderr.decode().strip())
+    ydl_opts = {
+        'format': format,
+        'geo_bypass': True,
+        'noplaylist': True,
+        'quiet': True,
+        'cookiefile': "cookies/cookies.txt",
+        'nocheckcertificate': True,
+    }
+    
+    try:
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            info = ydl.extract_info(link, download=False)
+            return (1, info['url']) if 'url' in info else (0, "No URL found")
+    except Exception as e:
+        return (0, str(e))
 
 
 
