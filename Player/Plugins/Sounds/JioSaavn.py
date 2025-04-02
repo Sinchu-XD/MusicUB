@@ -2,6 +2,8 @@ from pyrogram import filters
 from Player import app
 from Player.Utils.JioSaavn import get_song
 from Player.Core.Userbot import playAudio
+import config
+
 
 PREFIX = config.PREFIX
 RPREFIX = config.RPREFIX
