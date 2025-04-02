@@ -1,6 +1,6 @@
 from pyrogram import filters
 from Player import app
-from Player.Utils.JioSaavn import get_song
+from Player.Utils.JioSaavn import fetch_song_url, extract_mp3
 from Player.Core.Userbot import playAudio
 import config
 
@@ -11,22 +11,22 @@ PLAY_COMMAND = ["JPLAY", "JIOSAAVN"]
 
 
 @app.on_message((filters.command(PLAY_COMMAND, [PREFIX, RPREFIX])) & filters.group)
-async def jio_play(_, message):
-    """Play a JioSaavn song in VC."""
+async def jiosaavn_command(_, message):
     if len(message.command) < 2:
-        return await message.reply_text("Usage: /jplay [song name]")
+        return await message.reply_text("Usage: !jiosaavn <song name>")
 
-    query = message.text.split(None, 1)[1]
-    song = get_song(query)
+    song_name = " ".join(message.command[1:])
+    chat_id = message.chat.id
 
-    if not song:
-        return await message.reply_text("No song found!")
+    msg = await message.reply_text("🔍 Searching for song on JioSaavn...")
+    
+    song_link = fetch_song_url(song_name)
+    if not song_link:
+        return await msg.edit("⚠ No Song Found.")
 
-    await message.reply_photo(
-        photo=song["thumbnail"],
-        caption=f"🎵 **{song['title']}**\n👤 {song['artist']}\n🔗 [Listen on JioSaavn]({song['url']})"
-    )
+    song = extract_mp3(song_link)
+    if not song or not song["media_url"]:
+        return await msg.edit("⚠ Could not fetch MP3 URL.")
 
-    response = await playAudio(message.chat.id, song["media_url"])
-    await message.reply_text(response)
-  
+    result = await playAudio(chat_id, song["media_url"])
+    await msg.edit(result)
