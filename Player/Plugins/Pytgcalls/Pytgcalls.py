@@ -3,6 +3,7 @@ Telegram @Itz_Your_4Bhi
 Copyright ©️ 2025
 """
 
+import time
 
 from pytgcalls import PyTgCalls, filters
 from pytgcalls.types import Update, MediaStream
@@ -12,14 +13,11 @@ from Player.Utils.YtDetails import ytdl
 from Player.Utils.Loop import get_loop, set_loop
 from Player.Utils.Queue import QUEUE, get_queue, clear_queue, pop_an_item
 
-import time
 
 
 async def _skip(chat_id):
     loop = await get_loop(chat_id)
-    if loop == 0:
-        pass
-    else:
+    if loop > 0:
         try:
             chat_queue = get_queue(chat_id)
             loop = loop - 1

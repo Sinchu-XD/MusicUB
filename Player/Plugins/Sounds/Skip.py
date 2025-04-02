@@ -10,7 +10,7 @@ from Player.Utils.Loop import get_loop
 from Player.Utils.Delete import delete_messages
 from Player.Misc import SUDOERS
 from Player.Utils.YtDetails import ytdl
-from pytgcalls.types import MediaStream
+from pytgcalls.types import MediaStream, VideoQuality, AudioQuality
 from pyrogram import filters
 from pyrogram.enums import ChatMembersFilter
 import asyncio
@@ -124,4 +124,30 @@ async def stop(chat_id):
         await call.leave_call(chat_id)
     except:
         pass
-        
+
+
+@app.on_message((filters.command("seek", [PREFIX, RPREFIX])) & filters.group)
+async def seek_audio(_, message):
+    chat_id = message.chat.id
+    try:
+        text = msg.command[1]
+    except:
+        text = None
+    if chat_id not in QUEUE:
+        return await message.reply_text("No song playing...")
+
+    chat_queue = get_queue(chat_id)
+    songlink = chat_queue[0][4]
+    try:
+        await call.play(
+            chat_id=chat_id,
+            stream=MediaStream(
+                media_path=stream_url,
+                audio_parameters=AudioQuality.HIGH,
+                video_parameters=MediaStream.Flags.IGNORE,
+                ffmpeg_parameters=f"-ss {text}" if text else None,
+            ),
+        )
+        return await message.reply_text("Done.")
+    except Exception as e:
+        return await message.reply_text(f"Error: <code>{e}</code>")
