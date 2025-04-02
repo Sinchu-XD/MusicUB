@@ -26,6 +26,7 @@ async def seek_audio(_, message):
         seek_dur = int(message.text.split()[1])
     except:
         return await message.reply_text("Usage: /seek time (int)\n\nExample: `/seek 10`")
+        asyncio.create_task(delete_messages(message, m))
 
     chat_queue = get_queue(chat_id)
     songlink = chat_queue[0][3]
@@ -44,5 +45,6 @@ async def seek_audio(_, message):
         )
         seek_chats[chat_id] = duration
         return await message.reply_text("Seeked {} seconds".format(seek_dur))
+        asyncio.create_task(delete_messages(message, m))
     except Exception as e:
         return await message.reply_text(f"Error: <code>{e}</code>")
