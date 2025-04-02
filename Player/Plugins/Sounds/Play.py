@@ -157,14 +157,6 @@ async def playforce_command(_, message):
     await m.delete()
 
 
-from pytgcalls.types import StreamEnd
-
-@call.on_event(StreamEnd)
-async def vc_ended(client, update: StreamEnd):
-    chat_id = update.chat_id
-    if chat_id in QUEUE:
-        QUEUE[chat_id].clear()  # Reset queue after VC ends
-        await app.send_message(chat_id, "✅ **Queue has been reset after VC ended.**")
 
 
 
