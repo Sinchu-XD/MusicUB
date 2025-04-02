@@ -94,6 +94,7 @@ async def _aPlay(_, message):
     if chat_id in QUEUE and get_queue(chat_id):
         queue_num = add_to_queue(chat_id, title[:19], duration, songlink, link)
         return await m.edit(f"🎵 **#{queue_num} {title[:19]}** added to queue.")
+        return
 
     # Play the Song
     status, text = await Userbot.playAudio(chat_id, songlink)
