@@ -150,4 +150,4 @@ async def seek_audio(_, message):
         )
         return await message.reply_text("Done.")
     except Exception as e:
-        return await message.reply_text(f"Error: <code>{e}</code>\nTrackback: {e.__traceback__()}")
+        return await message.reply_text(f"Error: <code>{e}</code>")
