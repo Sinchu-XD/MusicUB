@@ -132,33 +132,24 @@ async def seek_audio(_, message):
     if chat_id not in QUEUE:
         return await message.reply_text("No song playing...")
     try:
-        text = int(msg.text.split()[0])
+        seek_dur = int(msg.text.split()[0])
     except:
-        await message.reply_text("Usage: /seek time")
+        await message.reply_text("Usage: /seek time (int)\n\nExample: `/seek 10`")
 
     chat_queue = get_queue(chat_id)
     songlink = chat_queue[0][3]
     try:
+        duration = await call.time(chat_id)
+        duration += seek_dur
         await call.play(
             chat_id,
             MediaStream(
                 media_path=songlink,
                 audio_parameters=AudioQuality.HIGH,
                 video_flags=MediaStream.Flags.IGNORE,
-                ffmpeg_parameters=f"-ss 150",
+                ffmpeg_parameters="-ss {0}".format(duration),
             ),
         )
         return await message.reply_text("Done.")
-    except Exception as e:
-        return await message.reply_text(f"Error: <code>{e}</code>")
-
-@app.on_message((filters.command("stats", [PREFIX, RPREFIX])) & filters.group)
-async def get_stats(_, message):
-    chat_id = message.chat.id
-    if chat_id not in QUEUE:
-        return await message.reply_text("No song playing...")
-    try:
-        time = await call.time(chat_id)
-        await message.reply_text(f"Current Played: {time}")
     except Exception as e:
         return await message.reply_text(f"Error: <code>{e}</code>")
