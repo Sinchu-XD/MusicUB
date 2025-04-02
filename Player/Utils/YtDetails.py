@@ -103,11 +103,13 @@ from yt_dlp import YoutubeDL
 async def ytdl(format, link):
     ydl_opts = {
         'format': format,
-        'quiet': True,
+        'geo_bypass': True,
         'noplaylist': True,
-        'extractaudio': True,
-        'audioquality': 1,
-        'outtmpl': 'downloads/%(id)s.%(ext)s',
+        'quiet': True,
+        'cookiefile': "cookies/cookies.txt",  # Ensure cookies are used
+        'nocheckcertificate': True,
+        'force_generic_extractor': True,  # Force using a generic extractor if needed
+        'extractor_retries': 3,  # Retry fetching if it fails
     }
 
     try:
