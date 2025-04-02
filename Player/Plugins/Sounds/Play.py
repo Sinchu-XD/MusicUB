@@ -188,7 +188,6 @@ async def playforce(_, message):
     if Status == False:
         return await m.edit(Text)
     
-    add_to_queue(chat_id, title[:19], duration, songlink, link)
     finish_time = time.time()
     total_time_taken = str(int(finish_time - start_time)) + "s"
 
@@ -201,6 +200,7 @@ async def playforce(_, message):
         disable_web_page_preview=True,
     )
     asyncio.create_task(delete_messages(message, m))
+
     
 
 
