@@ -1,5 +1,5 @@
 """
-Telegram @Itz_Your_4Bhi
+Telegram @Itz_Your_4Bhi @NotReallyAbhi
 Copyright ©️ 2025
 """
 
