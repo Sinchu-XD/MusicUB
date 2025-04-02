@@ -110,9 +110,9 @@ async def stop(chat_id):
         pass
 
 @call.on_update(filters.chat_update(ChatUpdate.Status.LEFT_CALL))
-def on_left_call(client, update):
+async def on_left_call(client, update):
     chat_id = update.chat_id
     await stop(chat_id)
     clear_queue(chat_id)
-    set_loop(chat_id, 0)
+    await set_loop(chat_id, 0)
     del seek_chats[chat_id]
