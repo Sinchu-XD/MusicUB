@@ -44,7 +44,7 @@ async def playVideo(chat_id, video_file=audio_file):
 async def pause(chat_id):
     """Pauses the stream."""
     try:
-        await call.set_is_paused(chat_id, True)  # Updated Method ✅
+        await call.pause(chat_id)  # Updated Method ✅
         return "⏸ Stream Paused"
     except Exception as e:
         return f"Error: <code>{e}</code>"
@@ -53,7 +53,7 @@ async def pause(chat_id):
 async def resume(chat_id):
     """Resumes the paused stream."""
     try:
-        await call.set_is_paused(chat_id, False)  # Updated Method ✅
+        await call.resume(chat_id)  # Updated Method ✅
         return "▶️ Stream Resumed"
     except Exception as e:
         return f"Error: <code>{e}</code>"
@@ -62,7 +62,7 @@ async def resume(chat_id):
 async def mute(chat_id):
     """Mutes the stream."""
     try:
-        await call.set_is_mute(chat_id, True)  # Updated Method ✅
+        await call.mute(chat_id)  # Updated Method ✅
         return "🔇 Stream Muted"
     except Exception as e:
         return f"Error: <code>{e}</code>"
@@ -71,7 +71,7 @@ async def mute(chat_id):
 async def unmute(chat_id):
     """Unmutes the stream."""
     try:
-        await call.set_is_mute(chat_id, False)  # Updated Method ✅
+        await call.unmute(chat_id)  # Updated Method ✅
         return "🔊 Stream Unmuted"
     except Exception as e:
         return f"Error: <code>{e}</code>"
