@@ -3,6 +3,7 @@ Telegram @Itz_Your_4Bhi
 Copyright ©️ 2025
 """
 
+import asyncio
 import config
 
 from Player import app, call, seek_chats
@@ -16,35 +17,37 @@ from pytgcalls.types import MediaStream, AudioQuality
 PREFIX = config.PREFIX
 RPREFIX = config.RPREFIX
 
-
 @app.on_message((filters.command("seek", [PREFIX, RPREFIX])) & filters.group)
 async def seek_audio(_, message):
     chat_id = message.chat.id
+
     if chat_id not in QUEUE:
-        return await message.reply_text("No song playing...")
+        return await message.reply_text("No song is currently playing.")
+
     try:
         seek_dur = int(message.text.split()[1])
-    except:
-        return await message.reply_text("Usage: /seek time (int)\n\nExample: `/seek 10`")
-        asyncio.create_task(delete_messages(message, m))
+    except (IndexError, ValueError):
+        msg = await message.reply_text("Usage: /seek time (int)\n\nExample: `/seek 10`")
+        return asyncio.create_task(delete_messages(message, msg))
 
     chat_queue = get_queue(chat_id)
     songlink = chat_queue[0][3]
+
     try:
-        seeked_dur = seek_chats.get(chat_id, 0)
-        duration = await call.time(chat_id)
-        duration += seek_dur + seeked_dur
+        seeked_dur = seek_chats.get(chat_id, 0) + seek_dur
         await call.play(
             chat_id,
             MediaStream(
                 media_path=songlink,
                 audio_parameters=AudioQuality.HIGH,
-                video_flags=MediaStream.Flags.IGNORE,
-                ffmpeg_parameters="-ss {0}".format(duration),
+                ffmpeg_parameters=f"-ss {seeked_dur}",
             ),
         )
-        seek_chats[chat_id] = duration
-        return await message.reply_text("Seeked {} seconds".format(seek_dur))
-        asyncio.create_task(delete_messages(message, m))
+
+        seek_chats[chat_id] = seeked_dur
+        msg = await message.reply_text(f"Seeked {seek_dur} seconds.")
+        asyncio.create_task(delete_messages(message, msg))
+
     except Exception as e:
-        return await message.reply_text(f"Error: <code>{e}</code>")
+        msg = await message.reply_text(f"Error: {e}")
+        asyncio.create_task(delete_messages(message, msg))
