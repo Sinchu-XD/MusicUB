@@ -169,7 +169,3 @@ async def playforce(_, message):
     )
 
 
-@call.on_stream_end(())
-async def _on_stream_end(_, chat_id):
-    """Automatically plays the next song when the current one ends."""
-    await play_next_song(chat_id)
