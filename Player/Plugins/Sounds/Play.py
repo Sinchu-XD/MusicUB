@@ -24,10 +24,6 @@ PLAYFORCE_COMMAND = ["PFORCE", "PLAYFORCE"]
 PREFIX = config.PREFIX
 RPREFIX = config.RPREFIX
 
-
-
-
-
 async def processReplyToMessage(message):
     msg = message.reply_to_message
     if msg.audio or msg.voice:
@@ -37,15 +33,10 @@ async def processReplyToMessage(message):
         return input_filename, m
     return None
 
-
-
 async def playWithLinks(link):
     if "&" in link:
         pass
-
     return 0
-
-
 
 @app.on_message((filters.command(PLAY_COMMAND, [PREFIX, RPREFIX])) & filters.group)
 async def _aPlay(_, message):
@@ -103,9 +94,7 @@ async def _aPlay(_, message):
                 await m.edit("No results found")
         except Exception as e:
             return await message.reply_text(f"Error:- <code>{e}</code>")
-            await m.edit("**ᴡᴀɪᴛ ɴᴀ ʏʀʀʀ\n\nꜱᴇᴀʀᴄʜɪɴɢ ʏᴏᴜʀ ꜱᴏɴɢ 🌚❤️..**")
-
-
+        await m.edit("**ᴡᴀɪᴛ ɴᴀ ʏʀʀʀ\n\nꜱᴇᴀʀᴄʜɪɴɢ ʏᴏᴜʀ ꜱᴏɴɢ 🌚❤️..**")
         format = "bestaudio"
         resp, songlink, duration = await ytdl(format, link)  # ✅ Fix
         if resp == 0:
@@ -117,8 +106,8 @@ async def _aPlay(_, message):
                     f"# {queue_num}\n{title[:19]}\n**ʏᴏᴜʀ ꜱᴏɴɢ ᴀᴅᴅᴇᴅ ɪɴ Qᴜᴇᴜᴇ\n\nᴘʟᴇᴀꜱᴇ ᴡᴀɪᴛ 😵‍💫**"
                 )
                 
-                return
                 asyncio.create_task(delete_messages(message, m))
+                return
                 
             durations = f"{duration // 60}:{duration % 60:02d}" if duration else "Unknown"
             Status, Text = await Userbot.playAudio(chat_id, songlink)
@@ -134,7 +123,7 @@ async def _aPlay(_, message):
                 disable_web_page_preview=True,
             )
         asyncio.create_task(delete_messages(message, m))
-        
+
 
 
 

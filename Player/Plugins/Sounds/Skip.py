@@ -7,7 +7,7 @@ import time
 import config
 import asyncio
 
-from Player import app, call
+from Player import app, call, seek_chats
 from Player.Core import Userbot
 from Player.Misc import SUDOERS
 from Player.Utils.Loop import get_loop
@@ -27,6 +27,8 @@ RPREFIX = config.RPREFIX
 
 @app.on_message((filters.command(SKIP_COMMAND, [PREFIX, RPREFIX])) & filters.group)
 async def _aSkip(_, message):
+    if chat_id in seek_chats:
+        del seek_chats[chat_id]
     start_time = time.time()
     chat_id = message.chat.id
     user_mention = message.from_user.mention

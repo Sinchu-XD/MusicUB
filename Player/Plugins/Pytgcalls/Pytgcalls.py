@@ -86,7 +86,8 @@ async def _skip(chat_id):
 async def handler(client: PyTgCalls, update: Update):
     start_time = time.time()
     chat_id = update.chat_id
-    del seek_chats[chat_id]
+    if chat_id in seek_chats:
+        del seek_chats[chat_id]
     resp = await _skip(chat_id)
     if resp == 1:
         pass
@@ -115,4 +116,5 @@ async def on_left_call(client, update):
     await stop(chat_id)
     clear_queue(chat_id)
     await set_loop(chat_id, 0)
-    del seek_chats[chat_id]
+    if chat_id in seek_chats:
+        del seek_chats[chat_id]
