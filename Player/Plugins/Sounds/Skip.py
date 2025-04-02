@@ -145,7 +145,7 @@ async def seek_audio(_, message):
                 media_path=songlink,
                 audio_parameters=AudioQuality.HIGH,
                 video_flags=MediaStream.Flags.IGNORE,
-                ffmpeg_parameters=f"-ss {text}" if text else "25"
+                ffmpeg_parameters=f"-ss 150",
             ),
         )
         return await message.reply_text("Done.")
