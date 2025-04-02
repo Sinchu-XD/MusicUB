@@ -27,8 +27,8 @@ async def seek_audio(_, message):
     try:
         seek_dur = int(message.text.split()[1])
     except (IndexError, ValueError):
-        msg = await message.reply_text("Usage: /seek time (int)\n\nExample: `/seek 10`")
-        return asyncio.create_task(delete_messages(message, msg))
+        m = await message.reply_text("Usage: /seek time (int)\n\nExample: `/seek 10`")
+        return asyncio.create_task(delete_messages(message, m))
 
     chat_queue = get_queue(chat_id)
     songlink = chat_queue[0][3]
@@ -45,9 +45,9 @@ async def seek_audio(_, message):
         )
 
         seek_chats[chat_id] = seeked_dur
-        msg = await message.reply_text(f"Seeked {seek_dur} seconds.")
-        asyncio.create_task(delete_messages(message, msg))
+        m = await message.reply_text(f"Seeked {seek_dur} seconds.")
+        asyncio.create_task(delete_messages(message, m))
 
     except Exception as e:
-        msg = await message.reply_text(f"Error: {e}")
-        asyncio.create_task(delete_messages(message, msg))
+        m = await message.reply_text(f"Error: {e}")
+        asyncio.create_task(delete_messages(message, m))
