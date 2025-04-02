@@ -4,7 +4,7 @@ Copyright ©️ 2025
 """
 
 from Player import call
-from pytgcalls.types.input_stream import AudioPiped
+from pytgcalls.types import AudioPiped
 from pytgcalls.types import MediaStream, VideoQuality, AudioQuality, StreamAudio
 
 audio_file = "http://docs.evostream.com/sample_content/assets/sintel1m720p.mp4"
