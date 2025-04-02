@@ -129,15 +129,12 @@ async def _aPlay(_, message):
         else:
             if chat_id in QUEUE:
                 queue_num = add_to_queue(chat_id, title[:19], duration, songlink, link)
-                return
-
-
 
                 await m.edit(
                     f"# {queue_num}\n{title[:19]}\n**ʏᴏᴜʀ ꜱᴏɴɢ ᴀᴅᴅᴇᴅ ɪɴ Qᴜᴇᴜᴇ\n\nᴘʟᴇᴀꜱᴇ ᴡᴀɪᴛ 😵‍💫**"
                 )
                 
-
+                return
             Status, Text = await Userbot.playAudio(chat_id, songlink)
             if Status == False:
                 return await m.edit(Text)
