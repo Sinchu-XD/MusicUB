@@ -141,15 +141,7 @@ def get_direct_audio_url(video_url):
 
 # ✅ Example Usage:
 if __name__ == "__main__":
-    search_query = "Shape of You"
-    title, duration, video_link = searchYt(search_query)
-
-    if title:
-        print(f"🎵 Found: {title} ({duration}) - {video_link}")
-        audio_url = get_direct_audio_url(video_link)
-        print(f"🔊 Direct Audio URL: {audio_url}")
-    else:
-        print("❌ No results found!")
+    
 
     # ✅ Playlist Example
     playlist_url = "https://www.youtube.com/playlist?list=YOUR_PLAYLIST_ID"
