@@ -1,6 +1,6 @@
 import requests
 
-JIOSAAVN_API = "https://jiosaavn-api.vercel.app"  # Public JioSaavn API
+JIOSAAVN_API = "https://jiosaavn-api.vercel.app/song?id=abcd"  # Public JioSaavn API
 
 def get_song(query):
     """Fetch song details from JioSaavn API."""
