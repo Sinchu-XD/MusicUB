@@ -129,14 +129,19 @@ def get_direct_audio_url(video_url):
     ydl_opts = {
         "format": "bestaudio",
         "quiet": True,
-        "cookies": COOKIES_FILE,  # Use YouTube cookies
+        "noplaylist": True,  # Ensure it's not treating videos as a playlist
+        "nocheckcertificate": True,
+        "cookiefile": COOKIES_FILE,  # Use YouTube cookies file
     }
 
-    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-        info_dict = ydl.extract_info(video_url, download=False)
-        audio_url = info_dict.get("url", None)
+    try:
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            info_dict = ydl.extract_info(video_url, download=False)
+            return info_dict.get("url", None)
 
-    return audio_url
+    except yt_dlp.DownloadError as e:
+        print(f"❌ yt-dlp Error: {e}")
+        return None
 
 
 # ✅ Example Usage:
