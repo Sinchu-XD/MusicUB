@@ -1,7 +1,7 @@
 import re
 import requests
 
-JIOSAAVN_API = "https://jiosaavn-api.vercel.app/song?id={}"
+JIOSAAVN_API = "https://saavn.me/songs?id={song_id}"
 
 def extract_song_id(link):
     """Extract song ID from a JioSaavn link."""
