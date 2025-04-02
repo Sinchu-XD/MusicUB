@@ -3,7 +3,12 @@ from Player import app
 from Player.Utils.JioSaavn import get_song
 from Player.Core.Userbot import playAudio
 
-@app.on_message(filters.command(["jplay", "jsaavn"]) & filters.me)
+PREFIX = config.PREFIX
+RPREFIX = config.RPREFIX
+PLAY_COMMAND = ["JPLAY", "JIOSAAVN"]
+
+
+@app.on_message((filters.command(PLAY_COMMAND, [PREFIX, RPREFIX])) & filters.group)
 async def jio_play(_, message):
     """Play a JioSaavn song in VC."""
     if len(message.command) < 2:
