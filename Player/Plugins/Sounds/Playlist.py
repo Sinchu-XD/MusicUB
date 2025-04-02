@@ -8,6 +8,7 @@ from Player.Core import Userbot
 from Player.Utils.YtDetails import extract_playlist_id, get_playlist_videos
 from Player.Utils.Queue import QUEUE, add_to_queue, clear_queue
 from Player.Utils.YtDetails import ytdl  # ✅ Import ytdl function
+from Player.Utils.Delete import delete_messages
 from pyrogram import filters
 import asyncio
 import time
