@@ -9,7 +9,7 @@ from urllib.parse import urlparse, parse_qs
 import yt_dlp
 
 # ✅ Replace with your YouTube API Key
-YOUTUBE_API_KEY = "AIzaSyCVYsP4Ip49UlLzubYlv1ZnD2osWnMu32Y"
+YOUTUBE_API_KEY = "AIzaSyAO-vb96xq-xyaYRTy9lF21rIINu67Snzg"
 YOUTUBE_API_URL = "https://www.googleapis.com/youtube/v3"
 
 # ✅ Path to your YouTube cookies file
