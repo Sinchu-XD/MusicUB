@@ -145,9 +145,9 @@ async def seek_audio(_, message):
                 media_path=songlink,
                 audio_parameters=AudioQuality.HIGH,
                 video_flags=MediaStream.Flags.IGNORE,
-                ffmpeg_parameters=f"-ss {text}" if text else "25",
+                ffmpeg_parameters=f"-ss {text}" if text else "25"
             ),
         )
         return await message.reply_text("Done.")
     except Exception as e:
-        return await message.reply_text(f"Error: <code>{e}</code>")
+        return await message.reply_text(f"Error: <code>{e}</code>\nTrackBack: {e.__traceback__}")
