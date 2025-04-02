@@ -1,21 +1,29 @@
+import re
 import requests
 
-JIOSAAVN_API = "https://jiosaavn-api.vercel.app/song?id=abcd"  # Public JioSaavn API
+JIOSAAVN_API = "https://jiosaavn-api.vercel.app/song?id={}"
 
-def get_song(query):
+def extract_song_id(link):
+    """Extract song ID from a JioSaavn link."""
+    match = re.search(r"/song/[^/]+/(\w+)", link)
+    return match.group(1) if match else None
+
+def get_song(song_link):
     """Fetch song details from JioSaavn API."""
-    url = f"{JIOSAAVN_API}/search?query={query}"
-    response = requests.get(url).json()
-    
-    if not response or "data" not in response:
+    song_id = extract_song_id(song_link)
+    if not song_id:
         return None
 
-    song = response["data"][0]
+    url = JIOSAAVN_API.format(song_id)
+    response = requests.get(url).json()
+
+    if "error" in response:
+        return None
+
     return {
-        "title": song["title"],
-        "url": song["url"],
-        "media_url": song["media_url"],
-        "thumbnail": song["image"],
-        "artist": song["primaryArtists"]
+        "title": response.get("song"),
+        "url": response.get("perma_url"),
+        "media_url": response.get("media_url"),
+        "thumbnail": response.get("image"),
+        "artist": response.get("singers")
     }
-  
