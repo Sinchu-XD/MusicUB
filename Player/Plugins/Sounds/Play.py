@@ -143,8 +143,12 @@ async def _aPlay(_, message):
                 f"**ѕσηg ιѕ ρℓαуιηg ιη ν¢**\n\n**SongName**:- [{title[:19]}]({link})\n**Duration**:- {duration}\n**Requested By**:- {mention}\n\n**Respose Time**:- {total_time_taken}",
                 disable_web_page_preview=True,
             )
-        await asyncio.sleep(2)
+        asyncio.create_task(asyncio.sleep(1))
+        await message.delete()
+
+        asyncio.create_task(asyncio.sleep(10))
         await m.delete()
+
 
 
 
@@ -194,8 +198,12 @@ async def playforce(_, message):
         f"**𝑅𝑒𝑠𝑝𝑜𝑛𝑠𝑒 𝑇𝑖𝑚𝑒**: {total_time_taken}",
         disable_web_page_preview=True,
     )
-    await asyncio.sleep(2)
+    asyncio.create_task(asyncio.sleep(1))
+    await message.delete()
+
+    asyncio.create_task(asyncio.sleep(10))
     await m.delete()
+    
 
 
 @app.on_message((filters.command(PLAY_COMMAND, [PREFIX, RPREFIX])) & SUDOERS)
@@ -227,5 +235,8 @@ async def _raPlay(_, message):
                 f"**ѕσηg ιѕ ρℓαуιηg ιη ν¢**\n\n**SongName**:- [{message.reply_to_message.audio.title[:19]}]({message.reply_to_message.link})\n**Duration**:- {message.reply_to_message.audio.duration}\n**Requested By**:- {mention}\n\n**Response Time**:- {total_time_taken}",
                     disable_web_page_preview=True,
             )
-        await asyncio.sleep(2)
+        asyncio.create_task(asyncio.sleep(1))
+        await message.delete()
+
+        asyncio.create_task(asyncio.sleep(10))
         await m.delete()
