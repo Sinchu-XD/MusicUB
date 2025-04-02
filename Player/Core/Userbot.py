@@ -89,7 +89,7 @@ async def change_volume(chat_id, volume: int = 200):
 async def stop(chat_id):
     """Stops the stream and leaves the voice chat."""
     try:
-        await call.leave(chat_id)  # Updated Method ✅
+        await call.leave_call(chat_id)  # Updated Method ✅
         return "🛑 Stream Ended"
     except Exception as e:
         return f"Error: <code>{e}</code>"
