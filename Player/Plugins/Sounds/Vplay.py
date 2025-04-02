@@ -111,6 +111,7 @@ async def _vPlay(_, message):
                     f"Tera video play kar rha hu aaja vc\n\nVideoName:- [{video_title[:19]}]({message.reply_to_message.link})\nDuration:- {video.duration}\nTime taken to play:- {total_time_taken}",
                     disable_web_page_preview=True,
                 )
+                asyncio.create_task(delete_messages(message, m))
 
     elif (len(message.command)) < 2:
         await message.reply_text("Link kon daalega mai? 🤔")
@@ -139,6 +140,7 @@ async def _vPlay(_, message):
                     f"# {queue_num}\n{title[:19]}\nTera Video queue me daal diya hu"
                 )
                 return
+                asyncio.create_task(delete_messages(message, m))
             # await asyncio.sleep(2)
             Status, Text = await Userbot.playVideo(chat_id, ytlink)
             # Check if the video ended
@@ -153,3 +155,4 @@ async def _vPlay(_, message):
                 f"Playing your video\n\nVideoName:- [{title[:19]}]({link})\nDuration:- {duration}\nTime taken to play:- {total_time_taken}",
                 disable_web_page_preview=True,
             )
+            asyncio.create_task(delete_messages(message, m))
