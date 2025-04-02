@@ -144,7 +144,7 @@ async def seek_audio(_, message):
             stream=MediaStream(
                 media_path=songlink,
                 audio_parameters=AudioQuality.HIGH,
-                video_parameters=MediaStream.Flags.IGNORE,
+                video_flags=MediaStream.Flags.IGNORE,
                 ffmpeg_parameters=f"-ss {text}" if text else "25fix",
             ),
         )
