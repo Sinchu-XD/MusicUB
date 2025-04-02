@@ -29,14 +29,20 @@ import yt_dlp
 
 async def ytdl(format: str, link: str):
     ydl_opts = {
-        'format': format,
+        'format': 'bestaudio/best',
         'geo_bypass': True,
         'noplaylist': True,
         'quiet': True,
         'cookiefile': "cookies/cookies.txt",
         'nocheckcertificate': True,
-        'extract_flat': True,  # Prevents unnecessary metadata downloads
-    }
+        'postprocessors': [{
+            'key': 'FFmpegExtractAudio',
+            'preferredcodec': 'mp3',  # Can also use 'flac' for lossless
+            'preferredquality': '320',  # Highest quality
+        }],
+        'outtmpl': 'downloads/%(title)s.%(ext)s',
+}
+
 
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
