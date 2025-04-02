@@ -26,25 +26,14 @@ RPREFIX = config.RPREFIX
 
 
 async def ytdl(format: str, link: str):
-    cookie_path = "cookies/cookies.txt"  # Ensure this matches the correct path
-    stdout, stderr = await bash(
-        f'yt-dlp --geo-bypass --cookies "{cookie_path}" -g -f "{format}" {link}'
-    )
-    if stdout:
-        return 1, stdout
-    return 0, stderr
-
-
-async def bash(cmd):
+    cmd = f'yt-dlp --geo-bypass --cookies "cookies/cookies.txt" -g -f "{format}" {link} --no-check-certificate --rm-cache-dir'
     process = await asyncio.create_subprocess_shell(
-        cmd,
-        stdout=asyncio.subprocess.PIPE,
-        stderr=asyncio.subprocess.PIPE,
+        cmd, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
     )
     stdout, stderr = await process.communicate()
-    err = stderr.decode().strip()
-    out = stdout.decode().strip()
-    return out, err
+    
+    return (1, stdout.decode().strip()) if stdout else (0, stderr.decode().strip())
+
 
 
 async def processReplyToMessage(message):
