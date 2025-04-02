@@ -87,6 +87,7 @@ async def _aPlay(_, message):
                     f"**ѕσηg ιѕ ρℓαуιηg ιη ν¢**\n\n**SongName**:- [{audio_title[:19]}]({message.reply_to_message.link})\n**Duration**:- {audio.duration}\n**Requested By**:- {mention}\n\n**Response Time**:- {total_time_taken}",
                     disable_web_page_preview=True,
                 )
+                asyncio.create_task(delete_messages(message, m))
     elif (len(message.command)) < 2:
         await message.reply_text("**𝑊𝑎𝑖𝑡 𝙶𝚒𝚟𝚎 𝙼𝚎 𝚂𝚘𝚗𝚐 𝙻𝚒𝚗𝚔 𝙾𝚛 𝚁𝚎𝚙𝚕𝚢 𝚃𝚘 𝚅𝚘𝚒𝚌𝚎 𝙽𝚘𝚝𝚎**")
     else:
