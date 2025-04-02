@@ -7,7 +7,9 @@ from Player import app
 from Player.Core import Userbot
 from Player.Utils.YtDetails import extract_playlist_id, get_playlist_videos, get_direct_audio_url
 from Player.Utils.Queue import QUEUE, add_to_queue, clear_queue
+from Player.Plugins.Sounds.Play import ytdl
 from pyrogram import filters
+
 import asyncio
 import time
 import config
@@ -56,7 +58,7 @@ async def _aPlay(_, message):
         return await m.edit("❌ Unable to fetch first song from playlist.")
 
     # ✅ Fetch direct audio URL using yt-dlp with cookies
-    direct_audio_url = get_direct_audio_url(first_song)
+    direct_audio_url = ytdl(first_song)
 
     if "❌ yt-dlp Error" in direct_audio_url:
         return await m.edit(direct_audio_url)
