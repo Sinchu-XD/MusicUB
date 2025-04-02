@@ -6,7 +6,7 @@ Copyright ©️ 2025
 from Player import app, call
 from Player.Core import Userbot
 from Player.Utils.YtDetails import searchYt, extract_video_id
-from Player.Utils.Queue import QUEUE, add_to_queue, get_queue, remove_first_from_queue
+from Player.Utils.Queue import QUEUE, add_to_queue, get_queue
 from Player.Utils.Delete import delete_messages
 from pyrogram import filters
 import asyncio
