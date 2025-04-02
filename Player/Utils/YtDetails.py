@@ -109,7 +109,7 @@ async def ytdl(format, link):
         'noplaylist': True,
         'extractaudio': True,
         'audioquality': 1,
-        'cookiefile': COOKIES_FILE,
+        'cookiefile': "cookies/cookies.txt",
         'outtmpl': 'downloads/%(id)s.%(ext)s',
     }
 
