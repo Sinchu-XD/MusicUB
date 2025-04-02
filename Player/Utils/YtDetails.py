@@ -13,7 +13,7 @@ YOUTUBE_API_KEY = "AIzaSyCVYsP4Ip49UlLzubYlv1ZnD2osWnMu32Y"
 YOUTUBE_API_URL = "https://www.googleapis.com/youtube/v3"
 
 # ✅ Path to your YouTube cookies file
-COOKIES_FILE = "cookies.txt"
+COOKIES_FILE = "cookies/cookies.txt"
 
 
 def searchYt(query):
