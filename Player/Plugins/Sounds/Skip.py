@@ -140,8 +140,8 @@ async def seek_audio(_, message):
     songlink = chat_queue[0][3]
     try:
         await call.play(
-            chat_id=chat_id,
-            stream=MediaStream(
+            chat_id,
+            MediaStream(
                 media_path=songlink,
                 audio_parameters=AudioQuality.HIGH,
                 video_flags=MediaStream.Flags.IGNORE,
