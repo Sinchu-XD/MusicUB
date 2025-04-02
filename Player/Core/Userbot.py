@@ -4,7 +4,8 @@ Copyright ©️ 2025
 """
 
 from Player import call
-from pytgcalls.types import MediaStream, VideoQuality, AudioQuality
+from pytgcalls.types.input_stream import AudioPiped
+from pytgcalls.types import MediaStream, VideoQuality, AudioQuality, StreamAudio
 
 audio_file = "http://docs.evostream.com/sample_content/assets/sintel1m720p.mp4"
 
@@ -39,6 +40,17 @@ async def playVideo(chat_id, video_file=audio_file):
         return True, None
     except Exception as e:
         return False, f"Error: <code>{e}</code>"
+
+async def play_song(chat_id: int, url: str) -> str:
+    """Play audio in the voice chat using PyTgCalls v2.1.1."""
+    try:
+        await call.play(
+            chat_id,
+            AudioPiped(url),  # Corrected Import Path
+        )
+        return "Now Playing in VC."
+    except Exception as e:
+        return f"Error: {e}"
 
 
 async def pause(chat_id):
