@@ -7,6 +7,8 @@ import requests
 import os
 from urllib.parse import urlparse, parse_qs
 import yt_dlp
+import asyncio
+
 
 # ✅ Replace with your YouTube API Key
 YOUTUBE_API_KEY = "AIzaSyAO-vb96xq-xyaYRTy9lF21rIINu67Snzg"
@@ -107,6 +109,7 @@ async def ytdl(format, link):
         'noplaylist': True,
         'extractaudio': True,
         'audioquality': 1,
+        'cookiefile': cookies/cookies.txt,
         'outtmpl': 'downloads/%(id)s.%(ext)s',
     }
 
