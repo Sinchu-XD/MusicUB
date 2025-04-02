@@ -3,10 +3,10 @@ Telegram @Itz_Your_4Bhi
 Copyright ©️ 2025
 """
 
-from Player import app
+from Player import app, call
 from Player.Core import Userbot
 from Player.Utils.YtDetails import searchYt, extract_video_id
-from Player.Utils.Queue import QUEUE, add_to_queue, get_queue
+from Player.Utils.Queue import QUEUE, add_to_queue, get_queue, remove_first_from_queue
 from Player.Utils.Delete import delete_messages
 from pyrogram import filters
 import asyncio
@@ -43,6 +43,25 @@ async def process_audio_reply(message):
     if msg and (msg.audio or msg.voice):
         return await msg.download()
     return None
+
+
+async def play_next_song(chat_id):
+    """Plays the next song in the queue automatically."""
+    if chat_id not in QUEUE or not get_queue(chat_id):
+        return await call.leave_group_call(chat_id)
+
+    song = remove_first_from_queue(chat_id)
+    title, duration, songlink, link = song
+
+    status, text = await Userbot.playAudio(chat_id, songlink)
+    if not status:
+        return await app.send_message(chat_id, f"❌ **Error playing next song:** `{text}`")
+
+    await app.send_message(
+        chat_id,
+        f"🎶 **Now Playing**\n**{title[:19]}**\n**Duration:** {duration}",
+        disable_web_page_preview=True,
+    )
 
 
 @app.on_message(filters.command(PLAY_COMMAND, [PREFIX, RPREFIX]) & filters.group)
@@ -91,9 +110,12 @@ async def _aPlay(_, message):
         return await m.edit("❌ **Failed to fetch song.**")
 
     # If Song is Already Playing, Add to Queue Instead
-    if chat_id in QUEUE and get_queue(chat_id):
+    if chat_id in QUEUE:
         queue_num = add_to_queue(chat_id, title[:19], duration, songlink, link)
-        return await m.edit(f"🎵 **#{queue_num} {title[:19]}** added to queue.")
+        await m.edit(
+                    f"# {queue_num}\n{title[:19]}\n**ʏᴏᴜʀ ꜱᴏɴɢ ᴀᴅᴅᴇᴅ ɪɴ Qᴜᴇᴜᴇ\n\nᴘʟᴇᴀꜱᴇ ᴡᴀɪᴛ 😵‍💫**"
+                )
+                
         return
 
     # Play the Song
@@ -145,3 +167,9 @@ async def playforce(_, message):
         f"**Response Time**: {int(time.time() - start_time)}s",
         disable_web_page_preview=True,
     )
+
+
+@call.on_stream_end(())
+async def _on_stream_end(_, chat_id):
+    """Automatically plays the next song when the current one ends."""
+    await play_next_song(chat_id)
