@@ -9,7 +9,7 @@ from pytgcalls.types import MediaStream, VideoQuality, AudioQuality
 audio_file = "http://docs.evostream.com/sample_content/assets/sintel1m720p.mp4"
 
 
-async def play_audio(chat_id, audio_file=audio_file):
+async def playAudio(chat_id, audio_file=audio_file):
     """Plays an audio file in the given chat."""
     try:
         await call.play(
@@ -25,7 +25,7 @@ async def play_audio(chat_id, audio_file=audio_file):
         return False, f"Error: <code>{e}</code>"
 
 
-async def play_video(chat_id, video_file=audio_file):
+async def playVideo(chat_id, video_file=audio_file):
     """Plays a video file in the given chat."""
     try:
         await call.play(
