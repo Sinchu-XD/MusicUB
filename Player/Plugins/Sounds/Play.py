@@ -157,8 +157,9 @@ async def playforce_command(_, message):
     await m.delete()
 
 
-@call.on_closed_voice_chat()
-async def vc_ended(client, chat_id: int):
+@call.on_stream_end()
+async def vc_ended(client, update: StreamEnd):
+    chat_id = update.chat_id
     if chat_id in QUEUE:
         QUEUE[chat_id].clear()  # Reset queue after VC ends
         await app.send_message(chat_id, "✅ **Queue has been reset after VC ended.**")
