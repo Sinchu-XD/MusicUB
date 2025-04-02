@@ -4,42 +4,20 @@ Copyright ©️ 2025
 """
 
 import requests
+import os
 from urllib.parse import urlparse, parse_qs
+import yt_dlp
 
-# Get your YouTube API Key from https://console.developers.google.com/
+# ✅ Replace with your YouTube API Key
 YOUTUBE_API_KEY = "AIzaSyCVYsP4Ip49UlLzubYlv1ZnD2osWnMu32Y"
 YOUTUBE_API_URL = "https://www.googleapis.com/youtube/v3"
 
-
-def searchYt(query):
-    """Search for a YouTube video using YouTube Data API v3."""
-    search_url = f"{YOUTUBE_API_URL}/search"
-    params = {
-        "part": "snippet",
-        "q": query,
-        "type": "video",
-        "maxResults": 1,
-        "key": YOUTUBE_API_KEY,
-    }
-
-    response = requests.get(search_url, params=params)
-    data = response.json()
-
-    if "items" not in data or not data["items"]:
-        return None, None, None
-
-    video_id = data["items"][0]["id"]["videoId"]
-    title = data["items"][0]["snippet"]["title"]
-    link = f"https://www.youtube.com/watch?v={video_id}"
-
-    # Fetch video duration
-    duration = get_video_duration(video_id)
-
-    return title, duration, link
+# ✅ Path to your YouTube cookies file
+COOKIES_FILE = "cookies/cookies.txt"
 
 
 def get_playlist_videos(playlist_id):
-    """Fetch all videos from a YouTube playlist."""
+    """Fetch all videos from a YouTube playlist using YouTube Data API v3."""
     playlist_items_url = f"{YOUTUBE_API_URL}/playlistItems"
     videos = []
     next_page_token = None
@@ -117,3 +95,34 @@ def extract_video_id(url):
 
     query_params = parse_qs(parsed_url.query)
     return query_params.get("v", [None])[0]
+
+
+def get_direct_audio_url(video_url):
+    """Fetch the direct audio URL using yt-dlp with cookies."""
+    ydl_opts = {
+        "format": "bestaudio",
+        "quiet": True,
+        "cookies": COOKIES_FILE,  # Use YouTube cookies
+    }
+
+    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+        info_dict = ydl.extract_info(video_url, download=False)
+        audio_url = info_dict.get("url", None)
+
+    return audio_url
+
+
+# ✅ Example Usage:
+if __name__ == "__main__":
+    playlist_url = "https://www.youtube.com/playlist?list=YOUR_PLAYLIST_ID"
+    playlist_id = extract_playlist_id(playlist_url)
+    videos = get_playlist_videos(playlist_id)
+
+    if videos:
+        print(f"✅ Found {len(videos)} videos in the playlist!")
+
+        for title, duration, link in videos:
+            audio_url = get_direct_audio_url(link)
+            print(f"🎵 {title} ({duration}) - {audio_url}")
+    else:
+        print("❌ No videos found!")
