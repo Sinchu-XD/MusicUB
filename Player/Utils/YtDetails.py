@@ -24,21 +24,25 @@ def searchYt(query):
         "key": YOUTUBE_API_KEY,
     }
 
-    response = requests.get(search_url, params=params)
-    data = response.json()
+    try:
+        response = requests.get(search_url, params=params)
+        response.raise_for_status()  # Raise error if request fails
+        data = response.json()
+    except requests.exceptions.RequestException as e:
+        print(f"Error fetching YouTube data: {e}")
+        return None, None, None
 
     if "items" not in data or not data["items"]:
         return None, None, None
 
-    video_id = data["items"][0]["id"]["videoId"]
+    video_id = data["items"][0]["id"].get("videoId")
     title = data["items"][0]["snippet"]["title"]
-    link = f"https://www.youtube.com/watch?v={video_id}"
+    link = f"https://www.youtube.com/watch?v={video_id}" if video_id else None
 
     # Fetch video duration
-    duration = get_video_duration(video_id)
+    duration = get_video_duration(video_id) if video_id else None
 
     return title, duration, link
-
 
 def get_playlist_videos(playlist_id):
     """Fetch all videos from a YouTube playlist using YouTube Data API v3."""
