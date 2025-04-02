@@ -114,12 +114,12 @@ async def ytdl(format: str, link: str):
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(link, download=False)
             if 'url' in info:
-                return (1, info['url'])  # Success, return audio URL
+                duration = info.get('duration', 0)  # Fetch duration safely
+                return (1, info['url'], duration)
             else:
-                return (0, "No URL found")
+                return (0, "No URL found", 0)
     except Exception as e:
-        return (0, f"Error: {str(e)}")
-    return parse_duration(duration_iso)
+        return (0, str(e), 0)
 
 
 def parse_duration(duration):
