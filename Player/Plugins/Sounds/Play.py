@@ -26,12 +26,15 @@ RPREFIX = config.RPREFIX
 
 
 async def ytdl(format: str, link: str):
-    cmd = f'yt-dlp --geo-bypass --cookies "cookies/cookies.txt" -g -f "{format}" {link} --no-check-certificate --rm-cache-dir'
+    cmd = (
+        f'yt-dlp --geo-bypass --cookies "cookies/cookies.txt" -g '
+        f'--extract-audio --audio-format best --concurrent-fragments 5 '
+        f'-f "{format}" {link} --no-check-certificate --rm-cache-dir'
+    )
     process = await asyncio.create_subprocess_shell(
         cmd, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
     )
     stdout, stderr = await process.communicate()
-    
     return (1, stdout.decode().strip()) if stdout else (0, stderr.decode().strip())
 
 
