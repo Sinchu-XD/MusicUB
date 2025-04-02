@@ -132,7 +132,7 @@ async def seek_audio(_, message):
     if chat_id not in QUEUE:
         return await message.reply_text("No song playing...")
     try:
-        seek_dur = int(msg.text.split()[1])
+        seek_dur = int(message.text.split()[1])
     except:
         return await message.reply_text("Usage: /seek time (int)\n\nExample: `/seek 10`")
 
