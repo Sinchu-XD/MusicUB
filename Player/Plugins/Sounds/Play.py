@@ -111,16 +111,15 @@ async def _aPlay(_, message):
         query = message.text.split(maxsplit=1)[1]
         video_id = extract_video_id(query)
 
-        if not video_id:  # If video_id is None or empty
-            video_id = query  # Use the full query as the search term
-
-    try:
-        title, duration, link = searchYt(video_id)
-        if not title:
-            return await m.edit("❌ No results found.")
-    except Exception as e:
-        return await message.reply_text(f"Error: <code>{e}</code>")
-        await m.edit("**ᴡᴀɪᴛ ɴᴀ ʏʀʀʀ\n\nꜱᴇᴀʀᴄʜɪɴɢ ʏᴏᴜʀ ꜱᴏɴɢ 🌚❤️..**")
+        try:
+            if video_id is None:
+                video_id = query
+            title, duration, link = searchYt(video_id)
+            if (title, duration, link) == (None, None, None):
+                await m.edit("No results found")
+            except Exception as e:
+            return await message.reply_text(f"Error:- <code>{e}</code>")
+            await m.edit("**ᴡᴀɪᴛ ɴᴀ ʏʀʀʀ\n\nꜱᴇᴀʀᴄʜɪɴɢ ʏᴏᴜʀ ꜱᴏɴɢ 🌚❤️..**")
 
 
         format = "bestaudio"
