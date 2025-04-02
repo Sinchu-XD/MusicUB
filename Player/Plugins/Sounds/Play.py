@@ -130,12 +130,14 @@ async def _aPlay(_, message):
             await m.edit(f"❌ yt-dl issues detected\n\n» `{songlink}`")
         else:
             if chat_id in QUEUE:
-                queue_num = add_to_queue(chat_id, title[:19], duration, songlink, link)
+            queue_num = add_to_queue(chat_id, title[:19], duration, songlink, link)
+        else:
+            queue_num = None
+
                 await m.edit(
                     f"# {queue_num}\n{title[:19]}\n**ʏᴏᴜʀ ꜱᴏɴɢ ᴀᴅᴅᴇᴅ ɪɴ Qᴜᴇᴜᴇ\n\nᴘʟᴇᴀꜱᴇ ᴡᴀɪᴛ 😵‍💫**"
                 )
-                await asyncio.sleep(5)
-                return await m.delete()
+                asyncio.create_task(delete_messages(message, m))
             Status, Text = await Userbot.playAudio(chat_id, songlink)
             if Status == False:
                 return await m.edit(Text)
