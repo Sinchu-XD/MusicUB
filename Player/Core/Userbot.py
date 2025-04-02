@@ -4,7 +4,7 @@ Copyright ©️ 2025
 """
 
 from Player import call
-from pytgcalls.types import AudioPiped
+from pytgcalls.types.stream import StreamAudio
 from pytgcalls.types import MediaStream, VideoQuality, AudioQuality, StreamAudio
 
 audio_file = "http://docs.evostream.com/sample_content/assets/sintel1m720p.mp4"
@@ -46,7 +46,7 @@ async def play_song(chat_id: int, url: str) -> str:
     try:
         await call.play(
             chat_id,
-            AudioPiped(url),  # Corrected Import Path
+            StreamAudio(url),  # Corrected Import Path
         )
         return "Now Playing in VC."
     except Exception as e:
