@@ -5,7 +5,7 @@ Copyright ©️ 2025
 """
 from Player import app, call
 from Player.Core import Userbot
-from Player.Utils.YtDetails import searchYt, extract_video_id
+from Player.Utils.YtDetails import searchYt, extract_video_id, ytdl
 from Player.Utils.Queue import QUEUE, add_to_queue
 from Player.Utils.Delete import delete_messages
 from Player.Misc import SUDOERS
@@ -25,24 +25,7 @@ PREFIX = config.PREFIX
 RPREFIX = config.RPREFIX
 
 
-import yt_dlp
 
-async def ytdl(format: str, link: str):
-    ydl_opts = {
-        'format': format,
-        'geo_bypass': True,
-        'noplaylist': True,
-        'quiet': True,
-        'cookiefile': "cookies/cookies.txt",
-        'nocheckcertificate': True,
-    }
-    
-    try:
-        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            info = ydl.extract_info(link, download=False)
-            return (1, info['url']) if 'url' in info else (0, "No URL found")
-    except Exception as e:
-        return (0, str(e))
 
 
 async def processReplyToMessage(message):
