@@ -27,15 +27,15 @@ RPREFIX = config.RPREFIX
 
 import yt_dlp
 
-async def ytdl(link: str):
+async def ytdl(format: str, link: str):
     ydl_opts = {
-        'format': 'bestaudio[ext=m4a]',  # Directly downloads M4A for speed
+        'format': format,
         'geo_bypass': True,
         'noplaylist': True,
         'quiet': True,
         'cookiefile': "cookies/cookies.txt",
         'nocheckcertificate': True,
-        'outtmpl': 'downloads/%(title)s.%(ext)s',
+        'extract_flat': True,  # Prevents unnecessary metadata downloads
     }
 
     try:
