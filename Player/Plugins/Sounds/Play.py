@@ -35,16 +35,14 @@ async def ytdl(format: str, link: str):
         'quiet': True,
         'cookiefile': "cookies/cookies.txt",
         'nocheckcertificate': True,
-        'extract_flat': True,  # Prevents unnecessary metadata downloads
     }
-
+    
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(link, download=False)
-            return (1, info['url'], info.get('title', 'Unknown'), info.get('duration', 'Unknown'))
+            return (1, info['url']) if 'url' in info else (0, "No URL found")
     except Exception as e:
-        return (0, str(e), None, None)
-
+        return (0, str(e))
 
 
 async def processReplyToMessage(message):
