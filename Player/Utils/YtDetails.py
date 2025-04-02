@@ -79,22 +79,7 @@ def get_playlist_videos(playlist_id):
     return videos
 
 
-async def ytdl(format: str, link: str):
-    ydl_opts = {
-        'format': format,
-        'geo_bypass': True,
-        'noplaylist': True,
-        'quiet': True,
-        'cookiefile': "cookies/cookies.txt",
-        'nocheckcertificate': True,
-    }
-    
-    try:
-        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            info = ydl.extract_info(link, download=False)
-            return (1, info['url']) if 'url' in info else (0, "No URL found")
-    except Exception as e:
-        return (0, str(e))
+
 
 def get_video_duration(video_id):
     """Fetch video duration using YouTube API v3."""
@@ -112,6 +97,28 @@ def get_video_duration(video_id):
         return "Unknown"
 
     duration_iso = data["items"][0]["contentDetails"]["duration"]
+
+async def ytdl(format: str, link: str):
+    ydl_opts = {
+        'format': format,
+        'geo_bypass': True,
+        'noplaylist': True,
+        'quiet': True,
+        'cookiefile': "cookies/cookies.txt",  # Ensure cookies are used
+        'nocheckcertificate': True,
+        'force_generic_extractor': True,  # Force using a generic extractor if needed
+        'extractor_retries': 3,  # Retry fetching if it fails
+    }
+    
+    try:
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            info = ydl.extract_info(link, download=False)
+            if 'url' in info:
+                return (1, info['url'])  # Success, return audio URL
+            else:
+                return (0, "No URL found")
+    except Exception as e:
+        return (0, f"Error: {str(e)}")
     return parse_duration(duration_iso)
 
 
