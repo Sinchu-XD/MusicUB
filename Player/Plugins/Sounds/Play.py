@@ -117,7 +117,7 @@ async def _aPlay(_, message):
             title, duration, link = searchYt(video_id)
             if (title, duration, link) == (None, None, None):
                 await m.edit("No results found")
-            except Exception as e:
+        except Exception as e:
             return await message.reply_text(f"Error:- <code>{e}</code>")
             await m.edit("**ᴡᴀɪᴛ ɴᴀ ʏʀʀʀ\n\nꜱᴇᴀʀᴄʜɪɴɢ ʏᴏᴜʀ ꜱᴏɴɢ 🌚❤️..**")
 
