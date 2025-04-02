@@ -3,6 +3,8 @@ Telegram @Itz_Your_4Bhi
 Copyright ©️ 2025
 """
 
+import config
+
 from Player import app, call
 from Player.Utils.Loop import get_loop
 from Player.Utils.Delete import delete_messages
@@ -10,6 +12,9 @@ from Player.Utils.Queue import QUEUE, get_queue
 
 from pyrogram import filters
 from pytgcalls.types import MediaStream, AudioQuality
+
+PREFIX = config.PREFIX
+RPREFIX = config.RPREFIX
 
 seek_chats = {}
 
