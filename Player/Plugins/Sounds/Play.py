@@ -97,7 +97,7 @@ async def _aPlay(_, message):
         format = "bestaudio"
         resp, songlink, duration = await ytdl(format, link)  # ✅ Fix
         if resp == 0 or songlink is None:
-            await m.edit(f"❌ yt-dl issues detected\n\n» `{songlink}`")
+            await m.edit(f"❌ yt-dl issues detected\n\n» No valid song link found.")
         else:
             if chat_id in QUEUE:
                 queue_num = add_to_queue(chat_id, title[:19], duration, songlink, link)
@@ -122,6 +122,7 @@ async def _aPlay(_, message):
                 disable_web_page_preview=True,
             )
         asyncio.create_task(delete_messages(message, m))
+
 
         
         
