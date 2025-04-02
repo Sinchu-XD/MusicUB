@@ -45,12 +45,14 @@ async def _aSkip(_, message):
             return await m.edit_text(
                 f"🔄 **Loop is enabled!** Disable it with `{PREFIX}endloop` to skip.\n🎤 **Requested by:** {user_mention}"
             )
+            asyncio.create_task(delete_messages(message, m))
 
         # Check if queue has next song
         if chat_id not in QUEUE or len(get_queue(chat_id)) == 1:
             clear_queue(chat_id)
             await stop(chat_id)
             return await m.edit_text(f"🚫 **Queue is empty.** Leaving voice chat...\n🎤 **Requested by:** {user_mention}")
+            asyncio.create_task(delete_messages(message, m))
 
         try:
             # Fetch next song details
@@ -71,6 +73,7 @@ async def _aSkip(_, message):
 
             if not status:
                 return await m.edit_text(f"❌ **Failed to fetch next song.**\n🛑 `{songlink}`\n🎤 **Requested by:** {user_mention}")
+                asyncio.create_task(delete_messages(message, m))
 
             # Convert duration to readable format (MM:SS)
             duration_formatted = f"{duration // 60}:{duration % 60:02d}" if duration else "Unknown"
@@ -97,6 +100,7 @@ async def _aSkip(_, message):
                 f"🎤 **Requested by:** {user_mention}",
                 disable_web_page_preview=True,
             )
+            asyncio.create_task(delete_messages(message, m))
 
         except Exception as e:
             await m.delete()
@@ -104,6 +108,7 @@ async def _aSkip(_, message):
 
     else:
         return await message.reply_text(f"❌ **You don’t have permission to skip songs.** Ask an admin.\n🎤 **Requested by:** {user_mention}")
+        asyncio.create_task(delete_messages(message, m))
             
             
 @app.on_message(filters.command("queue", [PREFIX, RPREFIX]) & filters.group)
@@ -120,6 +125,7 @@ async def _queue(_, message):
         await message.reply_text(output, disable_web_page_preview=True)
     else:
         await message.reply_text("⚠️ Queue is empty!")
+        
 
 
 async def stop(chat_id):
