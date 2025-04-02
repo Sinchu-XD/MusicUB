@@ -28,50 +28,55 @@ async def _aSkip(_, message):
     chat_id = message.chat.id
     user_mention = message.from_user.mention
 
-    # Get administrators
+    # Check if user has permission to skip
     administrators = []
     async for m in app.get_chat_members(chat_id, filter=ChatMembersFilter.ADMINISTRATORS):
         administrators.append(m)
 
-    # Check if user has permission to skip
     if message.from_user.id in SUDOERS or message.from_user.id in [admin.user.id for admin in administrators]:
-        m = await message.reply_text(f"⏩ **Skipping the current song...**\n🎤 Requested by: {user_mention}")
+        m = await message.reply_text(f"⏩ **Skipping song...**\n🎤 Requested by: {user_mention}")
 
         # Check if looping is enabled
         loop = await get_loop(chat_id)
         if loop != 0:
-            await m.edit_text(
+            return await m.edit_text(
                 f"🔄 **Loop is enabled!** Disable it with `{PREFIX}endloop` to skip.\n🎤 **Requested by:** {user_mention}"
             )
-            return asyncio.create_task(delete_messages(message, m))
 
-        # Check if queue is empty
+        # Check if queue has next song
         if chat_id not in QUEUE or len(get_queue(chat_id)) == 1:
             clear_queue(chat_id)
             await stop(chat_id)
-            await m.edit_text(f"🚫 **No more tracks in the queue.** Leaving the voice chat...\n🎤 **Requested by:** {user_mention}")
-            return asyncio.create_task(delete_messages(message, m))
+            return await m.edit_text(f"🚫 **Queue is empty.** Leaving voice chat...\n🎤 **Requested by:** {user_mention}")
 
         try:
-            # Get next song details
+            # Fetch next song details
             next_song_data = get_queue(chat_id)[1]
             title = next_song_data[1]
             duration = next_song_data[2]
             link = next_song_data[3]
 
-            # Fetch audio link with yt-dlp
-            status, songlink = await ytdl("bestaudio", link)
-            if not status:
-                await m.edit_text(f"❌ **Error fetching next song:** `{songlink}`\n🎤 **Requested by:** {user_mention}")
-                return
+            # Try fetching the audio URL
+            retry_count = 0
+            max_retries = 3
+            status, songlink = (0, "")
 
-            # Play the next song
+            while retry_count < max_retries and status == 0:
+                status, songlink = await ytdl("bestaudio", link)
+                if status == 0:
+                    await asyncio.sleep(2)  # Wait before retrying
+                    retry_count += 1
+
+            if not status:
+                return await m.edit_text(f"❌ **Failed to fetch next song.**\n🛑 `{songlink}`\n🎤 **Requested by:** {user_mention}")
+
+            # Play next song
             await call.play(
                 chat_id,
                 MediaStream(songlink, video_flags=MediaStream.Flags.AUTO_DETECT),
             )
 
-            # Remove the skipped song from queue
+            # Remove skipped song from queue
             pop_an_item(chat_id)
 
             # Time calculation
@@ -87,8 +92,6 @@ async def _aSkip(_, message):
                 f"🎤 **Requested by:** {user_mention}",
                 disable_web_page_preview=True,
             )
-
-            return asyncio.create_task(delete_messages(message, m))
 
         except Exception as e:
             await m.delete()
