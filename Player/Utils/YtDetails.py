@@ -81,30 +81,30 @@ def get_playlist_videos(playlist_id):
 
 
 def get_video_duration(video_id):
-    """Fetch video duration using YouTube API v3."""
+    """Fetches video duration using YouTube API."""
     video_url = f"{YOUTUBE_API_URL}/videos"
     params = {
         "part": "contentDetails",
         "id": video_id,
         "key": YOUTUBE_API_KEY,
     }
-
+    
     response = requests.get(video_url, params=params)
     data = response.json()
 
     if "items" not in data or not data["items"]:
-        return "Unknown"
-
-    duration_iso = data["items"][0]["contentDetails"]["duration"]
-    return parse_duration(duration_iso)
-
+        return None
+    
+    duration = data["items"][0]["contentDetails"]["duration"]
+    return parse_duration(duration)
 
 def parse_duration(duration):
-    """Convert YouTube's ISO 8601 duration format (PT#M#S) to MM:SS."""
-    matches = re.match(r"PT(?:(\d+)M)?(?:(\d+)S)?", duration)
-    minutes = int(matches[1]) if matches[1] else 0
-    seconds = int(matches[2]) if matches[2] else 0
-    return f"{minutes}:{seconds:02d}"
+    """Parses YouTube ISO 8601 duration format into seconds."""
+    import isodate  # Install with `pip install isodate`
+    try:
+        return int(isodate.parse_duration(duration).total_seconds())
+    except:
+        return None
 
 
 def extract_playlist_id(url):
