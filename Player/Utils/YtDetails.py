@@ -98,28 +98,30 @@ def get_video_duration(video_id):
 
     duration_iso = data["items"][0]["contentDetails"]["duration"]
 
-async def ytdl(format: str, link: str):
+from yt_dlp import YoutubeDL
+
+async def ytdl(format, link):
     ydl_opts = {
         'format': format,
-        'geo_bypass': True,
-        'noplaylist': True,
         'quiet': True,
-        'cookiefile': "cookies/cookies.txt",  # Ensure cookies are used
-        'nocheckcertificate': True,
-        'force_generic_extractor': True,  # Force using a generic extractor if needed
-        'extractor_retries': 3,  # Retry fetching if it fails
+        'noplaylist': True,
+        'extractaudio': True,
+        'audioquality': 1,
+        'outtmpl': 'downloads/%(id)s.%(ext)s',
     }
-    
+
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            info = ydl.extract_info(link, download=False)
-            if 'url' in info:
-                duration = info.get('duration', 0)  # Fetch duration safely
-                return (1, info['url'], duration)
+            info = await asyncio.to_thread(ydl.extract_info, link)
+            if 'formats' in info:
+                songlink = next((f['url'] for f in info['formats'] if f['format_id'] == 'bestaudio'), None)
+                duration = info.get('duration', None)
+                return 1, songlink, duration
             else:
-                return (0, "No URL found", 0)
+                return 0, None, None
     except Exception as e:
-        return (0, str(e), 0)
+        return 0, None, None
+
 
 
 def parse_duration(duration):
