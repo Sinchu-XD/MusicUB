@@ -43,6 +43,7 @@ async def _aPlay(_, message):
     user_id = message.from_user.id
     user_name = message.from_user.first_name
     mention = f"[{user_name}](tg://user?id={user_id})"
+    
     if (message.reply_to_message) is not None:
         if message.reply_to_message.audio or message.reply_to_message.voice:
             input_filename, m = await processReplyToMessage(message)
@@ -92,11 +93,11 @@ async def _aPlay(_, message):
                 await m.edit("No results found")
         except Exception as e:
             return await message.reply_text(f"Error:- <code>{e}</code>")
-            await m.edit("**ᴡᴀɪᴛ ɴᴀ ʏʀʀʀ\n\nꜱᴇᴀʀᴄʜɪɴɢ ʏᴏᴜʀ ꜱᴏɴɢ 🌚❤️..**")
+        await m.edit("**ᴡᴀɪᴛ ɴᴀ ʏʀʀʀ\n\nꜱᴇᴀʀᴄʜɪɴɢ ʏᴏᴜʀ ꜱᴏɴɢ 🌚❤️..**")
         format = "bestaudio"
         resp, songlink, duration = await ytdl(format, link)  # ✅ Fix
-        if resp == 0:
-            await m.edit(f"❌ yt-dl issues detected\n\n» {songlink}")
+        if resp == 0 or songlink is None:
+            await m.edit(f"❌ yt-dl issues detected\n\n» `{songlink}`")
         else:
             if chat_id in QUEUE:
                 queue_num = add_to_queue(chat_id, title[:19], duration, songlink, link)
@@ -121,6 +122,7 @@ async def _aPlay(_, message):
                 disable_web_page_preview=True,
             )
         asyncio.create_task(delete_messages(message, m))
+
         
         
         
