@@ -25,20 +25,30 @@ async def playAudio(chat_id, audio_file=audio_file):
         return False, f"Error: <code>{e}</code>"
 
 
-async def playVideo(chat_id, video_file=audio_file):
-    """Plays a video file in the given chat with optimized settings."""
+async def vplay(chat_id, video_file, quality="hd_720p"):
+    """Plays a video file in a voice chat with optimized performance."""
     try:
+        quality_mapping = {
+            "uhd_4k": VideoQuality.UHD_4K,
+            "uhd_2k": VideoQuality.UHD_2K,
+            "fhd_1080p": VideoQuality.FHD_1080P,
+            "hd_720p": VideoQuality.HD_720P,
+            "sd_480p": VideoQuality.SD_480P
+        }
+        # Get the selected video quality (default: HD 720p)
+        video_quality = quality_mapping.get(quality.lower(), VideoQuality.HD_720P)
         await call.play(
             chat_id,
             MediaStream(
-                media_path=video_file,
+                media_path=video_file, 
                 audio_parameters=AudioQuality.STUDIO,
-                video_parameters=VideoQuality.FHD_1080p,
+                video_parameters=video_quality,
             ),
         )
-        return True, None
+
+        return True, None  # Success
     except Exception as e:
-        return False, f"Error: <code>{e}</code>"
+        return False, f"Error: <code>{e}</code>"  # Error handling
 
 
 
