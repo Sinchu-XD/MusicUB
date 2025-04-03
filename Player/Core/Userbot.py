@@ -42,7 +42,7 @@ async def playVideo(chat_id, video_file=audio_file, quality="SD_480p"):
             chat_id,
             MediaStream(
                 media_path=video_file, 
-                audio_parameters=AudioQuality.STUDIO,
+                audio_parameters=AudioQuality.MEDIUM,
                 video_parameters=video_quality,
             ),
         )
