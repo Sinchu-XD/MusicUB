@@ -4,7 +4,7 @@ Copyright ©️ 2025
 """
 
 import time
-
+import asyncio
 from pytgcalls import PyTgCalls, filters
 from pytgcalls.types import Update, MediaStream, ChatUpdate
 
