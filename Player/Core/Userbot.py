@@ -30,7 +30,7 @@ async def playVideo(chat_id, video_file=audio_file, quality="hd_720p"):
     try:
         quality_mapping = {
             "uhd_4k": VideoQuality.UHD_4K,
-            "uhd_2k": VideoQuality.UHD_2K,
+            "qhd_2k": VideoQuality.QHD_2K,
             "fhd_1080p": VideoQuality.FHD_1080P,
             "hd_720p": VideoQuality.HD_720P,
             "sd_480p": VideoQuality.SD_480P
