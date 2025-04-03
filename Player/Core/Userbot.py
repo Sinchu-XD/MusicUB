@@ -25,7 +25,7 @@ async def playAudio(chat_id, audio_file=audio_file):
         return False, f"Error: <code>{e}</code>"
 
 
-async def vplay(chat_id, video_file, quality="hd_720p"):
+async def playVideo(chat_id, video_file=audio_file, quality="hd_720p"):
     """Plays a video file in a voice chat with optimized performance."""
     try:
         quality_mapping = {
