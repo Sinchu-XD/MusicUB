@@ -26,14 +26,14 @@ async def playAudio(chat_id, audio_file=audio_file):
 
 
 async def playVideo(chat_id, video_file=audio_file):
-    """Plays a video file in the given chat."""
+    """Plays a video file in the given chat with optimized settings."""
     try:
         await call.play(
             chat_id,
             MediaStream(
                 media_path=video_file,
-                audio_parameters=AudioQuality.STUDIO,
-                video_parameters=VideoQuality.UHD_4K,
+                audio_parameters=AudioQuality.HIGH,
+                video_parameters=VideoQuality.FHD_1080,
             ),
         )
         return True, None
