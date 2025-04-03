@@ -25,15 +25,16 @@ async def playAudio(chat_id, audio_file=audio_file):
         return False, f"Error: <code>{e}</code>"
 
 
-async def playVideo(chat_id, video_file=audio_file, quality="hd_720p"):
+async def playVideo(chat_id, video_file=audio_file, quality="HD_720p"):
     """Plays a video file in a voice chat with optimized performance."""
     try:
         quality_mapping = {
-            "uhd_4k": VideoQuality.UHD_4K,
-            "qhd_2k": VideoQuality.QHD_2K,
-            "fhd_1080p": VideoQuality.FHD_1080P,
-            "hd_720p": VideoQuality.HD_720P,
-            "sd_480p": VideoQuality.SD_480P
+            "UHD_4K": VideoQuality.UHD_4K,
+            "QHD_2K": VideoQuality.QHD_2K,
+            "FHD_1080p": VideoQuality.FHD_1080p,
+            "HD_720p": VideoQuality.HD_720p,
+            "SD_480p": VideoQuality.SD_480p,
+            "SD_360p": VideoQuality.SD_360p,
         }
         # Get the selected video quality (default: HD 720p)
         video_quality = quality_mapping.get(quality.lower(), VideoQuality.HD_720P)
