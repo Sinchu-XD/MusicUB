@@ -37,7 +37,7 @@ async def playVideo(chat_id, video_file=audio_file, quality="HD_720p"):
             "SD_360p": VideoQuality.SD_360p,
         }
         # Get the selected video quality (default: HD 720p)
-        video_quality = quality_mapping.get(quality.lower(), VideoQuality.HD_720P)
+        video_quality = quality_mapping.get(quality.lower(), VideoQuality.HD_720p)
         await call.play(
             chat_id,
             MediaStream(
