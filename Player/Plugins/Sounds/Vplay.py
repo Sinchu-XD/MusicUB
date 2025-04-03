@@ -11,6 +11,7 @@ import asyncio
 
 from Player import app
 from Player.Core import Userbot
+from Player.Utils.Delete import delete_messages
 from Player.Utils.YtDetails import searchYt, extract_video_id
 from Player.Utils.Queue import QUEUE, add_to_queue
 from Player.Misc import SUDOERS
