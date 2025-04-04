@@ -6,7 +6,7 @@ import asyncio
 import re
 
 # ✅ Replace with your YouTube API Key
-YOUTUBE_API_KEY = "AIzaSyBllgwdS_H8eMeDL6CdifRbbq2F5LYp1mM"
+YOUTUBE_API_KEY = "AIzaSyDWoCUjMLb6S9MJgd6i5Tgzzzj_cx-S1O4"
 YOUTUBE_API_URL = "https://www.googleapis.com/youtube/v3"
 
 # ✅ Path to your YouTube cookies file
