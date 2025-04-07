@@ -54,15 +54,29 @@ async def ytdl(link):
         return 0, stderr.decode()
 
 
+import re
+
+def clean_filename(name: str) -> str:
+    return re.sub(r'[<>:"/\\|?*]', '', name).strip().replace(' ', '_')
+
 async def processReplyToMessage(message):
     msg = message.reply_to_message
-    if msg.video or msg.video_note:
-        m = await message.reply_text("Rukja...Tera Video Download kar raha hu...")
-        video_original = await msg.download()
-        return video_original, m
-    else:
-        return None
 
+    if msg and (msg.video or msg.video_note):
+    m = await message.reply_text("Rukja... Tera video download kar raha hu...")
+
+    # Try to get original filename, if not fallback to "video"
+    file_name = getattr(msg.video, "file_name", None) or "video.mp4"
+    safe_file_name = clean_filename(file_name)
+
+    try:
+        video_original = await msg.download(file_name=f"downloads/{safe_file_name}")
+        return video_original, m
+    except Exception as e:
+        await m.edit(f"❌ Download failed: `{e}`")
+        return None, m
+    else:
+        return None, None
 
 async def playWithLinks(link):
     if "&" in link:
