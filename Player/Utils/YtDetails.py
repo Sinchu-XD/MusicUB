@@ -7,8 +7,8 @@ import asyncio
 import re
 
 # ✅ Replace with your YouTube API Key
-YOUTUBE_API_KEY = "AIzaSyCfKI90y0KcrMIi-zlh9U0bYe9scFcJ9Vo"
-YOUTUBE_API_URL = "https://www.googleapis.com/youtube/v3"
+#YOUTUBE_API_KEY = "AIzaSyCfKI90y0KcrMIi-zlh9U0bYe9scFcJ9Vo"
+#YOUTUBE_API_URL = "https://www.googleapis.com/youtube/v3"
 
 # ✅ Path to your YouTube cookies file
 COOKIES_FILE = "cookies/cookies.txt"
@@ -32,8 +32,57 @@ def searchYt(query):
             return title, duration, link
     return None, None, None
 
+
+def extract_playlist_id(url):
+    """Extract playlist ID from YouTube URL."""
+    parsed_url = urlparse(url)
+    query_params = parse_qs(parsed_url.query)
+    return query_params.get("list", [None])[0]
+
+def extract_video_id(url):
+    """Extract video ID from YouTube URL."""
+    parsed_url = urlparse(url)
+    if parsed_url.hostname == "youtu.be":
+        return parsed_url.path[1:]
+    query_params = parse_qs(parsed_url.query)
+    return query_params.get("v", [None])[0]
+
+def parse_duration(duration_str):
+    """Convert duration string like '12:34' or '1:02:45' to seconds."""
+    parts = duration_str.split(':')
+    parts = list(map(int, parts))
+    if len(parts) == 3:
+        hours, minutes, seconds = parts
+    elif len(parts) == 2:
+        hours = 0
+        minutes, seconds = parts
+    else:
+        hours = 0
+        minutes = 0
+        seconds = parts[0]
+    return hours * 3600 + minutes * 60 + seconds
+
+def get_playlist_videos(playlist_url):
+    """Fetch all videos from a YouTube playlist using youtube-search-python."""
+    playlist = Playlist(playlist_url)
+    playlist.videos  # Load initial videos
+
+    videos = []
+
+    while playlist.hasMoreVideos:
+        playlist.getNextVideos()
+
+    for video in playlist.videos:
+        title = video['title']
+        duration = parse_duration(video.get('duration', '0:00'))
+        link = video['link']
+        videos.append((title, duration, link))
+
+    return videos
+
+
+"""
 def get_playlist_videos(playlist_id):
-    """Fetch all videos from a YouTube playlist using YouTube Data API v3."""
     playlist_items_url = f"{YOUTUBE_API_URL}/playlistItems"
     videos = []
     next_page_token = None
@@ -69,7 +118,6 @@ def get_playlist_videos(playlist_id):
 
 
 def get_video_duration(video_id):
-    """Fetches video duration using YouTube API."""
     video_url = f"{YOUTUBE_API_URL}/videos"
     params = {
         "part": "contentDetails",
@@ -87,7 +135,6 @@ def get_video_duration(video_id):
     return parse_duration(duration)
 
 def parse_duration(duration):
-    """Parses YouTube ISO 8601 duration format into seconds."""
     import isodate  # Install with `pip install isodate`
     try:
         return int(isodate.parse_duration(duration).total_seconds())
@@ -96,21 +143,19 @@ def parse_duration(duration):
 
 
 def extract_playlist_id(url):
-    """Extract playlist ID from YouTube URL."""
     parsed_url = urlparse(url)
     query_params = parse_qs(parsed_url.query)
     return query_params.get("list", [None])[0]
 
 
 def extract_video_id(url):
-    """Extract video ID from YouTube URL."""
     parsed_url = urlparse(url)
     if parsed_url.hostname == "youtu.be":
         return parsed_url.path[1:]
 
     query_params = parse_qs(parsed_url.query)
     return query_params.get("v", [None])[0]
-
+"""
 
 async def ytdl(format: str, link: str):
     ydl_opts = {
@@ -136,9 +181,7 @@ async def ytdl(format: str, link: str):
     except Exception as e:
         return (0, str(e), 0)
 
-
 def get_direct_audio_url(video_url):
-    """Fetch the direct audio URL using yt-dlp with cookies."""
     ydl_opts = {
         "format": "bestaudio",
         "quiet": False,  # ✅ Show errors if any
@@ -156,17 +199,7 @@ def get_direct_audio_url(video_url):
 
 # ✅ Example Usage:
 if __name__ == "__main__":
-    # ✅ Playlist Example
-    playlist_url = "https://www.youtube.com/playlist?list=YOUR_PLAYLIST_ID"
-    playlist_id = extract_playlist_id(playlist_url)
-    videos = get_playlist_videos(playlist_id)
-
-    if videos:
-        print(f"✅ Found {len(videos)} videos in the playlist!")
-
-        for title, duration, link in videos:
-            audio_url = get_direct_audio_url(link)
-            print(f"🎵 {title} ({duration}) - {audio_url}")
-    else:
-        print("❌ No videos found!")
-        
+    url = "https://www.youtube.com/playlist?list=PLxyz..."  # Replace with your playlist
+    vids = get_playlist_videos(url)
+    for title, duration, link in vids:
+        print(f"{title} | {duration} sec | {link}")
