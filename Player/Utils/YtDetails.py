@@ -2,6 +2,7 @@ import requests
 import os
 from urllib.parse import urlparse, parse_qs
 import yt_dlp
+from youtubesearchpython import VideosSearch
 import asyncio
 import re
 
@@ -14,35 +15,22 @@ COOKIES_FILE = "cookies/cookies.txt"
 
 
 def searchYt(query):
-    """Search for a YouTube video using YouTube Data API v3."""
-    search_url = f"{YOUTUBE_API_URL}/search"
-    params = {
-        "part": "snippet",
-        "q": query,
-        "type": "video",
-        "maxResults": 1,
-        "key": YOUTUBE_API_KEY,
-    }
-
-    try:
-        response = requests.get(search_url, params=params)
-        response.raise_for_status()  # Raise error if request fails
-        data = response.json()
-    except requests.exceptions.RequestException as e:
-        print(f"Error fetching YouTube data: {e}")
-        return None, None, None
-
-    if "items" not in data or not data["items"]:
-        return None, None, None
-
-    video_id = data["items"][0]["id"].get("videoId")
-    title = data["items"][0]["snippet"]["title"]
-    link = f"https://www.youtube.com/watch?v={video_id}" if video_id else None
-
-    # Fetch video duration
-    duration = get_video_duration(video_id) if video_id else None
-
-    return title, duration, link
+    query = str(query)
+    videosResult = VideosSearch(query, limit=1)
+    Result = videosResult.result()
+    if not Result["result"] == []:
+        title = Result["result"][0]["title"]
+        duration = Result["result"][0]["duration"]
+        link = Result["result"][0]["link"]
+        return title, duration, link
+    else:
+        videosResult = Search(query, use_po_token=True)
+        for Result in videosResult.videos:
+            title = Result.title
+            duration = Result.length
+            link = Result.watch_url
+            return title, duration, link
+    return None, None, None
 
 def get_playlist_videos(playlist_id):
     """Fetch all videos from a YouTube playlist using YouTube Data API v3."""
