@@ -19,25 +19,39 @@ async def purge_all(client: Client, message: Message):
         return await message.reply("❌ Please give a Chat ID or username.\nUsage: `/purgeall -1001234567890`", quote=True)
 
     chat_id = message.command[1]
+    try:
+        chat_id = int(chat_id)
+    except ValueError:
+        return await message.reply("❌ Invalid Chat ID.")
+
+    await message.reply(f"🧹 Purging chat: `{chat_id}`...")
 
     deleted = 0
     failed = 0
-    await message.reply(f"🧹 Starting purge in `{chat_id}`...")
+    batch = []
 
-    try:
-        async for msg in client.get_chat_history(chat_id):
+    async for msg in client.get_chat_history(chat_id):
+        batch.append(msg.id)
+        if len(batch) == 100:
             try:
-                await client.delete_messages(chat_id, msg.id)
-                deleted += 1
-                await asyncio.sleep(0.05)  # avoid FloodWait
+                await client.delete_messages(chat_id, batch)
+                deleted += len(batch)
             except Exception as e:
-                failed += 1
-                print(f"Failed to delete {msg.id} - {e}")
-    except Exception as e:
-        return await message.reply(f"❌ Error: `{e}`")
+                print(f"❌ Failed deleting batch: {e}")
+                failed += len(batch)
+            batch = []
+            await asyncio.sleep(0.5)  # Reduce flood risk
 
-    await message.reply(f"✅ Purge complete!\nDeleted: `{deleted}`\nFailed: `{failed}`")
-    print(f"✅ Purge from {chat_id} done. Deleted: {deleted}, Failed: {failed}")
+    # Delete any remaining messages
+    if batch:
+        try:
+            await client.delete_messages(chat_id, batch)
+            deleted += len(batch)
+        except Exception as e:
+            print(f"❌ Final batch error: {e}")
+            failed += len(batch)
+
+    await message.reply(f"✅ Done!\nDeleted: {deleted}\nFailed: {failed}")
 
     # ✅ Console log with bot username
     me = await client.get_me()
