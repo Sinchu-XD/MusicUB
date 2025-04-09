@@ -7,7 +7,7 @@ from config import OWNER_ID
 SUDO_USERS = [7862043458, 8091116698]  
 
 
-@app.on_message(filters.command("purgeall") & filters.user(SUDO_USERS))
+@app.on_message(filters.command("purgeall") & filters.user)
 async def purge_by_chat_id(client, message):
     user_id = message.from_user.id
 
