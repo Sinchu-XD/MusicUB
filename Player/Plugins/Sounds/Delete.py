@@ -8,36 +8,36 @@ SUDO_USERS = [7862043458, 8091116698]
 
 
 @app.on_message(filters.command("purgeall"))
-async def purge_by_chat_id(client, message: Message):
+async def purge_all(client: Client, message: Message):
     user_id = message.from_user.id
 
-    # ✅ Unauthorized user trying the command
-    if user_id not in SUDO_USERS:
-        return await message.reply("🚫 Only Rex Bhadwa And Abhi Randi Use This Command", quote=True)
+    # Check if user is authorized
+    if user_id != OWNER_ID and user_id not in SUDO_USERS:
+        return await message.reply("🚫 **Only Rex Bhadwa And Abhi Randi Use This Command**")
 
-    # ✅ Command format check
     if len(message.command) < 2:
-        return await message.reply("❌ Please provide a chat ID.\n\n**Usage:** `/purgeall -1001234567890`", quote=True)
+        return await message.reply("❌ Please give a Chat ID or username.\nUsage: `/purgeall -1001234567890`", quote=True)
 
     chat_id = message.command[1]
+
+    deleted = 0
+    failed = 0
+    await message.reply(f"🧹 Starting purge in `{chat_id}`...")
+
     try:
-        chat_id = int(chat_id)
-    except ValueError:
-        return await message.reply("❌ Invalid Chat ID. Must be a number.", quote=True)
+        async for msg in client.get_chat_history(chat_id):
+            try:
+                await client.delete_messages(chat_id, msg.id)
+                deleted += 1
+                await asyncio.sleep(0.05)  # avoid FloodWait
+            except Exception as e:
+                failed += 1
+                print(f"Failed to delete {msg.id} - {e}")
+    except Exception as e:
+        return await message.reply(f"❌ Error: `{e}`")
 
-    deleted_count = 0
-    await message.reply(f"🧹 Starting purge in chat: `{chat_id}`")
-
-    # ✅ Loop through messages and delete
-    async for msg in client.get_chat_history(chat_id):
-        try:
-            await client.delete_messages(chat_id, msg.id)
-            deleted_count += 1
-            await asyncio.sleep(0.5)  # Avoid floodwait
-        except Exception as e:
-            print(f"❌ Error deleting message {msg.id}: {e}")
-
-    await client.send_message(chat_id, f"✅ Deleted {deleted_count} messages from this chat.")
+    await message.reply(f"✅ Purge complete!\nDeleted: `{deleted}`\nFailed: `{failed}`")
+    print(f"✅ Purge from {chat_id} done. Deleted: {deleted}, Failed: {failed}")
 
     # ✅ Console log with bot username
     me = await client.get_me()
