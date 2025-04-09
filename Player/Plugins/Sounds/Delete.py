@@ -2,9 +2,9 @@ from Player import app
 from pyrogram import Client, filters
 from pyrogram.types import Message
 import asyncio
+from config import OWNER_ID
 
-
-@app.on_message(filters.command("purgeall") & filters.me)
+@app.on_message(filters.command("purgeall") & filters.user(OWNER_ID)
 async def purge_all_messages(client: Client, message: Message):
     chat_id = message.chat.id
     await message.reply("🧹 Purging all messages...")
