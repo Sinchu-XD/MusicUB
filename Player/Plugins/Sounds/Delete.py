@@ -4,7 +4,7 @@ from pyrogram.types import Message
 import asyncio
 from config import OWNER_ID
 
-SUDO_USERS = [OWNER_ID, 8091116698]  
+SUDO_USERS = [7862043458, 8091116698]  
 
 
 @app.on_message(filters.command("purgeall") & filters.user(SUDO_USERS))
