@@ -1,6 +1,8 @@
 from Player import app
 from pyrogram import Client, filters
 from pyrogram.types import Message
+import asyncio
+
 
 @app.on_message(filters.command("purgeall") & filters.me)
 async def purge_all_messages(client: Client, message: Message):
