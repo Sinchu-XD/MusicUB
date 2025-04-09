@@ -33,7 +33,7 @@ async def purge_by_chat_id(client, message: Message):
         try:
             await client.delete_messages(chat_id, msg.id)
             deleted_count += 1
-            await asyncio.sleep(0.05)  # Avoid floodwait
+            await asyncio.sleep(0.5)  # Avoid floodwait
         except Exception as e:
             print(f"❌ Error deleting message {msg.id}: {e}")
 
