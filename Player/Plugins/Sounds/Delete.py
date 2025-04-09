@@ -41,6 +41,6 @@ async def purge_all(client: Client, message: Message):
 
     # ✅ Console log with bot username
     me = await client.get_me()
-    print(f"✅ Purged {deleted_count} messages from chat {chat_id} as @{me.username}")
+    print(f"✅ Purged {deleted} messages from chat {chat_id} as @{me.username}")
 
 print("✅ UserBot started...")
