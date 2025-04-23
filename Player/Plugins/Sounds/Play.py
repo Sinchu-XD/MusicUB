@@ -165,10 +165,9 @@ async def playforce(_, message):
     finish_time = time.time()
     total_time_taken = str(int(finish_time - start_time)) + "s"
     
-    title = search_results[0].get("title", "Unknown Song")
-    channel_name = search_results[0].get("channel_name", "Unknown Channel")
-    views = search_results[0].get("views", "Unknown Views")
-    durations = f"{duration // 60}:{duration % 60:02d}" if duration else "Unknown"
+    title = search_results[0]["title"]
+    channel_name = search_results[0]["channel_name"]
+    views = search_results[0]["views"]
 
     await m.edit(
         f"**𝑆𝑜𝑛𝑔 𝐹𝑜𝑟𝑐𝑒 𝑃𝑙𝑎𝑦𝑒𝑑 𝑎𝑡 ν𝑐**\n\n"
