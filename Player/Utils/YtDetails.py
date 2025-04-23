@@ -36,7 +36,8 @@ if __name__ == "__main__":
         query = input("Enter song name: ")
         try:
             url = await get_stream_url(query)
-            status, stream_url = await ytdl("bestaudio", url)
+            format = "bestaudio"
+            status, stream_url = await ytdl(format, url)
             if status:
                 print(f"Stream URL: {stream_url}")
             else:
