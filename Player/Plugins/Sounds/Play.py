@@ -82,13 +82,17 @@ async def _aPlay(_, message):
         resp = result[0]
         songlink = result[1]
         duration = search_results[0]['duration']
-    except Exception as e:
-        return await m.edit(f"Error during download: <code>{e}</code>")
-
-    if chat_id in QUEUE and QUEUE[chat_id]:
-        queue_num = add_to_queue(chat_id, search_results[0]["title"][:19], duration, songlink, stream_url)
-        await m.edit(f"# {queue_num}\n{search_results[0]['title'][:19]}\n**ʏᴏᴜʀ ꜱᴏɴɢ ᴀᴅᴅᴇᴅ ɪɴ Qᴜᴇᴜᴇ\nᴘʟᴇᴀꜱᴇ ᴡᴀɪᴛ 😵‍💫**")
-        return asyncio.create_task(delete_messages(message, m))
+    if resp == 0 or songlink is None:
+            await m.edit(f"❌ yt-dl issues detected\n\n» No valid song link found.")
+        else:
+            if chat_id in QUEUE:
+                queue_num = add_to_queue(chat_id, title[:19], duration, songlink, link)
+                await m.edit(
+                    f"# {queue_num}\n{title[:19]}\n**ʏᴏᴜʀ ꜱᴏɴɢ ᴀᴅᴅᴇᴅ ɪɴ Qᴜᴇᴜᴇ\n\nᴘʟᴇᴀꜱᴇ ᴡᴀɪᴛ 😵‍💫**"
+                )
+                
+                asyncio.create_task(delete_messages(message, m))
+                return
 
     Status, Text = await Userbot.playAudio(chat_id, songlink)
     if not Status:
