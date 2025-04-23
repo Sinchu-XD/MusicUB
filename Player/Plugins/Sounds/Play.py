@@ -149,10 +149,12 @@ async def playforce(_, message):
     resp = result[0]
     songlink = result[1]
     duration = result[2] if len(result) > 2 else None
-        if resp == 0:
-            return await m.edit(f"❌ yt-dl issues detected\n\n» {songlink}")
-    except Exception as e:
-        return await m.edit(f"Error: <code>{e}</code>")
+        
+        if resp == 0 or songlink is None:
+            await m.edit(f"❌ yt-dl issues detected\n\n» No valid song link found.")
+        else:
+            channel_name = search_results[0]["channel_name"]
+            views = search_results[0]["views"]
     
     Status, Text = await Userbot.playAudio(chat_id, songlink)
     if Status == False:
