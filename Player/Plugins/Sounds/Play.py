@@ -95,7 +95,7 @@ async def _aPlay(_, message):
         result = await ytdl(format, stream_url)
         resp = result[0]
         songlink = result[1]
-        duration = result[2] if len(result) > 2 else None
+        duration = search_results[0]["duration"]
         
         if resp == 0 or songlink is None:
             await m.edit(f"❌ yt-dl issues detected\n\n» No valid song link found.")
