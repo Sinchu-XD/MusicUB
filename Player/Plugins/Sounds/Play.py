@@ -81,29 +81,29 @@ async def _aPlay(_, message):
     songlink = result[1]
     duration = search_results[0]['duration']
     if resp == 0 or songlink is None:
-            await m.edit(f"❌ yt-dl issues detected\n\n» No valid song link found.")
-        else:
-            if chat_id in QUEUE:
-                queue_num = add_to_queue(chat_id, title[:19], duration, songlink, link)
-                await m.edit(
-                    f"# {queue_num}\n{title[:19]}\n**ʏᴏᴜʀ ꜱᴏɴɢ ᴀᴅᴅᴇᴅ ɪɴ Qᴜᴇᴜᴇ\n\nᴘʟᴇᴀꜱᴇ ᴡᴀɪᴛ 😵‍💫**"
+        await m.edit(f"❌ yt-dl issues detected\n\n» No valid song link found.")
+    else:
+        if chat_id in QUEUE:
+            queue_num = add_to_queue(chat_id, title[:19], duration, songlink, link)
+            await m.edit(
+                f"# {queue_num}\n{title[:19]}\n**ʏᴏᴜʀ ꜱᴏɴɢ ᴀᴅᴅᴇᴅ ɪɴ Qᴜᴇᴜᴇ\n\nᴘʟᴇᴀꜱᴇ ᴡᴀɪᴛ 😵‍💫**"
                 )
                 
-                asyncio.create_task(delete_messages(message, m))
-                return
+            asyncio.create_task(delete_messages(message, m))
+            return
 
-    Status, Text = await Userbot.playAudio(chat_id, songlink)
-    if not Status:
-        return await m.edit(Text)
+        Status, Text = await Userbot.playAudio(chat_id, songlink)
+        if not Status:
+            return await m.edit(Text)
 
-    total_time = f"{int(time.time() - start_time)}s"
-    await m.edit(
-        f"**ѕσηg ιѕ ρℓαуιηg ιη ν¢**\n\n**SongName**:- [{search_results[0]['title'][:19]}]({stream_url})\n"
-        f"**Duration**:- {duration}\n**Channel**:- {search_results[0]['channel']}\n"
-        f"**Views**:- {search_results[0]['views']}\n**Requested By**:- {mention}\n\n**Response Time**:- {total_time}",
-        disable_web_page_preview=True,
+        total_time = f"{int(time.time() - start_time)}s"
+        await m.edit(
+            f"**ѕσηg ιѕ ρℓαуιηg ιη ν¢**\n\n**SongName**:- [{search_results[0]['title'][:19]}]({stream_url})\n"
+            f"**Duration**:- {duration}\n**Channel**:- {search_results[0]['channel']}\n"
+            f"**Views**:- {search_results[0]['views']}\n**Requested By**:- {mention}\n\n**Response Time**:- {total_time}",
+            disable_web_page_preview=True,
     )
-    return asyncio.create_task(delete_messages(message, m))
+        return asyncio.create_task(delete_messages(message, m))
 
 
 @app.on_message((filters.command(PLAYFORCE_COMMAND, [PREFIX, RPREFIX])) & filters.group)
