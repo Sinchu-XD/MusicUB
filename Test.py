@@ -1,11 +1,11 @@
 import asyncio
-from Player.Utils.YtDetails import get_stream_url
+from Player.Utils.YtDetails import SearchYt
 
 async def main():
     query = input("🔍 Enter search query: ")
     try:
-        stream_url = await get_stream_url(query)
-        print(f"✅ Stream URL:\n{stream_url}")
+        stream_url = await SearchYt(query)
+        print(f"✅ URL:\n{stream_url}")
     except Exception as e:
         print(f"❌ Error: {str(e)}")
 
