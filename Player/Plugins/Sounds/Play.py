@@ -149,9 +149,6 @@ async def playforce(_, message):
     resp = result[0]
     songlink = result[1]
     duration = result[2] if len(result) > 2 else None
-    
-    try:
-        resp, songlink, duration = await ytdl(format, stream_url)
         if resp == 0:
             return await m.edit(f"❌ yt-dl issues detected\n\n» {songlink}")
     except Exception as e:
