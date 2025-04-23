@@ -42,10 +42,7 @@ async def ytdl(format: str, link: str):
         return (0, str(e))
 
 if __name__ == "__main__":
-    url = "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
-    loop = asyncio.get_event_loop()
-    asyncio.set_event_loop(loop)
-    title, duration, link = loop.run_until_complete(searchYt("Never Gonna Give You Up"))
+    title, duration, link = asyncio.run(searchYt("Never Gonna Give You Up"))
     if title:
         print(f"{title} | {link}")
         
