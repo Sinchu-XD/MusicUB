@@ -16,7 +16,7 @@ COOKIES_FILE = "cookies/cookies.txt"
 
 def searchYt(query: str) -> str:
     query = str(query)
-    Result = Search(query, limit=1)
+    Result = await Search(query, limit=1)
     if not Result["result"] == []:
         title = Result["result"][0]["title"]
         duration = Result["result"][0]["duration"]
