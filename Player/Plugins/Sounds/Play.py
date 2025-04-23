@@ -145,24 +145,37 @@ async def playforce(_, message):
     
     await m.edit("**Fetching Song Details...**")
     format = "bestaudio"
-    resp, songlink, duration = await ytdl(format, stream_url)
-
-    if resp == 0:
-        return await m.edit(f"❌ yt-dl issues detected\n\n» {songlink}")
-
-    durations = f"{duration // 60}:{duration % 60:02d}" if duration else "Unknown"
+    result = await ytdl(format, stream_url)
+    resp = result[0]
+    songlink = result[1]
+    duration = result[2] if len(result) > 2 else None
+    
+    try:
+        resp, songlink, duration = await ytdl(format, stream_url)
+        if resp == 0:
+            return await m.edit(f"❌ yt-dl issues detected\n\n» {songlink}")
+    except Exception as e:
+        return await m.edit(f"Error: <code>{e}</code>")
+    
     Status, Text = await Userbot.playAudio(chat_id, songlink)
     if Status == False:
         return await m.edit(Text)
     
     finish_time = time.time()
     total_time_taken = str(int(finish_time - start_time)) + "s"
+    channel_name = search_results[0].get("channel_name", "Unknown")
+    views = search_results[0].get("views", "Unknown")
 
     await m.edit(
         f"**𝑆𝑜𝑛𝑔 𝐹𝑜𝑟𝑐𝑒 𝑃𝑙𝑎𝑦𝑒𝑑 𝑎𝑡 ν𝑐**\n\n"
-        f"**SongName**:- [{search_results[0]['title'][:19]}]({stream_url})\n"
-        f"**Duration**:- {durations}\n**Requested By**:- {mention}\n\n**Response Time**:- {total_time_taken}",
+        f"**SongName**:- [{search_results[0]['title'][:19]}]({songlink})\n"
+        f"**Duration**:- {duration}\n"
+        f"**Channel**:- {channel_name}\n"
+        f"**Views**:- {views}\n"
+        f"**Requested By**:- {mention}\n\n"
+        f"**Response Time**:- {total_time_taken}",
         disable_web_page_preview=True,
     )
+    
     asyncio.create_task(delete_messages(message, m))
     
