@@ -5,10 +5,26 @@ from YouTubeMusic.YtSearch import Search
 COOKIES_FILE = "cookies/cookies.txt"
 
 async def get_stream_url(query: str) -> str:
-    results = await Search(query, limit=1)
+    results = await Search(query, limit=3)
+
     if not results:
         raise Exception("No results found.")
-    return results[0]["url"]
+
+    search_data = []
+    for item in results:
+        search_data.append({
+            "title": item["title"],
+            "artist": item["artist_name"],
+            "channel": item["channel_name"],
+            "duration": item["duration"],
+            "views": item["views"],
+            "thumbnail": item["thumbnail"],
+            "url": item["url"]
+        })
+
+    stream_url = results[0]["url"]
+    
+    return search_data, stream_url
 
 async def ytdl(format: str, url: str):
     ydl_opts = {
