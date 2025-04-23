@@ -14,13 +14,14 @@ import re
 COOKIES_FILE = "cookies/cookies.txt"
 
 
-def searchYt(query: str) -> str:
+async def searchYt(query: str):
     query = str(query)
     Result = await Search(query, limit=1)
-    if not Result["result"] == []:
-        title = Result["result"][0]["title"]
-        duration = Result["result"][0]["duration"]
-        link = Result["result"][0]["url"]
+
+    if Result and "result" in Result and Result["result"]:
+        title = Result["result"][0].get("title", "Unknown Title")
+        duration = Result["result"][0].get("duration", "Unknown Duration")
+        link = Result["result"][0].get("url", "No URL")
         return title, duration, link
 
     return None, None, None
