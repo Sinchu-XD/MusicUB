@@ -19,17 +19,14 @@ YDL_OPTS = {
 }
 
 async def get_stream_url(query: str) -> str:
-    search_results = await Search(query, limit=1)
-    if not search_results:
-        raise Exception(f"Song '{query}' not found.")
-    url = search_results[0]["url"]
-    loop = asyncio.get_event_loop()
-    data = await loop.run_in_executor(None, lambda: yt_dlp.YoutubeDL(YDL_OPTS).extract_info(url, download=False))
-    if "url" not in data:
-        raise Exception(f"Failed to extract stream URL for '{query}'.")
-    return data["url"]
+    results = await Search(query, limit=1)
 
-async def ytdl(format: str, link: str):
+    if not results:
+        raise Exception("No results found.")
+
+    return results[0]["url"]
+
+async def ytdl(format: str, url: str):
     ydl_opts = {
         'format': format,
         'geo_bypass': True,
@@ -43,7 +40,7 @@ async def ytdl(format: str, link: str):
     
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            info = ydl.extract_info(link, download=False)
+            info = ydl.extract_info(url, download=False)
             if 'url' in info:
                 return (1, info['url'])
             else:
