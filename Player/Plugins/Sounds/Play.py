@@ -86,7 +86,7 @@ async def _aPlay(_, message):
         video_id = extract_video_id(query) or query
 
         try:
-            title, duration, link = await searchYt(video_id)
+            title, duration, link = await searchYt(query)
             if not title:
                 return await m.edit("No results found")
         except Exception as e:
