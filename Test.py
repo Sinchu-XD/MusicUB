@@ -1,5 +1,5 @@
 import asyncio
-from YouTubeMusic.YtSearch import get_stream_url
+from Player.Utils.YtDetails import get_stream_url
 
 async def main():
     query = input("🔍 Enter search query: ")
