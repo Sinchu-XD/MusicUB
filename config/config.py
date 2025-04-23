@@ -15,7 +15,7 @@ SESSION_STRING: str = os.getenv("SESSION_STRING", "BQBclYcAfwPhsOaYEN9rZiJTeqV1e
 
 OWNER_ID: list[int] = [int(os.getenv("OWNER_ID", 7862043458))]
 
-LOG_GROUP_ID: int = int(os.getenv("LOG_GROUP_ID", --1002369363228))
+LOG_GROUP_ID: int = int(os.getenv("LOG_GROUP_ID", -1002523755325)
 
 PREFIX: str = str("/")
 
