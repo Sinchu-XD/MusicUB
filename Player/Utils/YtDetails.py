@@ -1,29 +1,13 @@
-import requests
-import os
 import yt_dlp
-from YouTubeMusic.YtSearch import Search
 import asyncio
-import re
+from YouTubeMusic.YtSearch import Search
 
 COOKIES_FILE = "cookies/cookies.txt"
 
-YDL_OPTS = {
-        'format': format,
-        'geo_bypass': True,
-        'noplaylist': True,
-        'quiet': True,
-        'cookiefile': COOKIES_FILE,
-        'nocheckcertificate': True,
-        'force_generic_extractor': True,
-        'extractor_retries': 3, 
-}
-
 async def get_stream_url(query: str) -> str:
     results = await Search(query, limit=1)
-
     if not results:
         raise Exception("No results found.")
-
     return results[0]["url"]
 
 async def ytdl(format: str, url: str):
@@ -37,7 +21,6 @@ async def ytdl(format: str, url: str):
         'force_generic_extractor': True,
         'extractor_retries': 3, 
     }
-    
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(url, download=False)
@@ -49,7 +32,16 @@ async def ytdl(format: str, url: str):
         return (0, str(e))
 
 if __name__ == "__main__":
-    title, duration, link = asyncio.run(searchYt("Never Gonna Give You Up"))
-    if title:
-        print(f"{title} | {link}")
-        
+    async def main():
+        query = input("Enter song name: ")
+        try:
+            url = await get_stream_url(query)
+            status, stream_url = await ytdl("bestaudio", url)
+            if status:
+                print(f"Stream URL: {stream_url}")
+            else:
+                print(f"Error: {stream_url}")
+        except Exception as e:
+            print(f"Search Error: {e}")
+
+    asyncio.run(main())
