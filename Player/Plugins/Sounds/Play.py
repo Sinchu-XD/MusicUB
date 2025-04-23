@@ -88,7 +88,7 @@ async def _aPlay(_, message):
         try:
             if video_id is None:
                 video_id = query
-            title, duration, link = searchYt(video_id)
+            title, duration, link = await searchYt(video_id)
             if (title, duration, link) == (None, None, None):
                 await m.edit("No results found")
         except Exception as e:
@@ -146,7 +146,7 @@ async def playforce(_, message):
     try:
         if video_id is None:
             video_id = query
-        title, duration, link = searchYt(video_id)
+        title, duration, link = await searchYt(video_id)
         if not title:
             return await m.edit("No results found")
     except Exception as e:
