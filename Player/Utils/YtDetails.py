@@ -4,7 +4,7 @@ from YouTubeMusic.YtSearch import Search
 
 COOKIES_FILE = "cookies/cookies.txt"
 
-async def get_stream_url(query: str) -> str:
+async def SearchYt(query: str):
     results = await Search(query, limit=3)
 
     if not results:
@@ -47,18 +47,30 @@ async def ytdl(format: str, url: str):
     except Exception as e:
         return (0, str(e))
 
-if __name__ == "__main__":
-    async def main():
-        query = input("Enter song name: ")
-        try:
-            url = await get_stream_url(query)
-            format = "bestaudio"
-            status, stream_url = await ytdl(format, url)
-            if status:
-                print(f"Stream URL: {stream_url}")
-            else:
-                print(f"Error: {stream_url}")
-        except Exception as e:
-            print(f"Search Error: {e}")
+async def main():
+    query = input("Enter song name: ")
+    try:
+        search_results, stream_url = await SearchYt(query)
+        format = "bestaudio"
+        status, stream_url = await ytdl(format, stream_url)
+        
+        if status:
+            print(f"Stream URL: {stream_url}")
+        else:
+            print(f"Error: {stream_url}")
+        
+        for idx, item in enumerate(search_results, 1):
+            print(f"\nResult {idx}:")
+            print(f"Title: {item['title']}")
+            print(f"Artist: {item['artist']}")
+            print(f"Channel: {item['channel']}")
+            print(f"Duration: {item['duration']}")
+            print(f"Views: {item['views']}")
+            print(f"Thumbnail: {item['thumbnail']}")
+            print(f"URL: {item['url']}")
+    
+    except Exception as e:
+        print(f"Search Error: {e}")
 
+if __name__ == "__main__":
     asyncio.run(main())
