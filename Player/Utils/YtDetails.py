@@ -157,10 +157,10 @@ async def ytdl(format: str, link: str):
         'geo_bypass': True,
         'noplaylist': True,
         'quiet': True,
-        'cookiefile': COOKIES_FILE,  # Ensure cookies are used
+        'cookiefile': COOKIES_FILE,
         'nocheckcertificate': True,
-        'force_generic_extractor': True,  # Force using a generic extractor if needed
-        'extractor_retries': 3,  # Retry fetching if it fails
+        'force_generic_extractor': True,
+        'extractor_retries': 3, 
     }
     
     try:
@@ -178,9 +178,9 @@ async def ytdl(format: str, link: str):
 def get_direct_audio_url(video_url):
     ydl_opts = {
         "format": "bestaudio",
-        "quiet": False,  # ✅ Show errors if any
-        "cookies": COOKIES_FILE,  # ✅ Use cookies
-        "noplaylist": True,  # ✅ Avoid playlist issues
+        "quiet": False,
+        "cookies": COOKIES_FILE, 
+        "noplaylist": True, 
     }
 
     try:
