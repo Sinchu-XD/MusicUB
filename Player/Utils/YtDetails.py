@@ -2,7 +2,7 @@ import requests
 import os
 from urllib.parse import urlparse, parse_qs
 import yt_dlp
-from youtubesearchpython import VideosSearch
+from YouTubeMusic.YtSearch import Search
 import asyncio
 import re
 
@@ -14,22 +14,16 @@ import re
 COOKIES_FILE = "cookies/cookies.txt"
 
 
-def searchYt(query):
+def searchYt(query: str) -> str:
     query = str(query)
-    videosResult = VideosSearch(query, limit=1)
+    videosResult = Search(query, limit=1)
     Result = videosResult.result()
     if not Result["result"] == []:
         title = Result["result"][0]["title"]
         duration = Result["result"][0]["duration"]
         link = Result["result"][0]["link"]
         return title, duration, link
-    else:
-        videosResult = Search(query, use_po_token=True)
-        for Result in videosResult.videos:
-            title = Result.title
-            duration = Result.length
-            link = Result.watch_url
-            return title, duration, link
+
     return None, None, None
 
 
