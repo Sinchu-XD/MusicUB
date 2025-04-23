@@ -76,12 +76,10 @@ async def _aPlay(_, message):
         return await m.edit(f"Error: <code>{e}</code>")
 
     await m.edit("**ᴡᴀɪᴛ ɴᴀ ʏʀʀʀ\n\nꜱᴇᴀʀᴄʜɪɴɢ ʏᴏᴜʀ ꜱᴏɴɢ 🌚❤️..**")
-
-    try:
-        result = await ytdl("bestaudio", stream_url)
-        resp = result[0]
-        songlink = result[1]
-        duration = search_results[0]['duration']
+    result = await ytdl("bestaudio", stream_url)
+    resp = result[0]
+    songlink = result[1]
+    duration = search_results[0]['duration']
     if resp == 0 or songlink is None:
             await m.edit(f"❌ yt-dl issues detected\n\n» No valid song link found.")
         else:
