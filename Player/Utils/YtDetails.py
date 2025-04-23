@@ -16,12 +16,11 @@ COOKIES_FILE = "cookies/cookies.txt"
 
 def searchYt(query: str) -> str:
     query = str(query)
-    videosResult = Search(query, limit=1)
-    Result = videosResult.result()
+    Result = Search(query, limit=1)
     if not Result["result"] == []:
         title = Result["result"][0]["title"]
         duration = Result["result"][0]["duration"]
-        link = Result["result"][0]["link"]
+        link = Result["result"][0]["url"]
         return title, duration, link
 
     return None, None, None
