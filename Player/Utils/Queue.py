@@ -1,7 +1,7 @@
 QUEUE = {}
 
 def add_to_queue(chat_id, title, duration, songlink, link):
-    print(f"Adding to queue: {chat_id}, {title}, {duration}, {file_id}, {link}")
+    print(f"Adding to queue: {chat_id}, {title}, {duration}, {song_link}, {link}")
     try:
         if chat_id in QUEUE:
             chat_queue = QUEUE[chat_id]
