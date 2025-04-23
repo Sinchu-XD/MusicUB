@@ -100,9 +100,6 @@ async def _aPlay(_, message):
         if resp == 0 or songlink is None:
             await m.edit(f"❌ yt-dl issues detected\n\n» No valid song link found.")
         else:
-            channel_name = search_results[0]["channel"]
-            views = search_results[0]["views"]
-
             if chat_id in QUEUE:
                 queue_num = add_to_queue(chat_id, search_results[0]["title"][:19], duration, songlink, stream_url)
                 await m.edit(
@@ -116,6 +113,9 @@ async def _aPlay(_, message):
 
             finish_time = time.time()
             total_time_taken = str(int(finish_time - start_time)) + "s"
+            channel_name = search_results[0]["channel"]
+            views = search_results[0]["views"]
+            
             await m.edit(
                 f"**ѕσηg ιѕ ρℓαуιηg ιη ν¢**\n\n**SongName**:- [{search_results[0]['title'][:19]}]({stream_url})\n**Duration**:- {duration}\n**Channel**:- {channel_name}\n**Views**:- {views}\n**Requested By**:- {mention}\n\n**Response Time**:- {total_time_taken}",
                 disable_web_page_preview=True,
