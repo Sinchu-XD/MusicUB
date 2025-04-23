@@ -100,7 +100,7 @@ async def _aPlay(_, message):
         if resp == 0 or songlink is None:
             await m.edit(f"❌ yt-dl issues detected\n\n» No valid song link found.")
         else:
-            channel_name = search_results[0]["channel_name"]
+            channel_name = search_results[0]["channel"]
             views = search_results[0]["views"]
 
             if chat_id in QUEUE:
@@ -166,7 +166,7 @@ async def playforce(_, message):
     total_time_taken = str(int(finish_time - start_time)) + "s"
     
     title = search_results[0]["title"]
-    channel_name = search_results[0]["channel_name"]
+    channel_name = search_results[0]["channel"]
     views = search_results[0]["views"]
 
     await m.edit(
