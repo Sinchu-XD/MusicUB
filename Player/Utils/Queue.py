@@ -1,18 +1,18 @@
 QUEUE = {}
 
 def add_to_queue(chat_id, title, duration, songlink, link):
-    if chat_id not in QUEUE:
-        QUEUE[chat_id] = []
-    
-    queue_number = len(QUEUE[chat_id]) + 1
-    QUEUE[chat_id].append({
-        'title': title,
-        'duration': duration,
-        'songlink': songlink,
-        'link': link
-    })
-    
-    return queue_number
+    print(f"Adding to queue: {chat_id}, {title}, {duration}, {song_link}, {link}")
+    try:
+        if chat_id in QUEUE:
+            chat_queue = QUEUE[chat_id]
+        else:
+            chat_queue = []
+            QUEUE[chat_id] = chat_queue
+        chat_queue.append([chat_id, title, duration, songlink, link])
+        return len(chat_queue) - 1
+    except Exception as e:
+        print(f"Error adding to queue: {e}")
+        return None
 
 
 def get_queue(chat_id):
