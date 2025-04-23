@@ -5,7 +5,7 @@ from YouTubeMusic.YtSearch import Search
 COOKIES_FILE = "cookies/cookies.txt"
 
 async def SearchYt(query: str):
-    results = await Search(query, limit=3)
+    results = await Search(query, limit=1)
 
     if not results:
         raise Exception("No results found.")
