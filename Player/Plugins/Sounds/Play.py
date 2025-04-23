@@ -1,11 +1,10 @@
-
 """
 Telegram @Itz_Your_4Bhi
 Copyright ©️ 2025
 """
 from Player import app, call
 from Player.Core import Userbot
-from Player.Utils.YtDetails import searchYt, extract_video_id, ytdl
+from Player.Utils.YtDetails import SearchYt, ytdl
 from Player.Utils.Queue import QUEUE, add_to_queue
 from Player.Utils.Delete import delete_messages
 from Player.Misc import SUDOERS
@@ -83,48 +82,41 @@ async def _aPlay(_, message):
     else:
         m = await message.reply_text("**Wait Na Yrrr 😒**")
         query = message.text.split(maxsplit=1)[1]
-        video_id = extract_video_id(query) or query
-
+        
         try:
-            title, duration, link = await searchYt(query)
-            if not title:
+            search_results, stream_url = await SearchYt(query)
+            if not search_results:
                 return await m.edit("No results found")
         except Exception as e:
             return await message.reply_text(f"Error:- <code>{e}</code>")
+        
         await m.edit("**ᴡᴀɪᴛ ɴᴀ ʏʀʀʀ\n\nꜱᴇᴀʀᴄʜɪɴɢ ʏᴏᴜʀ ꜱᴏɴɢ 🌚❤️..**")
         format = "bestaudio"
-        resp, songlink, duration = await ytdl(format, link)  # ✅ Fix
+        resp, songlink, duration = await ytdl(format, stream_url)
+        
         if resp == 0 or songlink is None:
             await m.edit(f"❌ yt-dl issues detected\n\n» No valid song link found.")
         else:
             if chat_id in QUEUE:
-                queue_num = add_to_queue(chat_id, title[:19], duration, songlink, link)
+                queue_num = add_to_queue(chat_id, search_results[0]["title"][:19], duration, songlink, stream_url)
                 await m.edit(
-                    f"# {queue_num}\n{title[:19]}\n**ʏᴏᴜʀ ꜱᴏɴɢ ᴀᴅᴅᴇᴅ ɪɴ Qᴜᴇᴜᴇ\n\nᴘʟᴇᴀꜱᴇ ᴡᴀɪᴛ 😵‍💫**"
+                    f"# {queue_num}\n{search_results[0]['title'][:19]}\n**ʏᴏᴜʀ ꜱᴏɴɢ ᴀᴅᴅᴇᴅ ɪɴ Qᴜᴇᴜᴇ\n\nᴘʟᴇᴀꜱᴇ ᴡᴀɪᴛ 😵‍💫**"
                 )
-                
                 asyncio.create_task(delete_messages(message, m))
                 return
-                
+
             durations = f"{duration // 60}:{duration % 60:02d}" if duration else "Unknown"
             Status, Text = await Userbot.playAudio(chat_id, songlink)
             if Status == False:
                 return await m.edit(Text)
-            if duration is None:
-                duration = "**Playing From LiveStream**"
-            add_to_queue(chat_id, title[:19], durations, songlink, link)
+
             finish_time = time.time()
             total_time_taken = str(int(finish_time - start_time)) + "s"
             await m.edit(
-                f"**ѕσηg ιѕ ρℓαуιηg ιη ν¢**\n\n**SongName**:- [{title[:19]}]({link})\n**Duration**:- {durations}\n**Requested By**:- {mention}\n\n**Respose Time**:- {total_time_taken}",
+                f"**ѕσηg ιѕ ρℓαуιηg ιη ν¢**\n\n**SongName**:- [{search_results[0]['title'][:19]}]({stream_url})\n**Duration**:- {durations}\n**Requested By**:- {mention}\n\n**Response Time**:- {total_time_taken}",
                 disable_web_page_preview=True,
             )
         asyncio.create_task(delete_messages(message, m))
-
-
-        
-        
-        
 
 @app.on_message((filters.command(PLAYFORCE_COMMAND, [PREFIX, RPREFIX])) & filters.group)
 async def playforce(_, message):
@@ -139,23 +131,21 @@ async def playforce(_, message):
     
     m = await message.reply_text("**Force Playing Your Song...**")
     query = message.text.split(maxsplit=1)[1]
-    video_id = extract_video_id(query)
     
     try:
-        if video_id is None:
-            video_id = query
-        title, duration, link = await searchYt(video_id)
-        if not title:
+        search_results, stream_url = await SearchYt(query)
+        if not search_results:
             return await m.edit("No results found")
     except Exception as e:
         return await message.reply_text(f"Error: <code>{e}</code>")
     
     await m.edit("**Fetching Song Details...**")
     format = "bestaudio"
-    resp, songlink, duration = await ytdl(format, link)  # ✅ Fix
+    resp, songlink, duration = await ytdl(format, stream_url)
 
     if resp == 0:
         return await m.edit(f"❌ yt-dl issues detected\n\n» {songlink}")
+
     durations = f"{duration // 60}:{duration % 60:02d}" if duration else "Unknown"
     Status, Text = await Userbot.playAudio(chat_id, songlink)
     if Status == False:
@@ -165,48 +155,10 @@ async def playforce(_, message):
     total_time_taken = str(int(finish_time - start_time)) + "s"
 
     await m.edit(
-        f"**𝑆𝑜𝑛𝑔 𝐹𝑜𝑟𝑐𝑒 𝑃𝑙𝑎𝑦𝑖𝑛𝑔 𝑖𝑛 𝑉𝐶**\n\n"
-        f"**𝑆𝑜𝑛𝑔**: [{title[:19]}]({link})\n"
-        f"**𝐷𝑢𝑟𝑎𝑡𝑖𝑜𝑛**: {durations}\n"
-        f"**𝑅𝑒𝑞𝑢𝑒𝑠𝑡𝑒𝑑 𝐵𝑦**: {mention}\n\n"
-        f"**𝑅𝑒𝑠𝑝𝑜𝑛𝑠𝑒 𝑇𝑖𝑚𝑒**: {total_time_taken}",
+        f"**𝑆𝑜𝑛𝑔 𝐹𝑜𝑟𝑐𝑒 𝑃𝑙𝑎𝑦𝑒𝑑 𝑎𝑡 ν𝑐**\n\n"
+        f"**SongName**:- [{search_results[0]['title'][:19]}]({stream_url})\n"
+        f"**Duration**:- {durations}\n**Requested By**:- {mention}\n\n**Response Time**:- {total_time_taken}",
         disable_web_page_preview=True,
     )
     asyncio.create_task(delete_messages(message, m))
-
-
-
     
-
-
-@app.on_message((filters.command(PLAY_COMMAND, [PREFIX, RPREFIX])) & SUDOERS)
-async def _raPlay(_, message):
-    start_time = time.time()
-    if (message.reply_to_message) is not None:
-        return await message.reply_text("Currently this is not supported")
-    elif (len(message.command)) < 3:
-        return await message.reply_text("You Forgot To Pass An Argument")
-    else:
-        m = await message.reply_text("Searching Your Query...")
-        query = message.text.split(" ", 2)[2]
-        msg_id = message.text.split(" ", 2)[1]
-        title, duration, link = searchYt(query)
-        await m.edit("Downloading...")
-        format = "bestaudio"
-        resp, songlink = await ytdl(format, link)
-        if resp == 0:
-            return await m.edit(f"❌ yt-dl issues detected\n\n» `{songlink}`")
-        else:
-            Status, Text = await Userbot.playAudio(msg_id, songlink)
-            if Status == False:
-                return await m.edit(Text)
-            if duration is None:
-                duration = "Playing From LiveStream"
-            finish_time = time.time()
-            total_time_taken = str(int(finish_time - start_time)) + "s"
-            await m.edit(
-                f"**ѕσηg ιѕ ρℓαуιηg ιη ν¢**\n\n**SongName**:- [{message.reply_to_message.audio.title[:19]}]({message.reply_to_message.link})\n**Duration**:- {message.reply_to_message.audio.duration}\n**Requested By**:- {mention}\n\n**Response Time**:- {total_time_taken}",
-                    disable_web_page_preview=True,
-            )
-        asyncio.create_task(delete_messages(message, m))
-
