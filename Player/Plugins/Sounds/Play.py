@@ -84,6 +84,7 @@ async def _aPlay(_, message):
         await m.edit(f"❌ yt-dl issues detected\n\n» No valid song link found.")
     else:
         if chat_id in QUEUE:
+            print("Before Adding to Queue")
             queue_num = add_to_queue(chat_id, title[:19], duration, songlink, link)
             print(f"Queue Number: {queue_num}")
             await m.edit(
