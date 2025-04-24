@@ -51,7 +51,7 @@ async def main():
     query = input("Enter song name: ")
     try:
         search_results, stream_url = await SearchYt(query)
-        format = "bestaudio"
+        format = "ba"
         status, stream_url = await ytdl(format, stream_url)
         
         if status:
