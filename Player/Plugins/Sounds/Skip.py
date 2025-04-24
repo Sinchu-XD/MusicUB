@@ -101,10 +101,10 @@ async def _aSkip(_, message):
 
         except Exception as e:
             await m.delete()
-            return await app.send_message(chat_id, f"❌ **Error:** `{e}`\n🎤 **Requested by:** {user_mention}")
+            return await app.send_message(chat_id, f"❌ **Error:** `{e}`\n🎤 **Skipped By:** {mention}")
 
     else:
-        return await message.reply_text(f"❌ **You don’t have permission to skip songs.** Ask an admin.\n🎤 **Requested by:** {user_mention}")
+        return await message.reply_text(f"❌ **You don’t have permission to skip songs.** Ask an admin.\n🎤 **Skipped By:** {mention}")
         asyncio.create_task(delete_messages(message, m))
             
             
