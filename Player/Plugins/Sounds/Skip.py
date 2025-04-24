@@ -65,7 +65,7 @@ async def _aSkip(_, message):
             resp = result[0]
             songlink = result[1]
             search_results = result[2]
-            if not status:
+            if resp == 0 or not songlink or not search_results:
                 return await m.edit_text(f"❌ **Failed to fetch next song.**\n🛑 `{songlink}`\n🎤 **Skipped By:** {mention}")
                 asyncio.create_task(delete_messages(message, m))
 
