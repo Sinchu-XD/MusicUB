@@ -69,8 +69,8 @@ async def _aSkip(_, message):
                 return await m.edit_text(f"❌ **Failed to fetch next song.**\n🛑 `{songlink}`\n🎤 **Skipped By:** {mention}")
                 asyncio.create_task(delete_messages(message, m))
 
-             title = search_results[0]['title']
-             duration = search_results[0]['duration']
+            title = search_results[0]['title']
+            duration = search_results[0]['duration']
 
             # Play next song
             await call.play(
