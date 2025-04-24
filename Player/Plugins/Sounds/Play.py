@@ -18,6 +18,7 @@ PLAYFORCE_COMMAND = ["PFORCE", "PLAYFORCE"]
 PREFIX = config.PREFIX
 RPREFIX = config.RPREFIX
 
+QUEUE = {}
 
 async def processReplyToMessage(message):
     msg = message.reply_to_message
@@ -83,12 +84,16 @@ async def _aPlay(_, message):
     if resp == 0 or songlink is None:
         await m.edit(f"❌ yt-dl issues detected\n\n» No valid song link found.")
     else:
+        title = search_results[0]['title']
+        song_data = [chat_id, search_results, songlink, stream_url]
+        
         if chat_id in QUEUE:
-            print("Before Adding to Queue")
-            title = search_results[0]['title']
-            queue_num = add_to_queue(chat_id, search_results, songlink, stream_url)
-            print(f"Queue Number: {queue_num}")
-            await m.edit(
+            QUEUE[chat_id].append(song_data)
+            queue_num = len(QUEUE[chat_id]) - 1
+        else:
+            QUEUE[chat_id] = [song_data]
+            queue_num = 0
+        await m.edit(
                 f"# {queue_num}\n{title[:19]}\n**ʏᴏᴜʀ ꜱᴏɴɢ ᴀᴅᴅᴇᴅ ɪɴ Qᴜᴇᴜᴇ\n\nᴘʟᴇᴀꜱᴇ ᴡᴀɪᴛ 😵‍💫**"
                 )
                 
