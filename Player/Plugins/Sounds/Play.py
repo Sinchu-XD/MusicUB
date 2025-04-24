@@ -20,6 +20,15 @@ RPREFIX = config.RPREFIX
 
 QUEUE = {}
 
+def add_queue(chat_id, song_data):
+    if chat_id not in QUEUE:
+        QUEUE[chat_id] = []
+
+    QUEUE[chat_id].append(song_data)
+    
+    return len(QUEUE[chat_id])
+
+
 async def processReplyToMessage(message):
     msg = message.reply_to_message
     if msg.audio or msg.voice:
@@ -87,8 +96,7 @@ async def _aPlay(_, message):
         title = search_results[0]['title']
         song_data = [chat_id, search_results, songlink, stream_url]
         
-        if chat_id in QUEUE:
-            queue_num = add_to_queue(song_data)
+        queue_num = add_queue(chat_id, song_data)
             await m.edit(
                 f"# {len(QUEUE[chat_id]) - 1}\n{title[:19]}\n**ʏᴏᴜʀ ꜱᴏɴɢ ᴀᴅᴅᴇᴅ ɪɴ Qᴜᴇᴜᴇ\n\nᴘʟᴇᴀꜱᴇ ᴡᴀɪᴛ 😵‍💫**"
                 )
