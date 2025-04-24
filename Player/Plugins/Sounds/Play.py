@@ -133,7 +133,9 @@ async def playforce(_, message):
 
     try:
         result = await ytdl("bestaudio", stream_url)
-        resp, songlink, duration = result
+        resp = result[0]
+        songlink = result[1]
+        duration = search_results[0]['duration']
     except Exception as e:
         return await m.edit(f"Error while downloading: <code>{e}</code>")
 
