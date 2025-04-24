@@ -25,7 +25,7 @@ def add_queue(chat_id, song_data):
 
     QUEUE[chat_id].append(song_data)
     
-    return len(QUEUE[chat_id])
+    return len(QUEUE[chat_id]) - 1
 
 
 async def processReplyToMessage(message):
