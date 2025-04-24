@@ -89,9 +89,8 @@ async def _aPlay(_, message):
         
         if chat_id in QUEUE:
             QUEUE[chat_id].append(song_data)
-            queue_num = len(QUEUE[chat_id]) - 1
         await m.edit(
-                f"# {queue_num}\n{title[:19]}\n**ʏᴏᴜʀ ꜱᴏɴɢ ᴀᴅᴅᴇᴅ ɪɴ Qᴜᴇᴜᴇ\n\nᴘʟᴇᴀꜱᴇ ᴡᴀɪᴛ 😵‍💫**"
+                f"# {len(QUEUE[chat_id]) - 1}\n{title[:19]}\n**ʏᴏᴜʀ ꜱᴏɴɢ ᴀᴅᴅᴇᴅ ɪɴ Qᴜᴇᴜᴇ\n\nᴘʟᴇᴀꜱᴇ ᴡᴀɪᴛ 😵‍💫**"
                 )
                 
         asyncio.create_task(delete_messages(message, m))
