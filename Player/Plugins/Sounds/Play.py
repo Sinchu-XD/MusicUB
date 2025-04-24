@@ -100,7 +100,7 @@ async def _aPlay(_, message):
         if not Status:
             return await m.edit(Text)
 
-        add_to_queue(chat_id, song_data)
+        add_to_queue(chat_id, search_results, songlink, stream_url)
 
         total_time = f"{int(time.time() - start_time)}s"
         await m.edit(
