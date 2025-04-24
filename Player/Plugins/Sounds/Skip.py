@@ -57,20 +57,22 @@ async def _aSkip(_, message):
             asyncio.create_task(delete_messages(message, m))
 
         try:
-            # Fetch next song details
             next_song_data = get_queue(chat_id)[1]
-            search_results = next_song_data[2]
             stream_url = next_song_data[3]
 
             result = await ytdl("bestaudio", stream_url)
             resp = result[0]
             songlink = result[1]
-            duration = search_results[0]['duration']
+            search_results = result[2]
             if resp == 0 or not songlink or not search_results:
                 return await m.edit_text(f"❌ **Failed to fetch next song.**\n🛑 `{songlink}`\n🎤 **Skipped By:** {mention}")
                 asyncio.create_task(delete_messages(message, m))
 
-            
+            if search_results and isinstance(search_results, list):
+                title = search_results[0]['title']
+                duration = search_results[0]['duration']
+                channel = search_results[0]['channel']
+                views = search_results[0]['views']
             
 
             # Play next song
