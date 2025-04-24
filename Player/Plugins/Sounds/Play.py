@@ -88,13 +88,13 @@ async def _aPlay(_, message):
         song_data = [chat_id, search_results, songlink, stream_url]
         
         if chat_id in QUEUE:
-            QUEUE[chat_id].append(song_data)
-        await m.edit(
+            queue_num = add_to_queue(song_data)
+            await m.edit(
                 f"# {len(QUEUE[chat_id]) - 1}\n{title[:19]}\n**ʏᴏᴜʀ ꜱᴏɴɢ ᴀᴅᴅᴇᴅ ɪɴ Qᴜᴇᴜᴇ\n\nᴘʟᴇᴀꜱᴇ ᴡᴀɪᴛ 😵‍💫**"
                 )
                 
-        asyncio.create_task(delete_messages(message, m))
-        return
+            asyncio.create_task(delete_messages(message, m))
+            return
 
         Status, Text = await Userbot.playAudio(chat_id, songlink)
         if not Status:
