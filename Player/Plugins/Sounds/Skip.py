@@ -39,7 +39,7 @@ async def _aSkip(_, message):
         administrators.append(m)
 
     if message.from_user.id in SUDOERS or message.from_user.id in [admin.user.id for admin in administrators]:
-        m = await message.reply_text(f"⏩ **Skipping song...**\n🎤 Requested by: {user_mention}")
+        m = await message.reply_text(f"⏩ **Skipping song...**\n🎤 **Skipped By**:{mention}")
 
         # Check if looping is enabled
         loop = await get_loop(chat_id)
