@@ -7,28 +7,34 @@ QUEUE = {}
 
 
 def add_to_queue(chat_id, search_results, songlink, stream_url):
-    data = [search_results, songlink, stream_url]
-    if chat_id not in QUEUE:
-        QUEUE[chat_id] = []
-    QUEUE[chat_id].append(data)
-    return len(QUEUE[chat_id]) - 1
+    if chat_id in QUEUE:
+        chat_queue = QUEUE[chat_id]
+        chat_queue.append([chat_id, search_results, songlink, stream_url])
+        return int(len(chat_queue) - 1)
+    else:
+        QUEUE[chat_id] = [[chat_id, search_results, songlink, stream_url]]
 
 
 def get_queue(chat_id):
-    return QUEUE.get(chat_id, [])
+    if chat_id in QUEUE:
+        chat_queue = QUEUE[chat_id]
+        return chat_queue
+    else:
+        return 0
 
 
 def pop_an_item(chat_id):
-    if chat_id in QUEUE and QUEUE[chat_id]:
-        QUEUE[chat_id].pop(0)
-        if not QUEUE[chat_id]:
-            del QUEUE[chat_id]
-        return True
-    return False
+    if chat_id in QUEUE:
+        chat_queue = QUEUE[chat_id]
+        chat_queue.pop(0)
+        return 1
+    else:
+        return 0
 
 
 def clear_queue(chat_id):
     if chat_id in QUEUE:
-        del QUEUE[chat_id]
-        return True
-    return False
+        QUEUE.pop(chat_id)
+        return 1
+    else:
+        return 0
