@@ -7,13 +7,13 @@ Copyright ©️ 2025
 QUEUE = {}
 
 
-def add_to_queue(chat_id, title, duration, songlink, stream_url):
+def add_to_queue(chat_id, search_results, songlink, stream_url):
     if chat_id in QUEUE:
         chat_queue = QUEUE[chat_id]
-        chat_queue.append([chat_id, title, duration, songlink, stream_url])
+        chat_queue.append([chat_id, search_results, songlink, stream_url])
         return int(len(chat_queue) - 1)
     else:
-        QUEUE[chat_id] = [[chat_id, title, duration, songlink, stream_url]]
+        QUEUE[chat_id] = [[chat_id, search_results, songlink, stream_url]]
 
 
 def get_queue(chat_id):
