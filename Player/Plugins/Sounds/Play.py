@@ -86,10 +86,9 @@ async def _aPlay(_, message):
     else:
         title = search_results[0]['title']
         chat_id = message.chat.id
-        song_data = [chat_id, search_results, songlink, stream_url]
 
         if chat_id in QUEUE:
-            queue_num = add_to_queue(chat_id, song_data)
+            queue_num = add_to_queue(chat_id, search_results, songlink, stream_url)
             await m.edit(
                 f"# {queue_num}\n{title[:19]}\n**ʏᴏᴜʀ ꜱᴏɴɢ ᴀᴅᴅᴇᴅ ɪɴ Qᴜᴇᴜᴇ\n\nᴘʟᴇᴀꜱᴇ ᴡᴀɪᴛ 😵‍💫**"
                 )
