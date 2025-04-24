@@ -18,7 +18,6 @@ PLAYFORCE_COMMAND = ["PFORCE", "PLAYFORCE"]
 PREFIX = config.PREFIX
 RPREFIX = config.RPREFIX
 
-QUEUE = {}
 
 def add_queue(chat_id, song_data):
     if chat_id not in QUEUE:
