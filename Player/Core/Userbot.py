@@ -2,7 +2,8 @@
 Telegram @Itz_Your_4Bhi
 Copyright ©️ 2025
 """
-
+import os
+import asyncio
 from Player import call
 from pytgcalls.types import MediaStream, VideoQuality, AudioQuality
 
@@ -10,7 +11,6 @@ audio_file = "http://docs.evostream.com/sample_content/assets/sintel1m720p.mp4"
 
 
 async def playAudio(chat_id, audio_file=audio_file):
-    """Plays an audio file in the given chat."""
     try:
         await call.play(
             chat_id,
@@ -26,7 +26,6 @@ async def playAudio(chat_id, audio_file=audio_file):
 
 
 async def playVideo(chat_id, video_file=audio_file, quality="SD_480p"):
-    """Plays a video file in a voice chat with optimized performance."""
     try:
         quality_mapping = {
             "UHD_4K": VideoQuality.UHD_4K,
@@ -36,7 +35,6 @@ async def playVideo(chat_id, video_file=audio_file, quality="SD_480p"):
             "SD_480p": VideoQuality.SD_480p,
             "SD_360p": VideoQuality.SD_360p,
         }
-        # Get the selected video quality (default: SD 480p)
         video_quality = quality_mapping.get(quality.lower(), VideoQuality.SD_480p)
         await call.play(
             chat_id,
@@ -47,61 +45,74 @@ async def playVideo(chat_id, video_file=audio_file, quality="SD_480p"):
             ),
         )
 
-        return True, None  # Success
+        return True, None
     except Exception as e:
-        return False, f"Error: <code>{e}</code>"  # Error handling
+        return False, f"Error: <code>{e}</code>"
 
+
+
+async def generate_filtered_audio(chat_id, audio_file, filter_type):
+    filtered_path = f"downloads/{chat_id}_{filter_type}.raw"
+
+    if filter_type == "bass":
+        filter_cmd = "bass=g=10"
+    elif filter_type == "nightcore":
+        filter_cmd = "asetrate=44100*1.25,atempo=1.1"
+    elif filter_type == "vaporwave":
+        filter_cmd = "asetrate=44100*0.8,atempo=0.9"
+    else:
+        return audio_file
+
+    cmd = f"ffmpeg -y -i '{audio_file}' -af '{filter_cmd}' -f s16le -ac 2 -ar 48000 '{filtered_path}'"
+    process = await asyncio.create_subprocess_shell(cmd)
+    await process.communicate()
+
+    return filtered_path
 
 
 async def pause(chat_id):
-    """Pauses the stream."""
     try:
-        await call.pause(chat_id)  # Updated Method ✅
+        await call.pause(chat_id)
         return "⏸ Stream Paused"
     except Exception as e:
         return f"Error: <code>{e}</code>"
 
 
 async def resume(chat_id):
-    """Resumes the paused stream."""
     try:
-        await call.resume(chat_id)  # Updated Method ✅
+        await call.resume(chat_id)
         return "▶️ Stream Resumed"
     except Exception as e:
         return f"Error: <code>{e}</code>"
 
 
 async def mute(chat_id):
-    """Mutes the stream."""
     try:
-        await call.mute(chat_id)  # Updated Method ✅
+        await call.mute(chat_id)
         return "🔇 Stream Muted"
     except Exception as e:
         return f"Error: <code>{e}</code>"
 
 
 async def unmute(chat_id):
-    """Unmutes the stream."""
     try:
-        await call.unmute(chat_id)  # Updated Method ✅
+        await call.unmute(chat_id)
         return "🔊 Stream Unmuted"
     except Exception as e:
         return f"Error: <code>{e}</code>"
 
 
 async def change_volume(chat_id, volume: int = 200):
-    """Changes the stream volume."""
     try:
-        await call.change_volume(chat_id, volume)  # Updated Method ✅
+        await call.change_volume(chat_id, volume)
         return f"🎧 Volume Changed To: {volume}%"
     except Exception as e:
         return f"Error: <code>{e}</code>"
 
 
 async def stop(chat_id):
-    """Stops the stream and leaves the voice chat."""
     try:
-        await call.leave_call(chat_id)  # Updated Method ✅
+        await call.leave_call(chat_id)
         return "🛑 Stream Ended"
     except Exception as e:
         return f"Error: <code>{e}</code>"
