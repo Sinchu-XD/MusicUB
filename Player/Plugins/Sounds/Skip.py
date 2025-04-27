@@ -53,6 +53,7 @@ async def _aSkip(_, message):
 
         try:
             next_song_data = get_queue(chat_id)[1]
+            print(next_song_data)
             if len(next_song_data) == 3:
                 title, duration, stream_url = next_song_data
             else:
