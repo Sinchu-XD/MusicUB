@@ -1,10 +1,10 @@
-"""
-Telegram @Itz_Your_4Bhi
-Copyright ©️ 2025
-"""
+import logging
 import time
-import config
 import asyncio
+import config
+from pyrogram import filters
+from pyrogram.enums import ChatMembersFilter
+from pytgcalls.types import MediaStream
 
 from Player import app, call, seek_chats
 from Player.Core import Userbot
@@ -12,99 +12,70 @@ from Player.Misc import SUDOERS
 from Player.Utils.Loop import get_loop
 from Player.Utils.YtDetails import ytdl
 from Player.Utils.Delete import delete_messages
-from Player.Utils.Queue import QUEUE, pop_an_item, get_queue, clear_queue
+from Player.Utils.Queue import QUEUE, get_queue, pop_an_item, clear_queue, add_to_queue, process_next_song
 
 from pyrogram import filters
-from pyrogram.enums import ChatMembersFilter
 
-from pytgcalls.types import MediaStream
+logging.basicConfig(level=logging.INFO)
 
 SKIP_COMMAND = ["SKIP"]
 PREFIX = config.PREFIX
 RPREFIX = config.RPREFIX
 
 @app.on_message((filters.command(SKIP_COMMAND, [PREFIX, RPREFIX])) & filters.group)
-async def _aSkip(_, message):
+async def skip_song(_, message):
     chat_id = message.chat.id
     if chat_id in seek_chats:
         del seek_chats[chat_id]
     start_time = time.time()
     mention = message.from_user.mention
 
-    administrators = []
-    async for m in app.get_chat_members(chat_id, filter=ChatMembersFilter.ADMINISTRATORS):
-        administrators.append(m)
-
-    if message.from_user.id in SUDOERS or message.from_user.id in [admin.user.id for admin in administrators]:
+    admins = [admin.user.id for admin in await app.get_chat_members(chat_id, filter=ChatMembersFilter.ADMINISTRATORS)]
+    if message.from_user.id in SUDOERS or message.from_user.id in admins:
         m = await message.reply_text(f"⏩ **Skipping song...**\n🎤 **Skipped By**:{mention}")
 
-        loop = await get_loop(chat_id)
-        if loop != 0:
-            return await m.edit_text(
-                f"🔄 **Loop is enabled!** Disable it with `{PREFIX}endloop` to skip.\n🎤 **Skipped By:** {mention}"
-            )
-            asyncio.create_task(delete_messages(message, m))
+        if await get_loop(chat_id) != 0:
+            await m.edit_text(f"🔄 **Loop is enabled!** Disable it with `{config.PREFIX}endloop` to skip.\n🎤 **Skipped By**: {mention}")
+            await delete_messages(message, m)
+            return
 
         if chat_id not in QUEUE or len(get_queue(chat_id)) == 1:
             clear_queue(chat_id)
             await stop(chat_id)
-            return await m.edit_text(f"🚫 **Queue is empty.** Leaving voice chat...\n🎤 **Skipped By:** {mention}")
-            asyncio.create_task(delete_messages(message, m))
+            await m.edit_text(f"🚫 **Queue is empty.** Leaving voice chat...\n🎤 **Skipped By**: {mention}")
+            await delete_messages(message, m)
+            return
 
-        try:
-            queue_data = get_queue(chat_id)
-            print("Queue data:", queue_data)
-            if len(queue_data) > 1:
-                next_song_data = queue_data[1]  # Adjusted index to properly unpack the next item
-                print("Before unpacking next_song_data.")
-                if len(next_song_data) == 4:
-                    raise ValueError(f"Invalid queue data: {next_song_data}. Expected 4 elements.")
-                    chat_id, song_details, stream_url = next_song_data
-                    print(f"Chat ID: {chat_id}")
-                    print(f"Song Title: {song_details[0]['title']}")
-                    print(f"Stream URL: {stream_url}")
-                
-                    status, stream_url = await ytdl("bestaudio", stream)
+        await process_next_song(chat_id)
 
-                    if status == 0 or not stream_url:
-                        raise ValueError("Failed to fetch the next song.")
-                        asyncio.create_task(delete_messages(message, m))
+        pop_an_item(chat_id)
 
-                    await call.play(
-                        chat_id,
-                        MediaStream(stream_url, video_flags=MediaStream.Flags.AUTO_DETECT),)
+        await delete_messages(message, m)
+    else:
+        await message.reply_text(f"❌ **You don't have permission to skip songs.** Ask an admin.\n🎤 **Skipped By**: {mention}")
 
-                    pop_an_item(chat_id)
-                else:
-                    raise ValueError("Next song data does not contain 4 elements.")
-            else:
-                raise ValueError("Next song data does not contain 4 elements.")
-        except Exception as e:
-            print(f"Error: {e}")
-            finish_time = time.time()
-            total_time_taken = f"{int(finish_time - start_time)}s"
+async def process_next_song(chat_id):
+    queue_data = get_queue(chat_id)
+    if not queue_data:
+        print(f"Queue is empty for chat_id: {chat_id}")
+        return
 
-            await m.delete()
-            await app.send_message(
-                chat_id,
-                f"🎶 **Now Playing**\n\n"
-                f"🎵 **Song:** [{next_song_data[1][:19]}]({stream_url})\n"
-                f"⏳ **Duration:** {next_song_data[2]}\n"
-                f"📺 **Channel:** {next_song_data[4]}\n"
-                f"👁 **Views:** {next_song_data[5]}\n"
-                f"🙋‍♂️ **Requested By:** {mention}\n"
-                f"⚡ **Response Time:** {total_time_taken}",
-                disable_web_page_preview=True,
-            )
-            asyncio.create_task(delete_messages(message, m))
+    next_song_data = queue_data[0]
+    
+    if len(next_song_data) == 4:
+        chat_id, search_results, songlink, stream_url = next_song_data
+        print(f"Processing next song: {songlink}")
+        
+        status, stream_url = await ytdl("best_audio", stream_url)
+        if status != 0 or not stream_url:
+            print(f"Failed to fetch stream for {songlink}")
+            return
 
-        except Exception as e:
-            await m.delete()
-            return await app.send_message(chat_id, f"❌ **Error:** `{e}`\n🎤 **Skipped By:** {mention}")
+        await call.play(chat_id, MediaStream(stream_url, video_flags=MediaStream.Flags.AUTO_DETECT))
 
     else:
-        return await message.reply_text(f"❌ **You don’t have permission to skip songs.** Ask an admin.\n🎤 **Skipped By:** {mention}")
-        asyncio.create_task(delete_messages(message, m))
+        print(f"Invalid data in queue: {next_song_data}. Expected 4 elements.")
+        logging.error(f"Invalid data in queue for chat_id {chat_id}: {next_song_data}")
 
 
 @app.on_message(filters.command("queue", [PREFIX, RPREFIX]) & filters.group)
@@ -121,11 +92,10 @@ async def _queue(_, message):
         await message.reply_text(output, disable_web_page_preview=True)
     else:
         await message.reply_text("⚠️ Queue is empty!")
-
-
+        
 async def stop(chat_id):
     try:
         await call.leave_call(chat_id)
-    except:
-        pass
+    except Exception as e:
+        print(f"Error stopping playback: {e}")
         
