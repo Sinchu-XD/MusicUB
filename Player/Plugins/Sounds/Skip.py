@@ -66,6 +66,9 @@ async def _aSkip(_, message):
                 return await m.edit_text(f"❌ **Next song data is incomplete.**\n🎤 **Skipped By:** {mention}")
                 asyncio.create_task(delete_messages(message, m))
             song_details = next_song_data[0]
+            if not isinstance(song_details, dict):
+                return await m.edit_text(f"❌ **Next song data is not in the expected format.**\n🎤 **Skipped By:** {mention}")
+                asyncio.create_task(delete_messages(message, m))
 
             required_keys = ['title', 'duration', 'url', 'channel', 'views']
             if not all(key in song_details for key in required_keys):
