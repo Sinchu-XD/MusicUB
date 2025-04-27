@@ -61,10 +61,15 @@ async def _aSkip(_, message):
 
             next_song_data = get_queue(chat_id)[1]
             print(f"Next Song Data: {next_song_data}")
+
+            if not isinstance(next_song_data, list) or len(next_song_data) == 0:
+                return await m.edit_text(f"❌ **Next song data is incomplete.**\n🎤 **Skipped By:** {mention}")
+                asyncio.create_task(delete_messages(message, m))
             song_details = next_song_data[0]
 
-            if len(song_details) < 5:
-                return await m.edit_text(f"❌ **Next song data is incomplete.**\n🎤 **Skipped By:** {mention}")
+            required_keys = ['title', 'duration', 'url', 'channel', 'views']
+            if not all(key in song_details for key in required_keys):
+                return await m.edit_text(f"❌ **Next song data is missing required fields.**\n🎤 **Skipped By:** {mention}")
                 asyncio.create_task(delete_messages(message, m))
 
             title = song_details['title']
