@@ -62,29 +62,24 @@ async def _aSkip(_, message):
                     print(f"Chat ID: {chat_id}")
                     print(f"Song Title: {song_details[0]['title']}")
                     print(f"Stream URL: {stream_url}")
+                
+                    status, stream_url = await ytdl("bestaudio", stream)
+
+                    if status == 0 or not stream_url:
+                        raise ValueError("Failed to fetch the next song.")
+                        asyncio.create_task(delete_messages(message, m))
+
+                    await call.play(
+                        chat_id,
+                        MediaStream(stream_url, video_flags=MediaStream.Flags.AUTO_DETECT),)
+
+                    pop_an_item(chat_id)
                 else:
                     raise ValueError("Next song data does not contain 3 elements.")
             else:
                 raise ValueError("Next song data does not contain 3 elements.")
         except Exception as e:
             print(f"Error: {e}")
-            
-            # Fetching stream details if unpacking fails
-            stream_url = None
-            if not stream_url:
-                status, stream_url = await ytdl("bestaudio", "https://www.youtube.com/watch?v=dQw4w9WgXcQ")
-
-            if status == 0 or not stream_url:
-                return await m.edit_text(f"❌ **Failed to fetch next song.**\n🛑 `{stream_url}`\n🎤 **Skipped By:** {mention}")
-                asyncio.create_task(delete_messages(message, m))
-
-            await call.play(
-                chat_id,
-                MediaStream(stream_url, video_flags=MediaStream.Flags.AUTO_DETECT),
-            )
-
-            pop_an_item(chat_id)
-
             finish_time = time.time()
             total_time_taken = f"{int(finish_time - start_time)}s"
 
