@@ -33,7 +33,6 @@ async def _aSkip(_, message):
     start_time = time.time()
     mention = message.from_user.mention
 
-    # Check if user has permission to skip
     administrators = []
     async for m in app.get_chat_members(chat_id, filter=ChatMembersFilter.ADMINISTRATORS):
         administrators.append(m)
@@ -41,7 +40,6 @@ async def _aSkip(_, message):
     if message.from_user.id in SUDOERS or message.from_user.id in [admin.user.id for admin in administrators]:
         m = await message.reply_text(f"⏩ **Skipping song...**\n🎤 **Skipped By**:{mention}")
 
-        # Check if looping is enabled
         loop = await get_loop(chat_id)
         if loop != 0:
             return await m.edit_text(
@@ -49,7 +47,6 @@ async def _aSkip(_, message):
             )
             asyncio.create_task(delete_messages(message, m))
 
-        # Check if queue has next song
         if chat_id not in QUEUE or len(get_queue(chat_id)) == 1:
             clear_queue(chat_id)
             await stop(chat_id)
@@ -57,34 +54,27 @@ async def _aSkip(_, message):
             asyncio.create_task(delete_messages(message, m))
 
         try:
-            next_song_data = get_queue(chat_id)[1]
-            stream_url = next_song_data[3]
+            if len(get_queue(chat_id)) > 1:
+                next_song_data = get_queue(chat_id)[1]
+                stream_url = next_song_data[3]
+            else:
+                return await m.edit_text(f"🚫 **Queue is empty.**\n🎤 **Skipped By:** {mention}")
 
             result = await ytdl("bestaudio", stream_url)
-            resp = result[0]
-            songlink = result[1]
-            search_results = result[2]
-            if resp == 0 or not songlink or not search_results:
-                return await m.edit_text(f"❌ **Failed to fetch next song.**\n🛑 `{songlink}`\n🎤 **Skipped By:** {mention}")
-                asyncio.create_task(delete_messages(message, m))
+            if len(result) < 3:
+                return await m.edit_text(f"❌ **Failed to fetch next song.**\n🛑 `{stream_url}`\n🎤 **Skipped By:** {mention}")
+            else:
+                resp = result[0]
+                songlink = result[1]
+                search_results = result[2]
 
-            if search_results and isinstance(search_results, list):
-                title = search_results[0]['title']
-                duration = search_results[0]['duration']
-                channel = search_results[0]['channel']
-                views = search_results[0]['views']
-            
-
-            # Play next song
             await call.play(
                 chat_id,
                 MediaStream(songlink, video_flags=MediaStream.Flags.AUTO_DETECT),
             )
 
-            # Remove skipped song from queue
             pop_an_item(chat_id)
 
-            # Time calculation
             finish_time = time.time()
             total_time_taken = f"{int(finish_time - start_time)}s"
 
@@ -105,10 +95,10 @@ async def _aSkip(_, message):
         except Exception as e:
             await m.delete()
             return await app.send_message(chat_id, f"❌ **Error:** `{e}`\n🎤 **Skipped By:** {mention}")
-
     else:
         return await message.reply_text(f"❌ **You don’t have permission to skip songs.** Ask an admin.\n🎤 **Skipped By:** {mention}")
         asyncio.create_task(delete_messages(message, m))
+
             
             
 @app.on_message(filters.command("queue", [PREFIX, RPREFIX]) & filters.group)
