@@ -12,7 +12,7 @@ from Player.Misc import SUDOERS
 from Player.Utils.Loop import get_loop
 from Player.Utils.YtDetails import ytdl
 from Player.Utils.Delete import delete_messages
-from Player.Utils.Queue import QUEUE, get_queue, pop_an_item, clear_queue, add_to_queue, process_next_song
+from Player.Utils.Queue import QUEUE, get_queue, pop_an_item, clear_queue, add_to_queue #process_next_song
 
 from pyrogram import filters
 
