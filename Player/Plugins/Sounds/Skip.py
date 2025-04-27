@@ -66,7 +66,7 @@ async def _aSkip(_, message):
             
             await call.play(
                 chat_id,
-                MediaStream(songlink, video_flags=MediaStream.Flags.AUTO_DETECT),
+                MediaStream(stream_url, video_flags=MediaStream.Flags.AUTO_DETECT),
             )
 
             pop_an_item(chat_id)
