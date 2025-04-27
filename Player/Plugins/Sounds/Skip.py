@@ -52,20 +52,19 @@ async def _aSkip(_, message):
             asyncio.create_task(delete_messages(message, m))
 
         try:
-            print("Queue data:", get_queue(chat_id))
-            next_song_data = get_queue(chat_id)[1]
-            
-            print("Before unpacking next_song_data.")
+            queue_data = get_queue(chat_id)
+            print("Queue data:", queue_data)
+            if len(queue_data) > 0:
+                next_song_data = queue_data[1]
+                print("Before unpacking next_song_data.")
             if len(next_song_data) == 3:
                 chat_id, song_details, stream_url = next_song_data
-                print(f"Chat ID: {chat_id}, Song Title: {song_details[0]['title']}, Stream URL: {stream_url}")
-            elif len(next_song_data) == 2:
-                chat_id, song_details = next_song_data
-                stream_url = None
-                print(f"Chat ID: {chat_id}, Song Title: {song_details[0]['title']}, Stream URL: Not Available")
+                print(f"Chat ID: {chat_id}")
+                print(f"Song Title: {song_details[0]['title']}")
+                print(f"Stream URL: {stream_url}")
             else:
                 return await m.edit_text(f"❌ **Next song data is incomplete.**")
-            print(f"Chat ID: {chat_id}, Song Title: {song_details[0]['title']}, Stream URL: {stream_url}")
+            
             status, stream_url = await ytdl("bestaudio", stream_url)
 
             if status == 0 or not stream_url:
