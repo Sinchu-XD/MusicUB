@@ -57,7 +57,8 @@ async def _aSkip(_, message):
             if len(queue_data) > 1:
                 next_song_data = queue_data[1]  # Adjusted index to properly unpack the next item
                 print("Before unpacking next_song_data.")
-                if len(next_song_data) == 3:
+                if len(next_song_data) == 4:
+                    raise ValueError(f"Invalid queue data: {next_song_data}. Expected 4 elements.")
                     chat_id, song_details, stream_url = next_song_data
                     print(f"Chat ID: {chat_id}")
                     print(f"Song Title: {song_details[0]['title']}")
@@ -75,9 +76,9 @@ async def _aSkip(_, message):
 
                     pop_an_item(chat_id)
                 else:
-                    raise ValueError("Next song data does not contain 3 elements.")
+                    raise ValueError("Next song data does not contain 4 elements.")
             else:
-                raise ValueError("Next song data does not contain 3 elements.")
+                raise ValueError("Next song data does not contain 4 elements.")
         except Exception as e:
             print(f"Error: {e}")
             finish_time = time.time()
