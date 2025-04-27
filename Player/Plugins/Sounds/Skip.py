@@ -61,6 +61,7 @@ async def _aSkip(_, message):
                 stream_url = None
             else:
                 return await m.edit_text(f"❌ **Next song data is incomplete.**")
+            print(f"Chat ID: {chat_id}, Song Title: {song_details[0]['title']}, Stream URL: {stream_url}")
             status, stream_url = await ytdl("bestaudio", stream_url)
 
             if status == 0 or not stream_url:
