@@ -68,12 +68,15 @@ async def process_next_song(chat_id):
         chat_id, search_results, songlink, stream_url = next_song_data
         print(f"Processing next song: {songlink}")
         
-        status, stream_url = await ytdl("bestaudio", stream_url)
-        if status != 0 or not stream_url:
+        result = await ytdl("bestaudio", stream_url)
+        resp = result[0]
+        songlink = result[1]
+        duration = search_results[0]['duration']
+        if resp != 0 or not song_link:
             print(f"Failed to fetch stream for {songlink}")
             return
 
-        await call.play(chat_id, MediaStream(song_link, video_flags=MediaStream.Flags.AUTO_DETECT))
+        await Userbot.playAudio(chat_id, songlink)
 
     else:
         print(f"Invalid data in queue: {next_song_data}. Expected 4 elements.")
