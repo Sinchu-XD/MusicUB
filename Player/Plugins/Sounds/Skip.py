@@ -56,6 +56,9 @@ async def _aSkip(_, message):
             print(next_song_data)
             if len(next_song_data) == 3:
                 title, duration, stream_url = next_song_data
+            elif len(next_song_data) == 2:
+                title, duration = next_song_data
+                stream_url = None
             else:
                 return await m.edit_text(f"❌ **Next song data is incomplete.**")
             status, stream_url = await ytdl("bestaudio", stream_url)
