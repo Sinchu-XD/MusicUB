@@ -47,7 +47,7 @@ async def _aSkip(_, message):
             )
             asyncio.create_task(delete_messages(message, m))
 
-        if chat_id not in QUEUE or len(get_queue(chat_id)) == 1:
+        if chat_id not in QUEUE or len(get_queue(chat_id)) < 2:
             clear_queue(chat_id)
             await stop(chat_id)
             return await m.edit_text(f"🚫 **Queue is empty.** Leaving voice chat...\n🎤 **Skipped By:** {mention}")
