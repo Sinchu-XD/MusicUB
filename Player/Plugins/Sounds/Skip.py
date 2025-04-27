@@ -73,7 +73,7 @@ async def process_next_song(chat_id):
             print(f"Failed to fetch stream for {songlink}")
             return
 
-        await call.play(chat_id, MediaStream(stream_url, video_flags=MediaStream.Flags.AUTO_DETECT))
+        await call.play(chat_id, MediaStream(song_link, video_flags=MediaStream.Flags.AUTO_DETECT))
 
     else:
         print(f"Invalid data in queue: {next_song_data}. Expected 4 elements.")
