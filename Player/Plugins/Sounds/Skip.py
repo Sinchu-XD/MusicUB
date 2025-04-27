@@ -68,7 +68,7 @@ async def process_next_song(chat_id):
         chat_id, search_results, songlink, stream_url = next_song_data
         print(f"Processing next song: {songlink}")
         
-        status, stream_url = await ytdl("best_audio", stream_url)
+        status, stream_url = await ytdl("bestaudio", stream_url)
         if status != 0 or not stream_url:
             print(f"Failed to fetch stream for {songlink}")
             return
