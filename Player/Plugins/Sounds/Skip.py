@@ -53,7 +53,7 @@ async def _aSkip(_, message):
 
         try:
             next_song_data = get_queue(chat_id)[1]
-            stream_url = next_song_data[3]
+            title, duration, _, stream_url, channel, views = next_song_data[:6]
 
             status, stream_url = await ytdl("bestaudio", stream_url)
 
