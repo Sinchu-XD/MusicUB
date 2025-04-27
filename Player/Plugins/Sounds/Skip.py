@@ -63,11 +63,9 @@ async def _aSkip(_, message):
             result = await ytdl("bestaudio", stream_url)
             if len(result) < 3:
                 return await m.edit_text(f"❌ **Failed to fetch next song.**\n🛑 `{stream_url}`\n🎤 **Skipped By:** {mention}")
-            else:
-                resp = result[0]
-                songlink = result[1]
-                search_results = result[2]
-
+            
+            resp, songlink, search_results = result
+            
             await call.play(
                 chat_id,
                 MediaStream(songlink, video_flags=MediaStream.Flags.AUTO_DETECT),
