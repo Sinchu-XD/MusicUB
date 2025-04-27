@@ -48,9 +48,8 @@ async def skip_song(_, message):
             await delete_messages(message, m)
             return
 
-        await process_next_song(chat_id)
-
         pop_an_item(chat_id)
+        await process_next_song(chat_id)
 
         await delete_messages(message, m)
     else:
@@ -63,25 +62,19 @@ async def process_next_song(chat_id):
         return
 
     next_song_data = queue_data[0]
-    
-    if len(next_song_data) == 4:
-        chat_id, search_results, songlink, stream_url = next_song_data
-        print(f"Processing next song: {songlink}")
+    chat_id, search_results, songlink, stream_url = next_song_data
+    print(f"Processing next song: {songlink}")
         
-        result = await ytdl("bestaudio", stream_url)
-        resp = result[0]
-        songlink = result[1]
-        duration = search_results[0]['duration']
-        if resp != 0 or not songlink:
-            print(f"Failed to fetch stream for {songlink}")
-            return
+    result = await ytdl("bestaudio", stream_url)
+    resp = result[0]
+    songlink = result[1]
+    duration = search_results[0]['duration']
+    
+    if resp != 0 or not songlink:
+        print(f"Failed to fetch stream for {songlink}")
+        return
 
-        await Userbot.playAudio(chat_id, songlink)
-
-    else:
-        print(f"Invalid data in queue: {next_song_data}. Expected 4 elements.")
-        logging.error(f"Invalid data in queue for chat_id {chat_id}: {next_song_data}")
-
+    await Userbot.playAudio(chat_id, songlink)
 
 @app.on_message(filters.command("queue", [PREFIX, RPREFIX]) & filters.group)
 async def _queue(_, message):
