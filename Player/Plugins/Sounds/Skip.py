@@ -54,7 +54,7 @@ async def _aSkip(_, message):
         try:
             queue_data = get_queue(chat_id)
             print("Queue data:", queue_data)
-            if len(queue_data) > 0:
+            if len(queue_data) > 1:
                 next_song_data = queue_data[1]
                 print("Before unpacking next_song_data.")
             if len(next_song_data) == 3:
