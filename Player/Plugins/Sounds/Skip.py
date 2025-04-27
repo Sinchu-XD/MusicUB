@@ -67,7 +67,7 @@ async def process_next_song(chat_id):
     if len(next_song_data) == 4:
         chat_id, search_results, songlink, stream_url = next_song_data
         print(f"Processing next song: {songlink}")
-        
+        """
         result = await ytdl("bestaudio", stream_url)
         resp = result[0]
         songlink = result[1]
@@ -75,7 +75,7 @@ async def process_next_song(chat_id):
         if resp != 0 or not songlink:
             print(f"Failed to fetch stream for {songlink}")
             return
-
+"""
         await Userbot.playAudio(chat_id, songlink)
 
     else:
