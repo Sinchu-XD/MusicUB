@@ -57,7 +57,7 @@ async def _aSkip(_, message):
             if len(get_queue(chat_id)) > 1:
                 next_song_data = get_queue(chat_id)[1]
 
-                if not next_song_data:
+                if len(next_song_data) < 6:
                     return await m.edit_text(f"❌ **No next song in the queue.**\n🎤 **Skipped By:** {mention}")
                     asyncio.create_task(delete_messages(message, m))
                     
