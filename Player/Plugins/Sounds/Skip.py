@@ -2,7 +2,6 @@
 Telegram @Itz_Your_4Bhi
 Copyright ©️ 2025
 """
-
 import time
 import config
 import asyncio
@@ -23,7 +22,6 @@ from pytgcalls.types import MediaStream
 SKIP_COMMAND = ["SKIP"]
 PREFIX = config.PREFIX
 RPREFIX = config.RPREFIX
-
 
 @app.on_message((filters.command(SKIP_COMMAND, [PREFIX, RPREFIX])) & filters.group)
 async def _aSkip(_, message):
@@ -47,39 +45,15 @@ async def _aSkip(_, message):
             )
             asyncio.create_task(delete_messages(message, m))
 
-        if chat_id not in QUEUE or len(get_queue(chat_id)) < 2:
+        if chat_id not in QUEUE or len(get_queue(chat_id)) == 1:
             clear_queue(chat_id)
             await stop(chat_id)
             return await m.edit_text(f"🚫 **Queue is empty.** Leaving voice chat...\n🎤 **Skipped By:** {mention}")
             asyncio.create_task(delete_messages(message, m))
 
         try:
-            queue_length = len(get_queue(chat_id))
-            if queue_length < 2:
-                return await m.edit_text(f"❌ **No next song in the queue.** The queue has only one song left.\n🎤 **Skipped By:** {mention}")
-                asyncio.create_task(delete_messages(message, m))
-
             next_song_data = get_queue(chat_id)[1]
-            print(f"Next Song Data: {next_song_data}")
-
-            if not isinstance(next_song_data, list) or len(next_song_data) == 0:
-                return await m.edit_text(f"❌ **Next song data is incomplete.**\n🎤 **Skipped By:** {mention}")
-                asyncio.create_task(delete_messages(message, m))
-            song_details = next_song_data[0]
-            if not isinstance(song_details, dict):
-                return await m.edit_text(f"❌ **Next song data is not in the expected format.**\n🎤 **Skipped By:** {mention}")
-                asyncio.create_task(delete_messages(message, m))
-
-            required_keys = ['title', 'duration', 'url', 'channel', 'views']
-            if not all(key in song_details for key in required_keys):
-                return await m.edit_text(f"❌ **Next song data is missing required fields.**\n🎤 **Skipped By:** {mention}")
-                asyncio.create_task(delete_messages(message, m))
-
-            title = song_details['title']
-            duration = song_details['duration']
-            stream_url = song_details['url']
-            channel_name = song_details['channel']
-            views = song_details['views']
+            stream_url = next_song_data[3]
 
             status, stream_url = await ytdl("bestaudio", stream_url)
 
@@ -101,10 +75,10 @@ async def _aSkip(_, message):
             await app.send_message(
                 chat_id,
                 f"🎶 **Now Playing**\n\n"
-                f"🎵 **Song:** [{title[:19]}]({stream_url})\n"
-                f"⏳ **Duration:** {duration}\n"
-                f"📺 **Channel:** {channel_name}\n"
-                f"👁 **Views:** {views}\n"
+                f"🎵 **Song:** [{next_song_data[1][:19]}]({stream_url})\n"
+                f"⏳ **Duration:** {next_song_data[2]}\n"
+                f"📺 **Channel:** {next_song_data[4]}\n"
+                f"👁 **Views:** {next_song_data[5]}\n"
                 f"🙋‍♂️ **Requested By:** {mention}\n"
                 f"⚡ **Response Time:** {total_time_taken}",
                 disable_web_page_preview=True,
@@ -114,6 +88,7 @@ async def _aSkip(_, message):
         except Exception as e:
             await m.delete()
             return await app.send_message(chat_id, f"❌ **Error:** `{e}`\n🎤 **Skipped By:** {mention}")
+
     else:
         return await message.reply_text(f"❌ **You don’t have permission to skip songs.** Ask an admin.\n🎤 **Skipped By:** {mention}")
         asyncio.create_task(delete_messages(message, m))
