@@ -25,14 +25,12 @@ RPREFIX = config.RPREFIX
 @app.on_message((filters.command(SKIP_COMMAND, [PREFIX, RPREFIX])) & filters.group)
 async def skip_song(_, message):
     chat_id = message.chat.id
-    if chat_id in seek_chats:
-        del seek_chats[chat_id]
-    start_time = time.time()
     mention = message.from_user.mention
 
     admins = []
     async for admin in app.get_chat_members(chat_id, filter=ChatMembersFilter.ADMINISTRATORS):
         admins.append(admin.user.id)
+
     if message.from_user.id in SUDOERS or message.from_user.id in admins:
         m = await message.reply_text(f"⏩ **Skipping song...**\n🎤 **Skipped By**:{mention}")
 
@@ -49,7 +47,7 @@ async def skip_song(_, message):
             return
 
         pop_an_item(chat_id)
-        await process_next_song(chat_id)
+        await process_next_song(chat_id)  # Call next song after popping current song
 
         await delete_messages(message, m)
     else:
@@ -58,47 +56,38 @@ async def skip_song(_, message):
 async def process_next_song(chat_id):
     queue_data = get_queue(chat_id)
     if not queue_data:
-        print(f"Queue empty at process_next_song: {chat_id}")
+        print(f"Queue is empty for chat_id: {chat_id}")
         return
 
     next_song_data = queue_data[0]
 
-    if len(next_song_data) != 4:
-        print(f"❗ Wrong song data format: {next_song_data}")
-        pop_an_item(chat_id)  # Remove broken data
-        await process_next_song(chat_id)
+    if len(next_song_data) < 4:
+        print(f"❗ Invalid song data format: {next_song_data}")
+        pop_an_item(chat_id) 
         return
 
-    try:
-        chat_id_in_queue, search_results, songlink, stream_url = next_song_data
-    except Exception as e:
-        print(f"Unpacking error: {e}")
-        pop_an_item(chat_id)
-        await process_next_song(chat_id)
-        return
+    _chat_id, search_results, songlink, stream_url = next_song_data
 
     try:
-        print(f"Processing next song: {stream_url}")
         result = await ytdl("bestaudio", stream_url)
-        if not result or len(result) != 2:
-            print(f"ytdl failed for {stream_url}")
+        resp = result[0]
+        final_stream_url = result[1]
+
+        if resp != 0 or not final_stream_url:
+            print(f"❌ Failed to fetch stream for {songlink}")
             pop_an_item(chat_id)
             await process_next_song(chat_id)
             return
 
-        resp, new_songlink = result
-        if resp != 0 or not new_songlink:
-            print(f"Stream fetch failed for {stream_url}")
-            pop_an_item(chat_id)
-            await process_next_song(chat_id)
-            return
+        await Userbot.playAudio(chat_id, final_stream_url) 
+        print(f"▶️ Now playing next song.")
 
-        await Userbot.playAudio(chat_id, new_songlink)
+        pop_an_item(chat_id)
 
     except Exception as e:
-        print(f"Error playing next song: {e}")
+        print(f"⚠️ Error while processing next song: {e}")
         pop_an_item(chat_id)
-        await process_next_song(chat_id)
+
 
 @app.on_message(filters.command("queue", [PREFIX, RPREFIX]) & filters.group)
 async def _queue(_, message):
