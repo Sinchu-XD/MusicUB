@@ -70,7 +70,9 @@ async def _aSkip(_, message):
             print(f"Error: {e}")
             
             # Fetching stream details if unpacking fails
-            status, stream_url = await ytdl("bestaudio", stream_url)
+            stream_url = None
+            if not stream_url:
+                status, stream_url = await ytdl("bestaudio", "https://www.youtube.com/watch?v=dQw4w9WgXcQ")
 
             if status == 0 or not stream_url:
                 return await m.edit_text(f"❌ **Failed to fetch next song.**\n🛑 `{stream_url}`\n🎤 **Skipped By:** {mention}")
