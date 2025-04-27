@@ -72,7 +72,7 @@ async def process_next_song(chat_id):
         resp = result[0]
         songlink = result[1]
         duration = search_results[0]['duration']
-        if resp != 0 or not song_link:
+        if resp != 0 or not songlink:
             print(f"Failed to fetch stream for {songlink}")
             return
 
