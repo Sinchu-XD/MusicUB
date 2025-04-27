@@ -30,7 +30,9 @@ async def skip_song(_, message):
     start_time = time.time()
     mention = message.from_user.mention
 
-    admins = [admin.user.id for admin in await app.get_chat_members(chat_id, filter=ChatMembersFilter.ADMINISTRATORS)]
+    admins = []
+    async for admin in app.get_chat_members(chat_id, filter=ChatMembersFilter.ADMINISTRATORS):
+        admins.append(admin.user.id)
     if message.from_user.id in SUDOERS or message.from_user.id in admins:
         m = await message.reply_text(f"⏩ **Skipping song...**\n🎤 **Skipped By**:{mention}")
 
