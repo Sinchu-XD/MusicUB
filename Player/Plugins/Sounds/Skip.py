@@ -55,55 +55,46 @@ async def _aSkip(_, message):
             queue_data = get_queue(chat_id)
             print("Queue data:", queue_data)
             if len(queue_data) > 0:
-                
-                next_song_data = queue_data[1]
+                next_song_data = queue_data[1]  # Adjusted index to properly unpack the next item
                 print("Before unpacking next_song_data.")
-
-                
                 if len(next_song_data) == 3:
-                    song_details = next_song_data[1]
-                    stream_url = next_song_data[2]
-
-                
-                    title = song_details[0]['title']
-                    channel = song_details[0]['channel']
-                    duration = song_details[0]['duration']
-                    views = song_details[0]['views']
-                    link = song_details[0]['url']
-
+                    chat_id, song_details, stream_url = next_song_data
                     print(f"Chat ID: {chat_id}")
-                    print(f"Song Title: {title}")
+                    print(f"Song Title: {song_details[0]['title']}")
                     print(f"Stream URL: {stream_url}")
+        except Exception as e:
+            print(f"Error: {e}")
+            
+            # Fetching stream details if unpacking fails
+            status, stream_url = await ytdl("bestaudio", stream_url)
 
-                    status, stream_url = await ytdl("bestaudio", stream_url)
+            if status == 0 or not stream_url:
+                return await m.edit_text(f"❌ **Failed to fetch next song.**\n🛑 `{stream_url}`\n🎤 **Skipped By:** {mention}")
+                asyncio.create_task(delete_messages(message, m))
 
-                    if status == 0 or not stream_url:
-                        return await m.edit_text(f"❌ **Failed to fetch next song.**\n🛑 `{stream_url}`\n🎤 **Skipped By:** {mention}")
-                        asyncio.create_task(delete_messages(message, m))
+            await call.play(
+                chat_id,
+                MediaStream(stream_url, video_flags=MediaStream.Flags.AUTO_DETECT),
+            )
 
-                    await call.play(
-                        chat_id,
-                        MediaStream(stream_url, video_flags=MediaStream.Flags.AUTO_DETECT),
-                    )
+            pop_an_item(chat_id)
 
-                    pop_an_item(chat_id)
+            finish_time = time.time()
+            total_time_taken = f"{int(finish_time - start_time)}s"
 
-                    finish_time = time.time()
-                    total_time_taken = f"{int(finish_time - start_time)}s"
-
-                    await m.delete()
-                    await app.send_message(
-                        chat_id,
-                        f"🎶 **Now Playing**\n\n"
-                        f"🎵 **Song:** [{title}]({link})\n"
-                        f"⏳ **Duration:** {duration}\n"
-                        f"📺 **Channel:** {channel}\n"
-                        f"👁 **Views:** {views}\n"
-                        f"🙋‍♂️ **Requested By:** {mention}\n"
-                        f"⚡ **Response Time:** {total_time_taken}",
-                        disable_web_page_preview=True,
-                    )
-                    asyncio.create_task(delete_messages(message, m))
+            await m.delete()
+            await app.send_message(
+                chat_id,
+                f"🎶 **Now Playing**\n\n"
+                f"🎵 **Song:** [{next_song_data[1][:19]}]({stream_url})\n"
+                f"⏳ **Duration:** {next_song_data[2]}\n"
+                f"📺 **Channel:** {next_song_data[4]}\n"
+                f"👁 **Views:** {next_song_data[5]}\n"
+                f"🙋‍♂️ **Requested By:** {mention}\n"
+                f"⚡ **Response Time:** {total_time_taken}",
+                disable_web_page_preview=True,
+            )
+            asyncio.create_task(delete_messages(message, m))
 
         except Exception as e:
             await m.delete()
@@ -112,7 +103,6 @@ async def _aSkip(_, message):
     else:
         return await message.reply_text(f"❌ **You don’t have permission to skip songs.** Ask an admin.\n🎤 **Skipped By:** {mention}")
         asyncio.create_task(delete_messages(message, m))
-
 
 
 @app.on_message(filters.command("queue", [PREFIX, RPREFIX]) & filters.group)
@@ -136,3 +126,4 @@ async def stop(chat_id):
         await call.leave_call(chat_id)
     except:
         pass
+        
