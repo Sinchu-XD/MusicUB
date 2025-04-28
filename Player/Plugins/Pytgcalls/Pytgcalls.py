@@ -51,20 +51,20 @@ async def _skip(chat_id):
                 songlink = chat_queue[0][3]
                 # link = chat_queue[1][4]
 
-                # retry_count = 0
-                # max_retries = 3
-                # status, songlink, duration = (0, "", 0)
+                retry_count = 0
+                max_retries = 3
+                status, songlink, duration = (0, "", 0)
 
-                # while retry_count < max_retries and status == 0:
-                #     status, songlink, duration = await ytdl("bestaudio", link)
-                #     if status == 0:
-                #         await asyncio.sleep(2)  # Wait before retrying
-                #         retry_count += 1
+                while retry_count < max_retries and status == 0:
+                    status, songlink = await ytdl("bestaudio", link)
+                    if status == 0:
+                        await asyncio.sleep(2)  # Wait before retrying
+                        retry_count += 1
 
-                # duration_formatted = f"{duration // 60}:{duration % 60:02d}" if duration else "Unknown"
+                duration_formatted = f"{duration // 60}:{duration % 60:02d}" if duration else "Unknown"
 
-                # if not status:
-                #     return [2, f"❌ **Failed to fetch next song.**"]
+                if not status:
+                    return [2, f"❌ **Failed to fetch next song.**"]
 
                 await call.play(
                     chat_id,
