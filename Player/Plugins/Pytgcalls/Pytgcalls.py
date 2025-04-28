@@ -46,6 +46,7 @@ async def _skip(chat_id):
             return 1
         else:
             try:
+                pop_an_item(chat_id)
                 title = chat_queue[0][1][0]['title']
                 link = chat_queue[0][2]
                 songlink = chat_queue[0][3]
@@ -75,7 +76,7 @@ async def _skip(chat_id):
                 )
                 duration = "2"
                 finish_time = time.time()
-                pop_an_item(chat_id)
+                
                 return [title, duration, link, finish_time]
             except Exception as e:
                 return [2, f"Error:- <code>{e}</code>"]
