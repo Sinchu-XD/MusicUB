@@ -31,7 +31,7 @@ async def seek_audio(_, message):
         return asyncio.create_task(delete_messages(message, m))
 
     chat_queue = get_queue(chat_id)
-    songlink = chat_queue[0][3]
+    songlink = chat_queue[0][2]
 
     try:
         seeked_dur = seek_chats.get(chat_id, 0) + seek_dur
