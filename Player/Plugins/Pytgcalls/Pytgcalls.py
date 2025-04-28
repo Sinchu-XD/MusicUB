@@ -22,10 +22,10 @@ async def _skip(chat_id):
             chat_queue = get_queue(chat_id)
             loop = loop - 1
             await set_loop(chat_id, loop)
-            title = chat_queue[0][1]
-            duration = chat_queue[0][2]
-            songlink = chat_queue[0][3]
-            link = chat_queue[0][4]
+            title = chat_queue[0][0]
+            duration = chat_queue[0][1]
+            songlink = chat_queue[0][2]
+            link = chat_queue[0][3]
             await call.play(
                 chat_id,
                 MediaStream(
