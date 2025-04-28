@@ -63,31 +63,32 @@ async def process_next_song(chat_id):
 
     if len(next_song_data) < 4:
         print(f"❗ Invalid song data format: {next_song_data}")
-        pop_an_item(chat_id) 
+        pop_an_item(chat_id)
         return
 
     _chat_id, search_results, songlink, stream_url = next_song_data
 
     try:
-        # result = await ytdl("bestaudio", stream_url)
-        # resp = result[0]
-        # final_stream_url = result[1]
+        result = await ytdl("bestaudio", stream_url)
+        resp = result[0]
+        final_stream_url = result[1]
 
-        # if resp != 0 or not final_stream_url:
-        #     print(f"❌ Failed to fetch stream for {songlink}")
-        #     pop_an_item(chat_id)
-        #     await process_next_song(chat_id)
-        #     return
+        if resp != 0 or not final_stream_url:
+            print(f"❌ Failed to fetch stream for {songlink}")
+            # pop_an_item(chat_id)
+            await process_next_song(chat_id)
+            return
 
-        await Userbot.playAudio(chat_id, stream_url)
-        # await Userbot.playAudio(chat_id, final_stream_url) 
+        # await Userbot.playAudio(chat_id, stream_url)
+        
+        await Userbot.playAudio(chat_id, final_stream_url)
         print(f"▶️ Now playing next song.")
 
-        pop_an_item(chat_id)
+        # pop_an_item(chat_id)
 
     except Exception as e:
         print(f"⚠️ Error while processing next song: {e}")
-        pop_an_item(chat_id)
+        # pop_an_item(chat_id)
 
 
 @app.on_message(filters.command("queue", [PREFIX, RPREFIX]) & filters.group)
