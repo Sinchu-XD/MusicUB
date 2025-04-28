@@ -22,8 +22,8 @@ async def _skip(chat_id):
             chat_queue = get_queue(chat_id)
             loop = loop - 1
             await set_loop(chat_id, loop)
-            title = chat_queue[0][0]
-            duration = chat_queue[0][1]
+            chat_id = chat_queue[0][0]
+            duration = chat_queue[0][1][0]['title']
             songlink = chat_queue[0][2]
             link = chat_queue[0][3]
             await call.play(
@@ -46,25 +46,25 @@ async def _skip(chat_id):
             return 1
         else:
             try:
-                title = chat_queue[1][1]
-                duration = chat_queue[1][2]
-                link = chat_queue[1][3]
+                title = chat_queue[0][1][0]['title']
+                link = chat_queue[0][2]
+                songlink = chat_queue[0][3]
                 # link = chat_queue[1][4]
 
-                retry_count = 0
-                max_retries = 3
-                status, songlink, duration = (0, "", 0)
+                # retry_count = 0
+                # max_retries = 3
+                # status, songlink, duration = (0, "", 0)
 
-                while retry_count < max_retries and status == 0:
-                    status, songlink, duration = await ytdl("bestaudio", link)
-                    if status == 0:
-                        await asyncio.sleep(2)  # Wait before retrying
-                        retry_count += 1
+                # while retry_count < max_retries and status == 0:
+                #     status, songlink, duration = await ytdl("bestaudio", link)
+                #     if status == 0:
+                #         await asyncio.sleep(2)  # Wait before retrying
+                #         retry_count += 1
 
-                duration_formatted = f"{duration // 60}:{duration % 60:02d}" if duration else "Unknown"
+                # duration_formatted = f"{duration // 60}:{duration % 60:02d}" if duration else "Unknown"
 
-                if not status:
-                    return [2, f"❌ **Failed to fetch next song.**"]
+                # if not status:
+                #     return [2, f"❌ **Failed to fetch next song.**"]
 
                 await call.play(
                     chat_id,
@@ -73,6 +73,7 @@ async def _skip(chat_id):
                         video_flags=MediaStream.Flags.IGNORE,
                     ),
                 )
+                duration = "2"
                 finish_time = time.time()
                 pop_an_item(chat_id)
                 return [title, duration, link, finish_time]
