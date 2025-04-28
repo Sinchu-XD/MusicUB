@@ -73,7 +73,7 @@ async def process_next_song(chat_id):
         resp = result[0]
         final_stream_url = result[1]
 
-        if resp != 0 or not final_stream_url:
+        if resp == 0 or not final_stream_url:
             print(f"❌ Failed to fetch stream for {songlink}")
             # pop_an_item(chat_id)
             await process_next_song(chat_id)
