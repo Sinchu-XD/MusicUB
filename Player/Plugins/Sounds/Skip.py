@@ -97,7 +97,7 @@ async def process_next_song(chat_id):
 
         # await Userbot.playAudio(chat_id, stream_url)
         
-        await Userbot.playAudio(chat_id, final_stream_url)
+        await Userbot.playAudio(chat_id, songlink)
         print(f"▶️ Now playing next song.")
 
         # pop_an_item(chat_id)
