@@ -24,6 +24,7 @@ RPREFIX = config.RPREFIX
 
 @app.on_message((filters.command(SKIP_COMMAND, [PREFIX, RPREFIX])) & filters.group)
 async def skip_song(_, message):
+    start_time = time.time()
     chat_id = message.chat.id
     mention = message.from_user.mention
 
