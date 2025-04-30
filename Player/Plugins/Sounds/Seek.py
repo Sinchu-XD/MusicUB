@@ -34,19 +34,20 @@ async def seek_audio(_, message):
     songlink = chat_queue[0][2]
 
     try:
-        seeked_dur = seek_chats.get(chat_id, 0) + seek_dur
+        #seeked_dur = seek_chats.get(chat_id, 0) + seek_dur
         await call.play(
             chat_id,
             MediaStream(
                 media_path=songlink,
                 audio_parameters=AudioQuality.HIGH,
-                ffmpeg_parameters=f"-ss {seeked_dur}",
+                ffmpeg_parameters=f"-ss {seek_dur}",
             ),
         )
 
-        seek_chats[chat_id] = seeked_dur
+        #seek_chats[chat_id] = seeked_dur
+        seek_chats.pop(chat_id, None)
         m = await message.reply_text(f"Seeked {seek_dur} seconds.")
-        del seeked_dur
+        #del seeked_dur
         asyncio.create_task(delete_messages(message, m))
 
     except Exception as e:
