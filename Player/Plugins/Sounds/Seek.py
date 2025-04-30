@@ -46,7 +46,7 @@ async def seek_audio(_, message):
 
         seek_chats[chat_id] = seeked_dur
         m = await message.reply_text(f"Seeked {seek_dur} seconds.")
-        del seek_chats[chat_id]
+        del seeked_dur
         asyncio.create_task(delete_messages(message, m))
 
     except Exception as e:
