@@ -91,7 +91,7 @@ async def _aPlay(_, message):
         if chat_id in QUEUE:
             queue_num = add_to_queue(chat_id, search_results, songlink, stream_url)
             await m.edit(
-                f"# **{queue_num} ʏᴏᴜʀ ꜱᴏɴɢ ᴀᴅᴅᴇᴅ ɪɴ Qᴜᴇᴜᴇ\n\nᴘʟᴇᴀꜱᴇ ᴡᴀɪᴛ 😵‍💫**",
+                f"# **{queue_num} ʏᴏᴜʀ ꜱᴏɴɢ ᴀᴅᴅᴇᴅ ɪɴ Qᴜᴇᴜᴇ\n\nᴘʟᴇᴀꜱᴇ ᴡᴀɪᴛ 😵‍💫**\n\n"
                 f"**SongName**:- [{search_results[0]['title'][:50]}]({songlink})\n"
                 f"**Duration**:- {duration}\n"
                 f"**Channel**:- {search_results[0]['channel']}\n"
