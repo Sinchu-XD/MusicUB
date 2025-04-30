@@ -47,6 +47,7 @@ async def skip_song(_, message):
             await delete_messages(message, m)
             return
 
+        pop_an_item(chat_id)
         queue_data = get_queue(chat_id)
         next_song_data = queue_data[0]
         if len(next_song_data) < 4:
@@ -56,8 +57,7 @@ async def skip_song(_, message):
 
         _chat_id, search_results, songlink, stream_url = next_song_data
         total_time = f"{int(time.time() - start_time)} **Seconds**"
-
-        pop_an_item(chat_id)
+   
         try:
             await Userbot.playAudio(chat_id, songlink)
         except Exception as e:
