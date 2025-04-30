@@ -55,7 +55,7 @@ async def _aPlay(_, message):
             await m.edit(f"# {queue_num}\n{audio_title[:19]}\n**ʏᴏᴜʀ ꜱᴏɴɢ ᴀᴅᴅᴇᴅ ɪɴ Qᴜᴇᴜᴇ\nᴘʟᴇᴀꜱᴇ ᴡᴀɪᴛ 😵‍💫**")
             return asyncio.create_task(delete_messages(message, m))
 
-        total_time = f"{int(time.time() - start_time)}s"
+        total_time = f"{int(time.time() - start_time)} **Seconds**"
         await m.edit(
             f"**ѕσηg ιѕ ρℓαуιηg ιη ν¢**\n\n**SongName**:- [{audio_title[:19]}]({message.reply_to_message.link})\n"
             f"**Duration**:- {audio.duration}\n**Requested By**:- {mention}\n\n**Response Time**:- {total_time}",
@@ -86,7 +86,7 @@ async def _aPlay(_, message):
     else:
         title = search_results[0]['title']
         chat_id = message.chat.id
-        total_time = f"{int(time.time() - start_time)}s"
+        total_time = f"{int(time.time() - start_time)} **Seconds**"
 
         if chat_id in QUEUE:
             queue_num = add_to_queue(chat_id, search_results, songlink, stream_url)
