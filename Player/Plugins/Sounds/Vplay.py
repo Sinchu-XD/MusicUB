@@ -109,7 +109,7 @@ async def _aPlay(_, message):
     total_time = f"{int(time.time() - start_time)} **Seconds**"
 
     if chat_id in QUEUE:
-        queue_num = add_to_queue(chat_id, title, duration, songlink, stream_url)
+        queue_num = add_to_queue(chat_id, search_results, songlink, stream_url)
         await m.edit(
             f"# **{queue_num} ʏᴏᴜʀ ꜱᴏɴɢ ᴀᴅᴅᴇᴅ ɪɴ Qᴜᴇᴜᴇ**\n\n"
             f"**SongName :** [{title[:19]}]({stream_url})\n"
