@@ -46,32 +46,42 @@ async def _aPlay(_, message):
     if chat_id in seek_chats:
         del seek_chats[chat_id]
         
-    if message.reply_to_message:
-        input_filename, m = await processReplyToMessage(message)
-        if input_filename is None:
-            return await message.reply_text(
-                "**𝙶𝚒𝚟𝚎 𝙼𝚎 𝚂𝚘𝚗𝚐 𝙻𝚒𝚗𝚔 𝙾𝚛 𝚁𝚎𝚙𝚕𝚢 𝚃𝚘 𝚅𝚘𝚒𝚌𝚎 𝙽𝚘𝚝𝚎😒**"
-            )
-
-        await m.edit("𝑊𝑎𝑖𝑡 𝑁𝑎 𝑌𝑟𝑟𝑟 😒..")
-        Status, Text = await Userbot.playVideo(chat_id, input_filename)
-        if not Status:
-            return await m.edit(Text)
-
-        video = message.reply_to_message.video or message.reply_to_message.video
-        audio_title = message.reply_to_message.text or "Unknown"
-        if chat_id in QUEUE:
-            queue_num = add_to_queue(chat_id, audio_title[:19], video.duration, video.file_id, message.reply_to_message.link)
-            await m.edit(f"# {queue_num}\n{audio_title[:19]}\n**ʏᴏᴜʀ ꜱᴏɴɢ ᴀᴅᴅᴇᴅ ɪɴ Qᴜᴇᴜᴇ\nᴘʟᴇᴀꜱᴇ ᴡᴀɪᴛ 😵‍💫**")
-            return asyncio.create_task(delete_messages(message, m))
-
-        total_time = f"{int(time.time() - start_time)} **Seconds**"
-        await m.edit(
-            f"**ѕσηg ιѕ ρℓαуιηg ιη ν¢**\n\n**SongName**:- [{audio_title[:19]}]({message.reply_to_message.link})\n"
-            f"**Duration**:- {video.duration}\n**Requested By**:- {mention}\n\n**Response Time**:- {total_time}",
-            disable_web_page_preview=True,
-        )
-        return asyncio.create_task(delete_messages(message, m))
+    if (message.reply_to_message) is not None:
+        if message.reply_to_message.video or message.reply_to_message.video_note:
+            input_filename, m = await processReplyToMessage(message)
+            if input_filename is None:
+                return await message.reply_text(
+                    "Video pe reply kon karega mai? ya phir video link kon dalega mai? 🤔"
+                )
+                
+            await m.edit("Rukja...Tera Video Play kar raha hu...")
+            Status, Text = await Userbot.playVideo(chat_id, input_filename)
+            if Status == False:
+                await m.edit(Text)
+            
+            else:
+                video = message.reply_to_message.video or message.reply_to_message.video_note
+                video_title = message.reply_to_message.text or "Unknown"
+                await message.delete()
+                if chat_id in QUEUE:
+                    queue_num = add_to_queue(
+                        chat_id,
+                        video_title[:19],
+                        video.duration,
+                        video.file_id,
+                        message.reply_to_message.link,
+                    )
+                    await m.edit(
+                        f"# {queue_num}\n{video_title[:19]}\nTera video queue me daal diya hu"
+                    )
+                    return
+                finish_time = time.time()
+                total_time_taken = str(int(finish_time - start_time)) + "s"
+                await m.edit(
+                    f"Tera video play kar rha hu aaja vc\n\nVideoName:- [{video_title[:19]}]({message.reply_to_message.link})\nDuration:- {video.duration}\nTime taken to play:- {total_time_taken}",
+                    disable_web_page_preview=True,
+                )
+                asyncio.create_task(delete_messages(message, m))
 
     elif len(message.command) < 2:
         return await message.reply_text("**𝑊𝑎𝑖𝑡 𝙶𝚒𝚟𝚎 𝙼𝚎 𝚂𝚘𝚗𝚐 𝙻𝚒𝚗𝚔 𝙾𝚛 𝚁𝚎𝚙𝚕𝚢 𝚃𝚘 𝚅𝚘𝚒𝚌𝚎 𝙽𝚘𝚝𝚎**")
