@@ -1,8 +1,18 @@
+import os
+import hashlib
+import logging
 import yt_dlp
 import asyncio
 from YouTubeMusic.YtSearch import Search
 
 COOKIES_FILE = "cookies/cookies.txt"
+CACHE_DIR = 'cached_songs'
+
+if not os.path.exists(CACHE_DIR):
+    os.makedirs(CACHE_DIR)
+
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
 
 async def SearchYt(query: str):
     results = await Search(query, limit=1)
@@ -27,6 +37,15 @@ async def SearchYt(query: str):
     return search_data, stream_url
 
 async def ytdl(format: str, url: str):
+    hashed = hashlib.md5(url.encode()).hexdigest()
+    cached_path = os.path.join(CACHE_DIR, f"{hashed}.webm")
+
+    if os.path.exists(cached_path):
+        logging.info(f"Cache hit for URL: {url}")
+        return (1, cached_path)
+
+    logging.info(f"Cache miss for URL: {url} - Downloading...")
+
     ydl_opts = {
         'format': format,
         'geo_bypass': True,
@@ -35,16 +54,17 @@ async def ytdl(format: str, url: str):
         'cookiefile': COOKIES_FILE,
         'nocheckcertificate': True,
         'force_generic_extractor': True,
-        'extractor_retries': 3, 
+        'extractor_retries': 3,
+        'outtmpl': cached_path,
     }
+
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            info = ydl.extract_info(url, download=False)
-            if 'url' in info:
-                return (1, info['url'])
-            else:
-                return (0, "No URL found")
+            info_dict = ydl.extract_info(url, download=True)
+            logging.info(f"Downloaded file: {cached_path}")
+            return (1, cached_path)
     except Exception as e:
+        logging.error(f"Error during download: {e}")
         return (0, str(e))
 
 async def main():
