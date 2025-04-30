@@ -12,6 +12,7 @@ from pyrogram import filters
 import os
 import asyncio
 import time
+import hashlib
 import logging
 import config
 
