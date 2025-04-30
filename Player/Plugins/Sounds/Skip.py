@@ -58,7 +58,7 @@ async def skip_song(_, message):
         await process_next_song(chat_id)
         await m.edit(
             f"**ѕσηg ιѕ ρℓαуιηg ιη ν¢**\n\n**SongName :** [{search_results[0]['title'][:19]}]({stream_url})\n"
-            f"**Duration :** {duration} **Minutes**\n**Channel :** {search_results[0]['channel']}\n"
+            f"**Duration :** {search_results[0]['duration']} **Minutes**\n**Channel :** {search_results[0]['channel']}\n"
             f"**Views :** {search_results[0]['views']}\n**Requested By :** {mention}\n\n**Response Time :** {total_time}",
             disable_web_page_preview=True,
         )
