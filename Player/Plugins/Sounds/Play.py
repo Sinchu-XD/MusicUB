@@ -111,7 +111,7 @@ async def _aPlay(_, message):
 
         add_to_queue(chat_id, search_results, songlink, stream_url)
 
-        total_time = f"{int(time.time() - start_time)}s"
+        total_time = f"{int(time.time() - start_time)} **Seconds**"
         await m.edit(
             f"**ѕσηg ιѕ ρℓαуιηg ιη ν¢**\n\n**SongName :** [{search_results[0]['title'][:19]}]({stream_url})\n"
             f"**Duration :** {duration} **Minutes**\n**Channel :** {search_results[0]['channel']}\n"
@@ -158,7 +158,7 @@ async def playforce(_, message):
     if not Status:
         return await m.edit(Text)
 
-    total_time = f"{int(time.time() - start_time)}s"
+    total_time = f"{int(time.time() - start_time)} **Seconds**"
     await m.edit(
         f"**𝑆𝑜𝑛𝑔 𝐹𝑜𝑟𝑐𝑒 𝑃𝑙𝑎𝑦𝑒𝑑 𝑎𝑡 ν𝑐**\n\n"
         f"**SongName :** [{search_results[0]['title'][:19]}]({stream_url})\n"
