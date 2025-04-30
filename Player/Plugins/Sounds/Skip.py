@@ -27,6 +27,8 @@ async def skip_song(_, message):
     start_time = time.time()
     chat_id = message.chat.id
     mention = message.from_user.mention
+    if chat_id in seek_chats:
+        del seek_chats[chat_id]
 
     admins = []
     async for admin in app.get_chat_members(chat_id, filter=ChatMembersFilter.ADMINISTRATORS):
