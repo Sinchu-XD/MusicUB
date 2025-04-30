@@ -22,10 +22,9 @@ PREFIX = config.PREFIX
 RPREFIX = config.RPREFIX
 
 
-if msg and (msg.video or msg.video_note):
+   if msg and (msg.video or msg.video_note):
         m = await message.reply_text("Rukja... Tera video download kar raha hu...")
 
-        # Try to get original filename, if not fallback to "video"
         file_name = getattr(msg.video, "file_name", None) or "video.mp4"
         safe_file_name = clean_filename(file_name)
         try:
