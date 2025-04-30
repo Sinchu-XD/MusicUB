@@ -46,7 +46,7 @@ async def _skip(chat_id):
         else:
             try:
                 pop_an_item(chat_id)
-                next_song = get_queue(chat_id)[0]
+                next_song = chat_queue[0]
                 title = next_song[1][0]['title']
                 duration = next_song[1][0]['duration']
                 channel = next_song[1][0]['channel']
