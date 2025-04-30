@@ -52,20 +52,8 @@ async def _skip(chat_id):
                 channel = next_song[1][0]['channel']
                 views = next_song[1][0]['views']
                 link = next_song[2]
-
-                retry_count = 0
-                max_retries = 3
-                status, songlink = 0, ""
-
-                while retry_count < max_retries and status == 0:
-                    status, songlink = await ytdl("bestaudio", link)
-                    if status == 0:
-                        await asyncio.sleep(2)
-                        retry_count += 1
-
-                if not status:
-                    return [2, "❌ **Failed to fetch next song stream URL.**"]
-
+                songlink = next_song[3]
+                
                 await call.play(chat_id, MediaStream(songlink, video_flags=MediaStream.Flags.IGNORE))
                 finish_time = time.time()
                 return [title, duration, channel, views, link, finish_time]
