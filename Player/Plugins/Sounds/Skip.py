@@ -46,6 +46,14 @@ async def skip_song(_, message):
             await delete_messages(message, m)
             return
 
+        queue_data = get_queue(chat_id)
+        next_song_data = queue_data[0]
+        if len(next_song_data) < 4:
+            print(f"❗ Invalid song data format: {next_song_data}")
+            return
+
+        _chat_id, search_results, songlink, stream_url = next_song_data
+
         pop_an_item(chat_id)
         await process_next_song(chat_id)
         await m.edit(
