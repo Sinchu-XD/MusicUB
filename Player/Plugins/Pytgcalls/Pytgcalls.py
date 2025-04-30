@@ -74,7 +74,7 @@ async def _skip(chat_id):
                         video_flags=MediaStream.Flags.IGNORE,
                     ),
                 )
-                duration = chat_queue[0][1][3]['duration']
+                duration = "chat_queue[0][1][3]['duration']"
                 finish_time = time.time()
                 
                 return [title, duration, link, finish_time]
