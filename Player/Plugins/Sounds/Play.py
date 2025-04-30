@@ -117,7 +117,7 @@ async def _aPlay(_, message):
             await m.edit(
                 f"# **{queue_num} ʏᴏᴜʀ ꜱᴏɴɢ ᴀᴅᴅᴇᴅ ɪɴ Qᴜᴇᴜᴇ\n\nᴘʟᴇᴀꜱᴇ ᴡᴀɪᴛ 😵‍💫**\n\n"
                 f"**SongName :** [{search_results[0]['title'][:19]}]({stream_url})\n"
-                f"**Duration :** {duration} **Minutes**\n"
+                f"**Duration :** {search_results[0]['duration']} **Minutes**\n"
                 f"**Channel :** {search_results[0]['channel']}\n"
                 f"**Views :** {search_results[0]['views']}\n"
                 f"**Requested By :** {mention}\n\n"
@@ -138,7 +138,7 @@ async def _aPlay(_, message):
         total_time = f"{int(time.time() - start_time)} **Seconds**"
         await m.edit(
             f"**ѕσηg ιѕ ρℓαуιηg ιη ν¢**\n\n**SongName :** [{search_results[0]['title'][:19]}]({stream_url})\n"
-            f"**Duration :** {duration} **Minutes**\n**Channel :** {search_results[0]['channel']}\n"
+            f"**Duration :** {search_results[0]['duration']} **Minutes**\n**Channel :** {search_results[0]['channel']}\n"
             f"**Views :** {search_results[0]['views']}\n**Requested By :** {mention}\n\n**Response Time :** {total_time}",
             disable_web_page_preview=True,
     )
