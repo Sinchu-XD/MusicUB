@@ -36,16 +36,15 @@ async def get_cache(query, stream_url):
 
     logging.info(f"Cache miss for query: {query} - Downloading...")
     
-    try:
-        status, songlink = await ytdl("bestaudio", stream_url)
-        if status and songlink:
+    status, songlink = await ytdl("bestaudio", stream_url)
+    if status and songlink:
+        try:
+
             os.rename(songlink, cached_path)
-            return status, songling
+        except Exception as e:
+            logging.error(f"Error moving file to cache: {e}")
+            return status, songlink
         return True, cached_path
-    else:
-        return False, None
-except Exception as e:
-    logging.error(f"Error during download: {e}")
     return False, None
 
 async def processReplyToMessage(message):
