@@ -21,6 +21,9 @@ PLAYFORCE_COMMAND = ["VPFORCE", "VPLAYFORCE"]
 PREFIX = config.PREFIX
 RPREFIX = config.RPREFIX
 
+def clean_filename(name: str) -> str:
+    return re.sub(r'[<>:"/\\|?*]', '', name).strip().replace(' ', '_')
+    
 async def processReplyToMessage(message):
     msg = message.reply_to_message
     if msg and (msg.video or msg.video_note):
