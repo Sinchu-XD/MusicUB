@@ -92,12 +92,12 @@ async def _aPlay(_, message):
             queue_num = add_to_queue(chat_id, search_results, songlink, stream_url)
             await m.edit(
                 f"# **{queue_num} ʏᴏᴜʀ ꜱᴏɴɢ ᴀᴅᴅᴇᴅ ɪɴ Qᴜᴇᴜᴇ\n\nᴘʟᴇᴀꜱᴇ ᴡᴀɪᴛ 😵‍💫**\n\n"
-                f"**SongName**:- [{search_results[0]['title'][:50]}]({stream_url})\n"
-                f"**Duration**:- {duration}\n"
-                f"**Channel**:- {search_results[0]['channel']}\n"
-                f"**Views**:- {search_results[0]['views']}\n"
-                f"**Requested By**:- {mention}\n\n"
-                f"**Response Time**:- {total_time}",
+                f"**SongName :** [{search_results[0]['title'][:50]}]({stream_url})\n"
+                f"**Duration :** {duration}\n"
+                f"**Channel :** {search_results[0]['channel']}\n"
+                f"**Views :** {search_results[0]['views']}\n"
+                f"**Requested By :** {mention}\n\n"
+                f"**Response Time :** {total_time}",
                 disable_web_page_preview=True,
             )
                 
@@ -113,9 +113,9 @@ async def _aPlay(_, message):
 
         total_time = f"{int(time.time() - start_time)}s"
         await m.edit(
-            f"**ѕσηg ιѕ ρℓαуιηg ιη ν¢**\n\n**SongName**:- [{search_results[0]['title'][:19]}]({stream_url})\n"
-            f"**Duration**:- {duration}\n**Channel**:- {search_results[0]['channel']}\n"
-            f"**Views**:- {search_results[0]['views']}\n**Requested By**:- {mention}\n\n**Response Time**:- {total_time}",
+            f"**ѕσηg ιѕ ρℓαуιηg ιη ν¢**\n\n**SongName :** [{search_results[0]['title'][:19]}]({stream_url})\n"
+            f"**Duration :** {duration}\n**Channel :** {search_results[0]['channel']}\n"
+            f"**Views :** {search_results[0]['views']}\n**Requested By :** {mention}\n\n**Response Time :** {total_time}",
             disable_web_page_preview=True,
     )
         return asyncio.create_task(delete_messages(message, m))
@@ -161,12 +161,12 @@ async def playforce(_, message):
     total_time = f"{int(time.time() - start_time)}s"
     await m.edit(
         f"**𝑆𝑜𝑛𝑔 𝐹𝑜𝑟𝑐𝑒 𝑃𝑙𝑎𝑦𝑒𝑑 𝑎𝑡 ν𝑐**\n\n"
-        f"**SongName**:- [{search_results[0]['title'][:50]}]({stream_url})\n"
-        f"**Duration**:- {duration}\n"
-        f"**Channel**:- {search_results[0]['channel']}\n"
-        f"**Views**:- {search_results[0]['views']}\n"
-        f"**Requested By**:- {mention}\n\n"
-        f"**Response Time**:- {total_time}",
+        f"**SongName :** [{search_results[0]['title'][:50]}]({stream_url})\n"
+        f"**Duration :** {duration}\n"
+        f"**Channel :** {search_results[0]['channel']}\n"
+        f"**Views :** {search_results[0]['views']}\n"
+        f"**Requested By :** {mention}\n\n"
+        f"**Response Time :** {total_time}",
         disable_web_page_preview=True,
     )
     return asyncio.create_task(delete_messages(message, m))
