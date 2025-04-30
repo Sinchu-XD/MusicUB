@@ -126,7 +126,7 @@ async def _aPlay(_, message):
     if not Status:
         return await m.edit(Text)
 
-    add_to_queue(chat_id, title, duration, songlink, stream_url)
+    add_to_queue(chat_id, search_results, songlink, stream_url)
     await m.edit(
         f"**ѕσηg ιѕ ρℓαуιηg ιη ν¢**\n\n"
         f"**SongName :** [{title[:19]}]({stream_url})\n"
