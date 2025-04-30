@@ -53,6 +53,7 @@ async def skip_song(_, message):
             return
 
         _chat_id, search_results, songlink, stream_url = next_song_data
+        total_time = f"{int(time.time() - start_time)} **Seconds**"
 
         pop_an_item(chat_id)
         await process_next_song(chat_id)
