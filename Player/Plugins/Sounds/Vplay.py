@@ -88,10 +88,9 @@ async def _aPlay(_, message):
                 )
                 asyncio.create_task(delete_messages(message, m))
 
-    elif len(message.command) < 2:
-        return await message.reply_text("**𝑊𝑎𝑖𝑡 𝙶𝚒𝚟𝚎 𝙼𝚎 𝚂𝚘𝚗𝚐 𝙻𝚒𝚗𝚔 𝙾𝚛 𝚁𝚎𝚙𝚕𝚢 𝚃𝚘 𝚅𝚘𝚒𝚌𝚎 𝙽𝚘𝚝𝚎**")
+    if len(message.text.split(maxsplit=1)) < 2:
+    return await message.reply_text("❌ Please provide a video name or URL.\n\n**Usage:** `/vplay <video name or link>`")
 
-    m = await message.reply_text("**Wait Na Yrrr 😒**")
     query = message.text.split(maxsplit=1)[1]
 
     try:
