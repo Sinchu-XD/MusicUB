@@ -105,8 +105,8 @@ async def _aPlay(_, message):
 
     await m.edit("**ᴡᴀɪᴛ ɴᴀ ʏʀʀʀ\n\nꜱᴇᴀʀᴄʜɪɴɢ ʏᴏᴜʀ ꜱᴏɴɢ 🌚❤️..**")
     
-    cached, songlink = await get_cache(query, stream_url)
-    if not cached or not songlink:
+    status, songlink = await get_cache(query, stream_url)
+    if not status or not songlink:
         await m.edit(f"❌ yt-dl issues detected\n\n» No valid song link found.")
     else:
         title = search_results[0]['title']
