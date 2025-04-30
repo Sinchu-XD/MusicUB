@@ -11,6 +11,7 @@ from Player.Misc import SUDOERS
 from pyrogram import filters
 import asyncio
 import time
+import logging
 import config
 
 PLAY_COMMAND = ["P", "PLAY"]
@@ -18,18 +19,30 @@ PLAYFORCE_COMMAND = ["PFORCE", "PLAYFORCE"]
 PREFIX = config.PREFIX
 RPREFIX = config.RPREFIX
 
-SONG_CACHE = {}
+logging.basicConfig(level=logging.INFO)
+
+CACHE_DIR = "cached_songs"
+os.makedirs(CACHE_DIR, exist_ok=True)
 
 async def get_cache(query, stream_url):
-    if query in SONG_CACHE:
-        return True, SONG_CACHE[query]
+    hashed = hashlib.md5(query.encode()).hexdigest()
+    cached_path = os.path.join(CACHE_DIR, f"{hashed}.webm")
 
+    if os.path.exists(cached_path):
+        logging.info(f"Cache hit for query: {query}")
+        return True, cached_path
+
+    logging.info(f"Cache miss for query: {query} - Downloading...")
     status, songlink = await ytdl("bestaudio", stream_url)
+    if status and songlink:
+        try:
+            os.rename(songlink, cached_path)
+        except Exception as e:
+            logging.error(f"Error moving file to cache: {e}")
+            return status, songlink
+        return True, cached_path
+    return False, None
 
-    if status:
-        SONG_CACHE[query] = songlink
-
-    return status, songlink
 
 async def processReplyToMessage(message):
     msg = message.reply_to_message
@@ -89,8 +102,8 @@ async def _aPlay(_, message):
 
     await m.edit("**ᴡᴀɪᴛ ɴᴀ ʏʀʀʀ\n\nꜱᴇᴀʀᴄʜɪɴɢ ʏᴏᴜʀ ꜱᴏɴɢ 🌚❤️..**")
     
-    status, songlink = await get_cache(query, stream_url)
-    if not status:
+    cached, songlink = await get_cache(query, stream_url)
+    if not cached or not songlink:
         await m.edit(f"❌ yt-dl issues detected\n\n» No valid song link found.")
     else:
         title = search_results[0]['title']
