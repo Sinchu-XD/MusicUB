@@ -30,6 +30,7 @@ async def _skip(chat_id):
             views = current[1][0]['views']
             link = current[2]
             songlink = current[3]
+            print(songlink)
 
             await call.play(chat_id, MediaStream(songlink, video_flags=MediaStream.Flags.IGNORE))
             finish_time = time.time()
