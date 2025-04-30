@@ -18,7 +18,18 @@ PLAYFORCE_COMMAND = ["PFORCE", "PLAYFORCE"]
 PREFIX = config.PREFIX
 RPREFIX = config.RPREFIX
 
+SONG_CACHE = {}
 
+async def get_cache(query, stream_url):
+    if query in SONG_CACHE:
+        return True, SONG_CACHE[query]
+
+    status, songlink = await ytdl("bestaudio", stream_url)
+
+    if status:
+        SONG_CACHE[query] = songlink
+
+    return status, songlink
 
 async def processReplyToMessage(message):
     msg = message.reply_to_message
@@ -77,11 +88,9 @@ async def _aPlay(_, message):
         return await m.edit(f"Error: <code>{e}</code>")
 
     await m.edit("**ᴡᴀɪᴛ ɴᴀ ʏʀʀʀ\n\nꜱᴇᴀʀᴄʜɪɴɢ ʏᴏᴜʀ ꜱᴏɴɢ 🌚❤️..**")
-    result = await ytdl("bestaudio", stream_url)
-    resp = result[0]
-    songlink = result[1]
-    duration = search_results[0]['duration']
-    if resp == 0 or songlink is None:
+    
+    status, songlink = await get_cache(query, stream_url)
+    if not status:
         await m.edit(f"❌ yt-dl issues detected\n\n» No valid song link found.")
     else:
         title = search_results[0]['title']
