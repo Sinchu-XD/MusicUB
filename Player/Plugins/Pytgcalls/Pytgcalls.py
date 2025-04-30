@@ -28,9 +28,8 @@ async def _skip(chat_id):
             duration = current[1][0]['duration']
             channel = current[1][0]['channel']
             views = current[1][0]['views']
-            link = current[2]
-            songlink = current[3]
-            print(songlink)
+            songlink = current[2]
+            ytlink = current[3]
 
             await call.play(chat_id, MediaStream(songlink, video_flags=MediaStream.Flags.IGNORE))
             finish_time = time.time()
@@ -52,13 +51,12 @@ async def _skip(chat_id):
                 duration = next_song[1][0]['duration']
                 channel = next_song[1][0]['channel']
                 views = next_song[1][0]['views']
-                link = next_song[2]
-                songlink = next_song[3]
-                print(link)
+                songlink = next_song[2]
+                ytlink = next_song[3]
                 
                 await call.play(chat_id, MediaStream(songlink, video_flags=MediaStream.Flags.IGNORE))
                 finish_time = time.time()
-                return [title, duration, channel, views, link, finish_time]
+                return [title, duration, channel, views, ytlink, finish_time]
 
             except Exception as e:
                 return [2, f"❌ **Skip Error:** `{e}`"]
