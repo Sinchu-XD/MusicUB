@@ -86,6 +86,7 @@ async def _aPlay(_, message):
     else:
         title = search_results[0]['title']
         chat_id = message.chat.id
+        total_time = f"{int(time.time() - start_time)}s"
 
         if chat_id in QUEUE:
             queue_num = add_to_queue(chat_id, search_results, songlink, stream_url)
