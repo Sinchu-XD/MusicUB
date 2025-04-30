@@ -57,7 +57,11 @@ async def skip_song(_, message):
         total_time = f"{int(time.time() - start_time)} **Seconds**"
 
         pop_an_item(chat_id)
-        await process_next_song(chat_id)
+        try:
+            await Userbot.playAudio(chat_id, songlink)
+        except Exception as e:
+            print(f"⚠️ Error while playing next song: {e}")
+            return
         await m.edit(
             f"**ѕσηg ιѕ ρℓαуιηg ιη ν¢**\n\n**SongName :** [{search_results[0]['title'][:19]}]({stream_url})\n"
             f"**Duration :** {search_results[0]['duration']} **Minutes**\n**Channel :** {search_results[0]['channel']}\n"
@@ -68,43 +72,6 @@ async def skip_song(_, message):
         await delete_messages(message, m)
     else:
         await message.reply_text(f"❌ **You don't have permission to skip songs.** Ask an admin.\n🎤 **Skipped By**: {mention}")
-
-async def process_next_song(chat_id):
-    queue_data = get_queue(chat_id)
-    if not queue_data:
-        print(f"Queue is empty for chat_id: {chat_id}")
-        return
-
-    next_song_data = queue_data[0]
-
-    if len(next_song_data) < 4:
-        print(f"❗ Invalid song data format: {next_song_data}")
-        pop_an_item(chat_id)
-        return
-
-    _chat_id, search_results, songlink, stream_url = next_song_data
-
-    try:
-      #  result = await ytdl("bestaudio", stream_url)
-    #    resp = result[0]
-     #   final_stream_url = result[1]
-
-      #  if resp == 0 or not final_stream_url:
-       #     print(f"❌ Failed to fetch stream for {songlink}")
-            # pop_an_item(chat_id)
-       #     await process_next_song(chat_id)
-       #     return
-
-        # await Userbot.playAudio(chat_id, stream_url)
-        
-        await Userbot.playAudio(chat_id, songlink)
-        print(f"▶️ Now playing next song.")
-
-        # pop_an_item(chat_id)
-
-    except Exception as e:
-        print(f"⚠️ Error while processing next song: {e}")
-        # pop_an_item(chat_id)
 
 
 @app.on_message(filters.command("queue", [PREFIX, RPREFIX]) & filters.group)
@@ -121,7 +88,8 @@ async def _queue(_, message):
         await message.reply_text(output, disable_web_page_preview=True)
     else:
         await message.reply_text("⚠️ Queue is empty!")
-        
+
+
 async def stop(chat_id):
     try:
         await call.leave_call(chat_id)
