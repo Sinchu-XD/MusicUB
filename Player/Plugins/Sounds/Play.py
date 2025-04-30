@@ -2,7 +2,7 @@
 Telegram @Itz_Your_4Bhi
 Copyright ©️ 2025
 """
-from Player import app, call
+from Player import app, call, seek_chats
 from Player.Core import Userbot
 from Player.Utils.YtDetails import SearchYt, ytdl
 from Player.Utils.Queue import QUEUE, add_to_queue
@@ -21,31 +21,6 @@ PLAYFORCE_COMMAND = ["PFORCE", "PLAYFORCE"]
 PREFIX = config.PREFIX
 RPREFIX = config.RPREFIX
 
-logging.basicConfig(level=logging.INFO)
-
-CACHE_DIR = "cached_songs"
-os.makedirs(CACHE_DIR, exist_ok=True)
-
-async def get_cache(query, stream_url):
-    hashed = hashlib.md5(query.encode()).hexdigest()
-    cached_path = os.path.join(CACHE_DIR, f"{hashed}.webm")
-
-    if os.path.exists(cached_path):
-        logging.info(f"Cache hit for query: {query}")
-        return True, cached_path
-
-    logging.info(f"Cache miss for query: {query} - Downloading...")
-    
-    status, songlink = await ytdl("bestaudio", stream_url)
-    if status and songlink:
-        try:
-
-            os.rename(songlink, cached_path)
-        except Exception as e:
-            logging.error(f"Error moving file to cache: {e}")
-            return status, songlink
-        return True, cached_path
-    return False, None
 
 async def processReplyToMessage(message):
     msg = message.reply_to_message
@@ -60,9 +35,10 @@ async def processReplyToMessage(message):
 async def _aPlay(_, message):
     start_time = time.time()
     chat_id = message.chat.id
-    user_id = message.from_user.id
-    mention = f"[{message.from_user.first_name}](tg://user?id={user_id})"
-
+    mention = message.from_user.mention
+    if chat_id in seek_chats:
+        del seek_chats[chat_id]
+        
     if message.reply_to_message:
         input_filename, m = await processReplyToMessage(message)
         if input_filename is None:
@@ -150,8 +126,9 @@ async def _aPlay(_, message):
 async def playforce(_, message):
     start_time = time.time()
     chat_id = message.chat.id
-    user_id = message.from_user.id
-    mention = f"[{message.from_user.first_name}](tg://user?id={user_id})"
+    mention = message.from_user.mention
+    if chat_id in seek_chats:
+        del seek_chats[chat_id]
 
     if len(message.command) < 2:
         return await message.reply_text("**𝑊𝑎𝑖𝑡 𝙶𝚒𝚟𝚎 𝙼𝚎 𝚂𝚘𝚗𝚐 𝙻𝚒𝚗𝚔 𝙾𝚛 𝚁𝚎𝚙𝚕𝚢 𝚃𝚘 𝚅𝚘𝚒𝚌𝚎 𝙽𝚘𝚝𝚎**")
