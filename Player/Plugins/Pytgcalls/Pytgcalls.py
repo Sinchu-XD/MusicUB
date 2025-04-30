@@ -82,7 +82,7 @@ async def handler(client: PyTgCalls, update: Update):
         await app.send_message(chat_id, resp[1])
     else:
         total_time = int(time.time() - resp[5])
-        await app.send_message(
+        m = await app.send_message(
             chat_id,
             f"**ѕσηg ιѕ ρℓαуιηg ιη ν¢**\n\n"
             f"**SongName :** [{resp[0][:19]}]({resp[4]})\n"
@@ -92,6 +92,8 @@ async def handler(client: PyTgCalls, update: Update):
             f"**Response Time :** `{total_time}` Seconds",
             disable_web_page_preview=True,
         )
+        await asyncio.sleep(10)
+        await m.delete()
 
 
 async def stop(chat_id):
