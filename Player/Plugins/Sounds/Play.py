@@ -126,10 +126,9 @@ async def _aPlay(_, message):
 async def playforce(_, message):
     start_time = time.time()
     chat_id = message.chat.id
-    seek_chats.pop(chat_id, None)
     mention = message.from_user.mention
-    if chat_id in seek_chats:
-        del seek_chats[chat_id]
+
+    seek_chats.pop(chat_id, None)
 
     if len(message.command) < 2:
         return await message.reply_text("**𝑊𝑎𝑖𝑡 𝙶𝚒𝚟𝚎 𝙼𝚎 𝚂𝚘𝚗𝚐 𝙻𝚒𝚗𝚔 𝙾𝚛 𝚁𝚎𝚙𝚕𝚢 𝚃𝚘 𝚅𝚘𝚒𝚌𝚎 𝙽𝚘𝚝𝚎**")
@@ -157,6 +156,9 @@ async def playforce(_, message):
     if resp == 0 or not songlink:
         return await m.edit("❌ yt-dl issues detected.\n\n» No valid song link found.")
 
+    QUEUE[chat_id] = [(search_results[0]['title'], message.from_user.id, songlink)]
+    seek_chats.pop(chat_id, None)
+
     Status, Text = await Userbot.playAudio(chat_id, songlink)
     if not Status:
         return await m.edit(Text)
@@ -173,4 +175,3 @@ async def playforce(_, message):
         disable_web_page_preview=True,
     )
     return asyncio.create_task(delete_messages(message, m))
-    
