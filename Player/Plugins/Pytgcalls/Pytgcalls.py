@@ -89,7 +89,7 @@ async def handler(client: PyTgCalls, update: Update):
             f"**Duration :** {resp[1]} **Minutes**\n"
             f"**Channel :** {resp[2]}\n"
             f"**Views :** {resp[3]}\n\n"
-            f"**Response Time :** `{total_time}` Seconds",
+            f"**Response Time :** `{total_time}` **Seconds**",
             disable_web_page_preview=True,
         )
         await asyncio.sleep(10)
