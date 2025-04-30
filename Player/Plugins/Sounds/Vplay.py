@@ -1,175 +1,177 @@
 """
-
+Telegram @Itz_Your_4Bhi
+Copyright ©️ 2025
 """
-
-import os
-import time
-import glob
-import config
-import random
-import asyncio
-
-from Player import app
+from Player import app, call, seek_chats
 from Player.Core import Userbot
-from Player.Utils.Delete import delete_messages
-#from Player.Utils.YtDetails import searchYt, extract_video_id
+from Player.Utils.YtDetails import SearchYt, ytdl
 from Player.Utils.Queue import QUEUE, add_to_queue
+from Player.Utils.Delete import delete_messages
 from Player.Misc import SUDOERS
-
 from pyrogram import filters
-from pytgcalls.types import MediaStream
+import os
+import asyncio
+import time
+import hashlib
+import logging
+import config
 
-
-VIDEO_PLAY = ["VP", "VPLAY"]
-
+PLAY_COMMAND = ["V", "VPLAY"]
+PLAYFORCE_COMMAND = ["VPFORCE", "VPLAYFORCE"]
 PREFIX = config.PREFIX
-
 RPREFIX = config.RPREFIX
 
-def cookies():
-    folder_path = f"{os.getcwd()}/cookies"
-    txt_files = glob.glob(os.path.join(folder_path, "*.txt"))
-    if not txt_files:
-        raise FileNotFoundError("No .txt files found in the specified folder.")
-    cookie_txt_file = random.choice(txt_files)
-    return f"""cookies/{str(cookie_txt_file).split("/")[-1]}"""
-    
-
-async def ytdl(link):
-    proc = await asyncio.create_subprocess_exec(
-        "yt-dlp",
-        "-g",
-        "-f",
-        "best[height<=?720][width<=?1280]",
-        f"--cookies",
-        cookies(),
-        f"{link}",
-        stdout=asyncio.subprocess.PIPE,
-        stderr=asyncio.subprocess.PIPE,
-    )
-    stdout, stderr = await proc.communicate()
-    if stdout:
-        return 1, stdout.decode().split("\n")[0]
-    else:
-        return 0, stderr.decode()
-
-
-import re
-
-def clean_filename(name: str) -> str:
-    # Remove special characters that can break file paths
-    return re.sub(r'[<>:"/\\|?*]', '', name).strip().replace(' ', '_')
 
 async def processReplyToMessage(message):
     msg = message.reply_to_message
-
-    if msg and (msg.video or msg.video_note):
-        m = await message.reply_text("Rukja... Tera video download kar raha hu...")
-
-        # Try to get original filename, if not fallback to "video"
-        file_name = getattr(msg.video, "file_name", None) or "video.mp4"
-        safe_file_name = clean_filename(file_name)
-
-        try:
-            video_original = await msg.download(file_name=f"downloads/{safe_file_name}")
-            return video_original, m
-        except Exception as e:
-            await m.edit(f"❌ Download failed: `{e}`")
-            return None, m
-    else:
-        return None, None
+    if msg.video or msg.video:
+        m = await message.reply_text("**𝓦𝓪𝓲𝓽 𝓑𝓪𝓫𝔂... 𝓓𝓸𝔀𝓷𝓵𝓸𝓪𝓭𝓲𝓷𝓰 𝓨𝓸𝓾𝓻 𝓢𝓸𝓷𝓰 ❤️**.")
+        audio_original = await msg.download()
+        return audio_original, m
+    return None, None
 
 
-async def playWithLinks(link):
-    if "&" in link:
-        pass
-    if "?" in link:
-        pass
-
-    return 0
-
-
-@app.on_message((filters.command(VIDEO_PLAY, [PREFIX, RPREFIX])) & filters.group)
-async def _vPlay(_, message):
+@app.on_message((filters.command(PLAY_COMMAND, [PREFIX, RPREFIX])) & filters.group)
+async def _aPlay(_, message):
     start_time = time.time()
     chat_id = message.chat.id
-    if (message.reply_to_message) is not None:
-        if message.reply_to_message.video or message.reply_to_message.video_note:
-            input_filename, m = await processReplyToMessage(message)
-            if input_filename is None:
-                return await message.reply_text(
-                    "Video pe reply kon karega mai? ya phir video link kon dalega mai? 🤔"
-                )
-                
-            await m.edit("Rukja...Tera Video Play kar raha hu...")
-            Status, Text = await Userbot.playVideo(chat_id, input_filename)
-            if Status == False:
-                await m.edit(Text)
-            
-            else:
-                video = message.reply_to_message.video or message.reply_to_message.video_note
-                video_title = message.reply_to_message.text or "Unknown"
-                await message.delete()
-                if chat_id in QUEUE:
-                    queue_num = add_to_queue(
-                        chat_id,
-                        video_title[:19],
-                        video.duration,
-                        video.file_id,
-                        message.reply_to_message.link,
-                    )
-                    await m.edit(
-                        f"# {queue_num}\n{video_title[:19]}\nTera video queue me daal diya hu"
-                    )
-                    return
-                finish_time = time.time()
-                total_time_taken = str(int(finish_time - start_time)) + "s"
-                await m.edit(
-                    f"Tera video play kar rha hu aaja vc\n\nVideoName:- [{video_title[:19]}]({message.reply_to_message.link})\nDuration:- {video.duration}\nTime taken to play:- {total_time_taken}",
-                    disable_web_page_preview=True,
-                )
-                asyncio.create_task(delete_messages(message, m))
+    mention = message.from_user.mention
+    if chat_id in seek_chats:
+        del seek_chats[chat_id]
+        
+    if message.reply_to_message:
+        input_filename, m = await processReplyToMessage(message)
+        if input_filename is None:
+            return await message.reply_text(
+                "**𝙶𝚒𝚟𝚎 𝙼𝚎 𝚂𝚘𝚗𝚐 𝙻𝚒𝚗𝚔 𝙾𝚛 𝚁𝚎𝚙𝚕𝚢 𝚃𝚘 𝚅𝚘𝚒𝚌𝚎 𝙽𝚘𝚝𝚎😒**"
+            )
 
-    elif (len(message.command)) < 2:
-        await message.reply_text("Link kon daalega mai? 🤔")
+        await m.edit("𝑊𝑎𝑖𝑡 𝑁𝑎 𝑌𝑟𝑟𝑟 😒..")
+        Status, Text = await Userbot.playVideo(chat_id, input_filename)
+        if not Status:
+            return await m.edit(Text)
+
+        video = message.reply_to_message.video or message.reply_to_message.video
+        audio_title = message.reply_to_message.text or "Unknown"
+        if chat_id in QUEUE:
+            queue_num = add_to_queue(chat_id, audio_title[:19], video.duration, video.file_id, message.reply_to_message.link)
+            await m.edit(f"# {queue_num}\n{audio_title[:19]}\n**ʏᴏᴜʀ ꜱᴏɴɢ ᴀᴅᴅᴇᴅ ɪɴ Qᴜᴇᴜᴇ\nᴘʟᴇᴀꜱᴇ ᴡᴀɪᴛ 😵‍💫**")
+            return asyncio.create_task(delete_messages(message, m))
+
+        total_time = f"{int(time.time() - start_time)} **Seconds**"
+        await m.edit(
+            f"**ѕσηg ιѕ ρℓαуιηg ιη ν¢**\n\n**SongName**:- [{audio_title[:19]}]({message.reply_to_message.link})\n"
+            f"**Duration**:- {video.duration}\n**Requested By**:- {mention}\n\n**Response Time**:- {total_time}",
+            disable_web_page_preview=True,
+        )
+        return asyncio.create_task(delete_messages(message, m))
+
+    elif len(message.command) < 2:
+        return await message.reply_text("**𝑊𝑎𝑖𝑡 𝙶𝚒𝚟𝚎 𝙼𝚎 𝚂𝚘𝚗𝚐 𝙻𝚒𝚗𝚔 𝙾𝚛 𝚁𝚎𝚙𝚕𝚢 𝚃𝚘 𝚅𝚘𝚒𝚌𝚎 𝙽𝚘𝚝𝚎**")
+
+    m = await message.reply_text("**Wait Na Yrrr 😒**")
+    query = message.text.split(maxsplit=1)[1]
+
+    try:
+        search_results, stream_url = await SearchYt(query)
+        if not search_results:
+            return await m.edit("No results found")
+    except Exception as e:
+        return await m.edit(f"Error: <code>{e}</code>")
+
+    await m.edit("**ᴡᴀɪᴛ ɴᴀ ʏʀʀʀ\n\nꜱᴇᴀʀᴄʜɪɴɢ ʏᴏᴜʀ ꜱᴏɴɢ 🌚❤️..**")
+    
+    status, songlink = await ytdl("bestaudio", stream_url)
+    if not status or not songlink:
+        await m.edit(f"❌ yt-dl issues detected\n\n» No valid song link found.")
     else:
-        m = await message.reply_text("Rukja...Tera video dhund raha hu...")
-        query = message.text.split(maxsplit=1)[1]
-        video_id = extract_video_id(query)
-        try:
-            if video_id is None:
-                video_id = query
-            title, duration, link = searchYt(video_id)
-            if (title, duration, link) == (None, None, None):
-                return await m.edit("No results found")
-        except Exception as e:
-            await message.reply_text(f"Error:- <code>{e}</code>")
-            return
+        title = search_results[0]['title']
+        chat_id = message.chat.id
+        total_time = f"{int(time.time() - start_time)} **Seconds**"
 
-        await m.edit("Rukja...Tera video download kar raha hu...")
-        resp, ytlink = await ytdl(link)
-        if resp == 0:
-            await m.edit(f"❌ yt-dl issues detected\n\n» `{ytlink}`")
-        else:
-            if chat_id in QUEUE:
-                queue_num = add_to_queue(chat_id, title[:19], duration, ytlink, link)
-                await m.edit(
-                    f"# {queue_num}\n{title[:19]}\nTera Video queue me daal diya hu"
-                )
-                return
-                asyncio.create_task(delete_messages(message, m))
-            # await asyncio.sleep(2)
-            Status, Text = await Userbot.playVideo(chat_id, ytlink)
-            # Check if the video ended
-            if Status == False:
-                return await m.edit(Text)
-            if duration is None:
-                duration = "Playing From LiveStream"
-            add_to_queue(chat_id, title[:19], duration, ytlink, link)
-            finish_time = time.time()
-            total_time_taken = str(int(finish_time - start_time)) + "s"
+        if chat_id in QUEUE:
+            queue_num = add_to_queue(chat_id, search_results, songlink, stream_url)
             await m.edit(
-                f"Playing your video\n\nVideoName:- [{title[:19]}]({link})\nDuration:- {duration}\nTime taken to play:- {total_time_taken}",
+                f"# **{queue_num} ʏᴏᴜʀ ꜱᴏɴɢ ᴀᴅᴅᴇᴅ ɪɴ Qᴜᴇᴜᴇ\n\nᴘʟᴇᴀꜱᴇ ᴡᴀɪᴛ 😵‍💫**\n\n"
+                f"**SongName :** [{search_results[0]['title'][:19]}]({stream_url})\n"
+                f"**Duration :** {search_results[0]['duration']} **Minutes**\n"
+                f"**Channel :** {search_results[0]['channel']}\n"
+                f"**Views :** {search_results[0]['views']}\n"
+                f"**Requested By :** {mention}\n\n"
+                f"**Response Time :** {total_time}",
                 disable_web_page_preview=True,
             )
+                
+                
             asyncio.create_task(delete_messages(message, m))
+            return
+
+        Status, Text = await Userbot.playVideo(chat_id, songlink)
+        if not Status:
+            return await m.edit(Text)
+
+        add_to_queue(chat_id, search_results, songlink, stream_url)
+
+        total_time = f"{int(time.time() - start_time)} **Seconds**"
+        await m.edit(
+            f"**ѕσηg ιѕ ρℓαуιηg ιη ν¢**\n\n**SongName :** [{search_results[0]['title'][:19]}]({stream_url})\n"
+            f"**Duration :** {search_results[0]['duration']} **Minutes**\n**Channel :** {search_results[0]['channel']}\n"
+            f"**Views :** {search_results[0]['views']}\n**Requested By :** {mention}\n\n**Response Time :** {total_time}",
+            disable_web_page_preview=True,
+    )
+        return asyncio.create_task(delete_messages(message, m))
+
+
+@app.on_message((filters.command(PLAYFORCE_COMMAND, [PREFIX, RPREFIX])) & filters.group)
+async def playforce(_, message):
+    start_time = time.time()
+    chat_id = message.chat.id
+    mention = message.from_user.mention
+
+    seek_chats.pop(chat_id, None)
+
+    if len(message.command) < 2:
+        return await message.reply_text("**𝑊𝑎𝑖𝑡 𝙶𝚒𝚟𝚎 𝙼𝚎 𝚂𝚘𝚗𝚐 𝙻𝚒𝚗𝚔 𝙾𝚛 𝚁𝚎𝚙𝚕𝚢 𝚃𝚘 𝚅𝚘𝚒𝚌𝚎 𝙽𝚘𝚝𝚎**")
+
+    m = await message.reply_text("**Force Playing Your Song...**")
+    query = message.text.split(maxsplit=1)[1]
+
+    try:
+        search_results, stream_url = await SearchYt(query)
+        if not search_results:
+            return await m.edit("No results found.")
+    except Exception as e:
+        return await m.edit(f"Error while searching: <code>{e}</code>")
+
+    await m.edit("**Fetching Song Details...**")
+
+    try:
+        result = await ytdl("bestaudio", stream_url)
+        resp = result[0]
+        songlink = result[1]
+        duration = search_results[0]['duration']
+    except Exception as e:
+        return await m.edit(f"Error while downloading: <code>{e}</code>")
+
+    if resp == 0 or not songlink:
+        return await m.edit("❌ yt-dl issues detected.\n\n» No valid song link found.")
+
+    QUEUE[chat_id] = [(search_results[0]['title'], message.from_user.id, songlink)]
+    seek_chats.pop(chat_id, None)
+
+    Status, Text = await Userbot.playVideo(chat_id, songlink)
+    if not Status:
+        return await m.edit(Text)
+
+    total_time = f"{int(time.time() - start_time)} **Seconds**"
+    await m.edit(
+        f"**𝑆𝑜𝑛𝑔 𝐹𝑜𝑟𝑐𝑒 𝑃𝑙𝑎𝑦𝑒𝑑 𝑎𝑡 ν𝑐**\n\n"
+        f"**SongName :** [{search_results[0]['title'][:19]}]({stream_url})\n"
+        f"**Duration :** {duration} **Minutes**\n\n"
+        f"**Channel :** {search_results[0]['channel']}\n"
+        f"**Views :** {search_results[0]['views']}\n"
+        f"**Requested By :** {mention}\n\n"
+        f"**Response Time :** {total_time}",
+        disable_web_page_preview=True,
+    )
+    return asyncio.create_task(delete_messages(message, m))
