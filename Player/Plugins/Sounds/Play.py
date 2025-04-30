@@ -90,8 +90,16 @@ async def _aPlay(_, message):
         if chat_id in QUEUE:
             queue_num = add_to_queue(chat_id, search_results, songlink, stream_url)
             await m.edit(
-                f"# {queue_num}\n{title[:19]}\n**ʏᴏᴜʀ ꜱᴏɴɢ ᴀᴅᴅᴇᴅ ɪɴ Qᴜᴇᴜᴇ\n\nᴘʟᴇᴀꜱᴇ ᴡᴀɪᴛ 😵‍💫**"
-                )
+                f"# **{queue_num} ʏᴏᴜʀ ꜱᴏɴɢ ᴀᴅᴅᴇᴅ ɪɴ Qᴜᴇᴜᴇ\n\nᴘʟᴇᴀꜱᴇ ᴡᴀɪᴛ 😵‍💫**",
+                f"**SongName**:- [{search_results[0]['title'][:50]}]({songlink})\n"
+                f"**Duration**:- {duration}\n"
+                f"**Channel**:- {search_results[0]['channel']}\n"
+                f"**Views**:- {search_results[0]['views']}\n"
+                f"**Requested By**:- {mention}\n\n"
+                f"**Response Time**:- {total_time}",
+                disable_web_page_preview=True,
+            )
+                
                 
             asyncio.create_task(delete_messages(message, m))
             return
