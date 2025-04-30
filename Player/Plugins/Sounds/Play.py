@@ -125,8 +125,8 @@ async def _aPlay(_, message):
 @app.on_message((filters.command(PLAYFORCE_COMMAND, [PREFIX, RPREFIX])) & filters.group)
 async def playforce(_, message):
     start_time = time.time()
-    seek_chats.pop(chat_id, None)
     chat_id = message.chat.id
+    seek_chats.pop(chat_id, None)
     mention = message.from_user.mention
     if chat_id in seek_chats:
         del seek_chats[chat_id]
