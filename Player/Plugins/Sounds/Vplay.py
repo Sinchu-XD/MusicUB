@@ -22,13 +22,20 @@ PREFIX = config.PREFIX
 RPREFIX = config.RPREFIX
 
 
-async def processReplyToMessage(message):
-    msg = message.reply_to_message
-    if msg.video or msg.video:
-        m = await message.reply_text("**𝓦𝓪𝓲𝓽 𝓑𝓪𝓫𝔂... 𝓓𝓸𝔀𝓷𝓵𝓸𝓪𝓭𝓲𝓷𝓰 𝓨𝓸𝓾𝓻 𝓢𝓸𝓷𝓰 ❤️**.")
-        audio_original = await msg.download()
-        return audio_original, m
-    return None, None
+if msg and (msg.video or msg.video_note):
+        m = await message.reply_text("Rukja... Tera video download kar raha hu...")
+
+        # Try to get original filename, if not fallback to "video"
+        file_name = getattr(msg.video, "file_name", None) or "video.mp4"
+        safe_file_name = clean_filename(file_name)
+        try:
+            video_original = await msg.download(file_name=f"downloads/{safe_file_name}")
+            return video_original, m
+        except Exception as e:
+            await m.edit(f"❌ Download failed: `{e}`")
+            return None, m
+        else:
+            return None, None
 
 
 @app.on_message((filters.command(PLAY_COMMAND, [PREFIX, RPREFIX])) & filters.group)
