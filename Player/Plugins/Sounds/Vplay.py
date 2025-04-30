@@ -98,7 +98,7 @@ async def _aPlay(_, message):
     except Exception as e:
         return await m.edit(f"Error: <code>{e}</code>")
 
-    status, songlink = await ytdl("bestaudio", stream_url)
+    status, songlink = await ytdl("best[height<=?720][width<=?1280]", stream_url)
     if not status or not songlink:
         return await m.edit(f"❌ yt-dl issues detected\n\n» No valid song link found.")
 
@@ -164,7 +164,7 @@ async def playforce(_, message):
     await m.edit("**Fetching Song Details...**")
 
     try:
-        status, songlink = await ytdl("bestaudio", stream_url)
+        status, songlink = await ytdl("best[height<=?720][width<=?1280]", stream_url)
         duration = search_results[0]['duration']
     except Exception as e:
         return await m.edit(f"Error while downloading: <code>{e}</code>")
