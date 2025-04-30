@@ -47,7 +47,13 @@ async def skip_song(_, message):
             return
 
         pop_an_item(chat_id)
-        await process_next_song(chat_id)  # Call next song after popping current song
+        await process_next_song(chat_id)
+        await m.edit(
+            f"**ѕσηg ιѕ ρℓαуιηg ιη ν¢**\n\n**SongName :** [{search_results[0]['title'][:19]}]({stream_url})\n"
+            f"**Duration :** {duration} **Minutes**\n**Channel :** {search_results[0]['channel']}\n"
+            f"**Views :** {search_results[0]['views']}\n**Requested By :** {mention}\n\n**Response Time :** {total_time}",
+            disable_web_page_preview=True,
+        )
 
         await delete_messages(message, m)
     else:
