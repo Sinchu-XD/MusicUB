@@ -19,6 +19,16 @@ async def _skip(chat_id):
     loop = await get_loop(chat_id)
     if loop > 0:
         try:
+            chat_queue = get_queue(chat_id)
+            loop -= 1
+            await set_loop(chat_id, loop)
+            current = chat_queue[0]
+            title = current[1][0]['title']
+            duration = current[1][0]['duration']
+            channel = current[1][0]['channel']
+            views = current[1][0]['views']
+            songlink = current[2]
+            ytlink = current[3]
 
             await call.play(chat_id, MediaStream(songlink, video_flags=MediaStream.Flags.IGNORE))
             finish_time = time.time()
@@ -36,6 +46,9 @@ async def _skip(chat_id):
             try:
                 pop_an_item(chat_id)
                 next_song = chat_queue[0]
+                title = next_song[1][0]['title']
+                duration = next_song[1][0]['duration']
+                channel = next_song[1][0]['channel']
                 views = next_song[1][0]['views']
                 songlink = next_song[2]
                 ytlink = next_song[3]
