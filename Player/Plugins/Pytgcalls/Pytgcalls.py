@@ -52,8 +52,8 @@ async def _skip(chat_id):
                 ytlink = next_song[3]
                 
                 await call.play(chat_id, MediaStream(songlink, video_flags=MediaStream.Flags.IGNORE))
-                    finish_time = time.time()
-                    return [title, duration, channel, views, ytlink, finish_time]
+                finish_time = time.time()
+                return [title, duration, channel, views, ytlink, finish_time]
 
                 if autoplay:
                     try:
