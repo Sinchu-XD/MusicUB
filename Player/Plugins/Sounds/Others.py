@@ -22,7 +22,6 @@ PAUSE_COMMAND = ["PAUSE"]
 RESUME_COMMAND = ["RESUME"]
 MUTE_COMMAND = ["MUTE"]
 UNMUTE_COMMAND = ["UNMUTE"]
-VOLUME_COMMAND = ["VOL", "VOLUME"]
 LOOP_COMMAND = ["LOOP"]
 LOOPEND_COMMAND = ["ENDLOOP"]
 
@@ -72,16 +71,6 @@ async def _mute(_, message):
 @app.on_message(filters.command(UNMUTE_COMMAND, PREFIX))
 async def _unmute(_, message):
     Text = await Userbot.unmute(message.chat.id)
-    m = await message.reply_text(Text)
-    asyncio.create_task(delete_messages(message, m))
-
-@app.on_message(filters.command(VOLUME_COMMAND, PREFIX))
-async def _volume(_, message):
-    try:
-        vol = int(message.text.split()[1])
-        Text = await Userbot.changeVolume(message.chat.id, vol)
-    except:
-        Text = await Userbot.changeVolume(message.chat.id)
     m = await message.reply_text(Text)
     asyncio.create_task(delete_messages(message, m))
 
