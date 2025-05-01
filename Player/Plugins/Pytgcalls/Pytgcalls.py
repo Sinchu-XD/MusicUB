@@ -42,6 +42,7 @@ async def _skip(chat_id):
     if chat_id in QUEUE:
         chat_queue = get_queue(chat_id)
         if len(chat_queue) == 1:
+            
             try:
                 pop_an_item(chat_id)
                 next_song = chat_queue[0]
@@ -59,7 +60,7 @@ async def _skip(chat_id):
                         if last_query:
                             recommended_url = await get_recommendation(last_query)
                             if recommended_url:
-                                status, songlink = await ytdl("bestaudio", stream_url)
+                                status, songlink = await ytdl("bestaudio", recommended_url)
                                 if status and songlink:
                                     await call.play(chat_id, MediaStream(songlink, video_flags=MediaStream.Flags.IGNORE))
                                     return [title, duration, channel, views, ytlink, finish_time] 
