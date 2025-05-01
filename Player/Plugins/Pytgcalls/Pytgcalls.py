@@ -25,8 +25,8 @@ async def _skip(chat_id):
             await set_loop(chat_id, loop)
             current = chat_queue[0]
             title = current[1][0]['title']
-            raw_duration = current[1][0]['duration']
-            duration = parse_duration(raw_duration)
+            duration = current[1][0]['duration']
+            #duration = parse_duration(raw_duration)
             channel = current[1][0]['channel']
             views = current[1][0]['views']
             songlink = current[2]
@@ -34,7 +34,6 @@ async def _skip(chat_id):
 
             await call.play(chat_id, MediaStream(songlink, video_flags=MediaStream.Flags.IGNORE))
             start_time = time.time()
-            await update_seek_bar(chat_id, duration, start_time, title, ytlink, channel, views)
 
             finish_time = time.time()
             return [title, duration, channel, views, ytlink, finish_time]
@@ -52,8 +51,8 @@ async def _skip(chat_id):
                 pop_an_item(chat_id)
                 next_song = chat_queue[0]
                 title = next_song[1][0]['title']
-                raw_duration = next_song[1][0]['duration']
-                duration = parse_duration(raw_duration)
+                duration = next_song[1][0]['duration']
+               # duration = parse_duration(raw_duration)
                 channel = next_song[1][0]['channel']
                 views = next_song[1][0]['views']
                 songlink = next_song[2]
@@ -61,8 +60,7 @@ async def _skip(chat_id):
                 
                 await call.play(chat_id, MediaStream(songlink, video_flags=MediaStream.Flags.IGNORE))
                 start_time = time.time()
-                await update_seek_bar(chat_id, duration, start_time, title, ytlink, channel, views)
-
+                
                 finish_time = time.time()
                 return [title, duration, channel, views, ytlink, finish_time]
             except Exception as e:
