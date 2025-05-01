@@ -39,8 +39,6 @@ async def seek_audio(_, message):
 
     current_seek = seek_chats.get(chat_id, 0)
     new_seek = current_seek + seek_dur
-
-    # Prevent seeking to negative time
     if new_seek < 0:
         new_seek = 0
 
