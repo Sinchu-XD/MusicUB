@@ -55,12 +55,14 @@ async def _skip(chat_id):
                 if autoplay:
                     try:
                         last_song = chat_queue[0]
-                        last_query = last_song[1][0]['stream_url']
+                        last_query = last_song[3]
                         if last_query:
                             recommended_url = await get_recommendation(last_query)
-                            status, songlink = await ytdl("bestaudio", stream_url)
-                            if status and songlink:
-                                await call.play(chat_id, MediaStream(songlink, video_flags=MediaStream.Flags.IGNORE))
+                            if recommended_url:
+                                status, songlink = await ytdl("bestaudio", stream_url)
+                                if status and songlink:
+                                    await call.play(chat_id, MediaStream(songlink, video_flags=MediaStream.Flags.IGNORE))
+                                    return [title, duration, channel, views, ytlink, finish_time] 
 
                 else:
                     await call.play(chat_id, MediaStream(songlink, video_flags=MediaStream.Flags.IGNORE))
