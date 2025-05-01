@@ -10,7 +10,7 @@ from pytgcalls.types import Update, MediaStream, ChatUpdate
 
 from Player import call, app, seek_chats
 from Player.Utils.YtDetails import ytdl
-from Player.Utils.Seek_Bar import update_seek_bar
+from Player.Utils.Seek_Bar import update_seek_bar, parse_duration
 from Player.Utils.AutoPlay import is_autoplay_on, get_recommendation
 from Player.Utils.Loop import get_loop, set_loop
 from Player.Utils.Queue import QUEUE, get_queue, clear_queue, pop_an_item
@@ -25,7 +25,8 @@ async def _skip(chat_id):
             await set_loop(chat_id, loop)
             current = chat_queue[0]
             title = current[1][0]['title']
-            duration = current[1][0]['duration']
+            raw_duration = current[1][0]['duration']
+            duration = parse_duration(raw_duration)
             channel = current[1][0]['channel']
             views = current[1][0]['views']
             songlink = current[2]
@@ -51,7 +52,8 @@ async def _skip(chat_id):
                 pop_an_item(chat_id)
                 next_song = chat_queue[0]
                 title = next_song[1][0]['title']
-                duration = next_song[1][0]['duration']
+                raw_duration = next_song[1][0]['duration']
+                duration = parse_duration(raw_duration)
                 channel = next_song[1][0]['channel']
                 views = next_song[1][0]['views']
                 songlink = next_song[2]
