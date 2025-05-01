@@ -17,36 +17,25 @@ from Player.Utils.Queue import QUEUE, get_queue, clear_queue, pop_an_item
 
 async def _skip(chat_id):
     loop = await get_loop(chat_id)
-    autoplay = await is_autoplay_on(chat_id)
-
     if loop > 0:
         try:
-            chat_queue = get_queue(chat_id)
-            loop -= 1
-            await set_loop(chat_id, loop)
-            current = chat_queue[0]
-            title = current[1][0]['title']
-            duration = current[1][0]['duration']
-            channel = current[1][0]['channel']
-            views = current[1][0]['views']
-            songlink = current[2]
-            ytlink = current[3]
 
             await call.play(chat_id, MediaStream(songlink, video_flags=MediaStream.Flags.IGNORE))
             finish_time = time.time()
-            return [title, duration, channel, views, ytlink, finish_time]
+            return [title, duration, channel, views, link, finish_time]
         except Exception as e:
             return [2, f"❌ **Loop Play Failed:**\n`{e}`"]
 
     if chat_id in QUEUE:
         chat_queue = get_queue(chat_id)
         if len(chat_queue) == 1:
+            await stop(chat_id)
+            clear_queue(chat_id)
+            return 1
+        else:
             try:
                 pop_an_item(chat_id)
                 next_song = chat_queue[0]
-                title = next_song[1][0]['title']
-                duration = next_song[1][0]['duration']
-                channel = next_song[1][0]['channel']
                 views = next_song[1][0]['views']
                 songlink = next_song[2]
                 ytlink = next_song[3]
@@ -54,47 +43,11 @@ async def _skip(chat_id):
                 await call.play(chat_id, MediaStream(songlink, video_flags=MediaStream.Flags.IGNORE))
                 finish_time = time.time()
                 return [title, duration, channel, views, ytlink, finish_time]
-
-                if autoplay:
-                    try:
-                        last_song = chat_queue[0]
-                        last_query = last_song[3]
-                        if last_query:
-                            recommended_url = await get_recommendation(last_query)
-                            if recommended_url:
-                                status, songlink = await ytdl("bestaudio", recommended_url)
-                                if status and songlink:
-                                    QUEUE[chat_id].append([
-                                        None,
-                                        [{
-                                            "title": "Recommended Song",
-                                            "duration": "Unknown",
-                                            "channel": "AutoPlay",
-                                            "views": "N/A"
-                                        }],
-                                        songlink,
-                                        recommended_url
-                                    ])
-
-                                    await call.play(chat_id, MediaStream(songlink, video_flags=MediaStream.Flags.IGNORE))
-                                    finish_time = time.time()
-                                    return [title, duration, channel, views, ytlink, finish_time]
-
-                    except Exception as e:
-                        return [2, f"❌ **Autoplay Error:** `{e}`"]
-
-                else:
-                    await call.play(chat_id, MediaStream(songlink, video_flags=MediaStream.Flags.IGNORE))
-                    finish_time = time.time()
-                    return [title, duration, channel, views, ytlink, finish_time]
-
             except Exception as e:
                 return [2, f"❌ **Skip Error:** `{e}`"]
 
-
     await stop(chat_id)
     return 1
-
 
 
 @call.on_update(filters.stream_end())
