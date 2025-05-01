@@ -10,6 +10,7 @@ from pytgcalls.types import Update, MediaStream, ChatUpdate
 
 from Player import call, app, seek_chats
 from Player.Utils.YtDetails import ytdl
+from Player.Utils.Seek_Bar import update_seek_bar
 from Player.Utils.AutoPlay import is_autoplay_on, get_recommendation
 from Player.Utils.Loop import get_loop, set_loop
 from Player.Utils.Queue import QUEUE, get_queue, clear_queue, pop_an_item
@@ -31,8 +32,11 @@ async def _skip(chat_id):
             ytlink = current[3]
 
             await call.play(chat_id, MediaStream(songlink, video_flags=MediaStream.Flags.IGNORE))
+            start_time = time.time()
+            await update_seek_bar(chat_id, duration, start_time, title, ytlink, channel, views)
+
             finish_time = time.time()
-            return [title, duration, channel, views, link, finish_time]
+            return [title, duration, channel, views, ytlink, finish_time]
         except Exception as e:
             return [2, f"❌ **Loop Play Failed:**\n`{e}`"]
 
@@ -54,6 +58,9 @@ async def _skip(chat_id):
                 ytlink = next_song[3]
                 
                 await call.play(chat_id, MediaStream(songlink, video_flags=MediaStream.Flags.IGNORE))
+                start_time = time.time()
+                await update_seek_bar(chat_id, duration, start_time, title, ytlink, channel, views)
+
                 finish_time = time.time()
                 return [title, duration, channel, views, ytlink, finish_time]
             except Exception as e:
