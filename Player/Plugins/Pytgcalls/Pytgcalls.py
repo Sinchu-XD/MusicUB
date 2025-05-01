@@ -15,7 +15,6 @@ from Player.Utils.Loop import get_loop, set_loop
 from Player.Utils.Queue import QUEUE, get_queue, clear_queue, pop_an_item
 
 
-
 async def _skip(chat_id):
     loop = await get_loop(chat_id)
     autoplay = await is_autoplay_on(chat_id)
@@ -42,7 +41,6 @@ async def _skip(chat_id):
     if chat_id in QUEUE:
         chat_queue = get_queue(chat_id)
         if len(chat_queue) == 1:
-            
             try:
                 pop_an_item(chat_id)
                 next_song = chat_queue[0]
@@ -52,6 +50,8 @@ async def _skip(chat_id):
                 views = next_song[1][0]['views']
                 songlink = next_song[2]
                 ytlink = next_song[3]
+
+                finish_time = time.time()
 
                 if autoplay:
                     try:
@@ -63,18 +63,19 @@ async def _skip(chat_id):
                                 status, songlink = await ytdl("bestaudio", recommended_url)
                                 if status and songlink:
                                     await call.play(chat_id, MediaStream(songlink, video_flags=MediaStream.Flags.IGNORE))
-                                    return [title, duration, channel, views, ytlink, finish_time] 
+                                    return [title, duration, channel, views, ytlink, finish_time]
+                    except Exception as e:
+                        return [2, f"❌ **Autoplay Error:** `{e}`"]
 
-                else:
-                    await call.play(chat_id, MediaStream(songlink, video_flags=MediaStream.Flags.IGNORE))
-                    finish_time = time.time()
-                    return [title, duration, channel, views, ytlink, finish_time]
+                await call.play(chat_id, MediaStream(songlink, video_flags=MediaStream.Flags.IGNORE))
+                return [title, duration, channel, views, ytlink, finish_time]
 
             except Exception as e:
                 return [2, f"❌ **Skip Error:** `{e}`"]
 
     await stop(chat_id)
     return 1
+
 
 @call.on_update(filters.stream_end())
 async def handler(client: PyTgCalls, update: Update):
@@ -122,3 +123,4 @@ async def on_left_call(client, update):
     await set_loop(chat_id, 0)
     if chat_id in seek_chats:
         del seek_chats[chat_id]
+        
