@@ -30,3 +30,18 @@ async def update_seek_bar(chat_id, song_duration, start_time, title, ytlink, cha
 
         if current_time >= song_duration:
             break
+
+def parse_duration(duration_str):
+    try:
+        parts = list(map(int, duration_str.split(":")))
+        if len(parts) == 3:
+            return parts[0] * 3600 + parts[1] * 60 + parts[2]
+        elif len(parts) == 2:
+            return parts[0] * 60 + parts[1]
+        elif len(parts) == 1:
+            return parts[0]
+        else:
+            return 0
+    except:
+        return 0
+        
