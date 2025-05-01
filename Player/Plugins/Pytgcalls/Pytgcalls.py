@@ -40,7 +40,8 @@ async def _skip(chat_id):
 
     if chat_id in QUEUE:
         chat_queue = get_queue(chat_id)
-        if len(chat_queue) == 1:
+
+        if len(chat_queue) > 1:
             try:
                 pop_an_item(chat_id)
                 next_song = chat_queue[0]
@@ -53,28 +54,37 @@ async def _skip(chat_id):
 
                 finish_time = time.time()
 
-                if autoplay:
-                    try:
-                        last_song = chat_queue[0]
-                        last_query = last_song[3]
-                        if last_query:
-                            recommended_url = await get_recommendation(last_query)
-                            if recommended_url:
-                                status, songlink = await ytdl("bestaudio", recommended_url)
-                                if status and songlink:
-                                    await call.play(chat_id, MediaStream(songlink, video_flags=MediaStream.Flags.IGNORE))
-                                    return [title, duration, channel, views, ytlink, finish_time]
-                    except Exception as e:
-                        return [2, f"❌ **Autoplay Error:** `{e}`"]
-
                 await call.play(chat_id, MediaStream(songlink, video_flags=MediaStream.Flags.IGNORE))
                 return [title, duration, channel, views, ytlink, finish_time]
 
             except Exception as e:
-                return [2, f"❌ **Skip Error:** `{e}`"]
+                return [2, f"❌ **Queue Next Song Error:** `{e}`"]
+
+        elif len(chat_queue) == 1 and autoplay:
+            try:
+                last_song = chat_queue[0]
+                last_query = last_song[3]
+                if last_query:
+                    recommended_url = await get_recommendation(last_query)
+                    if recommended_url:
+                        status, songlink = await ytdl("bestaudio", recommended_url)
+                        if status and songlink:
+                            await call.play(chat_id, MediaStream(songlink, video_flags=MediaStream.Flags.IGNORE))
+                            finish_time = time.time()
+                            return [
+                                last_song[1][0]['title'],
+                                last_song[1][0]['duration'],
+                                last_song[1][0]['channel'],
+                                last_song[1][0]['views'],
+                                recommended_url,
+                                finish_time,
+                            ]
+            except Exception as e:
+                return [2, f"❌ **Autoplay Error:** `{e}`"]
 
     await stop(chat_id)
     return 1
+
 
 
 @call.on_update(filters.stream_end())
