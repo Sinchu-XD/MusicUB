@@ -10,6 +10,7 @@ from pytgcalls.types import Update, MediaStream, ChatUpdate
 
 from Player import call, app, seek_chats
 from Player.Utils.YtDetails import ytdl
+from Player.Utils.AutoPlay import is_autoplay_on, get_recommendation
 from Player.Utils.Loop import get_loop, set_loop
 from Player.Utils.Queue import QUEUE, get_queue, clear_queue, pop_an_item
 
@@ -17,6 +18,7 @@ from Player.Utils.Queue import QUEUE, get_queue, clear_queue, pop_an_item
 
 async def _skip(chat_id):
     loop = await get_loop(chat_id)
+    autoplay = await is_autoplay_on(chat_id)
 
     if loop > 0:
         try:
@@ -33,17 +35,13 @@ async def _skip(chat_id):
 
             await call.play(chat_id, MediaStream(songlink, video_flags=MediaStream.Flags.IGNORE))
             finish_time = time.time()
-            return [title, duration, channel, views, link, finish_time]
+            return [title, duration, channel, views, ytlink, finish_time]
         except Exception as e:
             return [2, f"❌ **Loop Play Failed:**\n`{e}`"]
 
     if chat_id in QUEUE:
         chat_queue = get_queue(chat_id)
         if len(chat_queue) == 1:
-            await stop(chat_id)
-            clear_queue(chat_id)
-            return 1
-        else:
             try:
                 pop_an_item(chat_id)
                 next_song = chat_queue[0]
@@ -53,17 +51,27 @@ async def _skip(chat_id):
                 views = next_song[1][0]['views']
                 songlink = next_song[2]
                 ytlink = next_song[3]
-                
-                await call.play(chat_id, MediaStream(songlink, video_flags=MediaStream.Flags.IGNORE))
-                finish_time = time.time()
-                return [title, duration, channel, views, ytlink, finish_time]
+
+                if autoplay:
+                    try:
+                        last_song = chat_queue[0]
+                        last_query = last_song[1][0]['stream_url']
+                        if last_query:
+                            recommended_url = await get_recommendation(last_query)
+                            status, songlink = await ytdl("bestaudio", stream_url)
+                            if status and songlink:
+                                await call.play(chat_id, MediaStream(songlink, video_flags=MediaStream.Flags.IGNORE))
+
+                else:
+                    await call.play(chat_id, MediaStream(songlink, video_flags=MediaStream.Flags.IGNORE))
+                    finish_time = time.time()
+                    return [title, duration, channel, views, ytlink, finish_time]
 
             except Exception as e:
                 return [2, f"❌ **Skip Error:** `{e}`"]
 
     await stop(chat_id)
     return 1
-
 
 @call.on_update(filters.stream_end())
 async def handler(client: PyTgCalls, update: Update):
