@@ -71,23 +71,11 @@ async def _skip(chat_id):
                         status, songlink = await ytdl("bestaudio", recommended_url)
                         if status and songlink:
                             pop_an_item(chat_id)
-
-                            QUEUE[chat_id].append([
-                                None,
-                            [{
-                                "title": "Recommended Song",
-                                "duration": "Unknown",
-                                "channel": "AutoPlay",
-                                "views": "N/A"
-                        }],
-                                songlink,
-                                recommended_url
-                    ])
-
                             await call.play(chat_id, MediaStream(songlink, video_flags=MediaStream.Flags.IGNORE))
                             finish_time = time.time()
 
                             return ["Recommended Song", "Unknown", "AutoPlay", "N/A", recommended_url, finish_time]
+                            pop_an_item(chat_id)
             except Exception as e:
                 return [2, f"❌ **Autoplay Error:** `{e}`"]
 
