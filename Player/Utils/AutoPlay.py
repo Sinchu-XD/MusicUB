@@ -1,8 +1,29 @@
 import json
 import asyncio
 import atexit
+from yt_dlp import YoutubeDL
 
 AUTOPLAY_STATE = {}
+
+
+async def get_recommendation(video_url):
+    ydl_opts = {
+        "quiet": True,
+        "extract_flat": "in_playlist",
+        "skip_download": True,
+        "cookiefile": "cookies/cookies.txt",
+    }
+
+    with YoutubeDL(ydl_opts) as ydl:
+        info = ydl.extract_info(video_url, download=False)
+        related = info.get("related_videos", [])
+        if related:
+            next_vid_id = related[0]["id"]
+            next_vid_url = f"https://www.youtube.com/watch?v={next_vid_id}"
+            return next_vid_url
+        else:
+            return None
+
 
 async def autoplay(chat_id):
     if chat_id not in AUTOPLAY_STATE:
@@ -28,3 +49,4 @@ def load_autoplay_state():
 load_autoplay_state()
 
 atexit.register(save_autoplay_state)
+
