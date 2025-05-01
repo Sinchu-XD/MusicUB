@@ -27,30 +27,29 @@ async def set_volume(_, message):
 
     try:
         vol_input = int(message.text.split()[1])
-        if vol_input < 0 or vol_input > 200:
+        if not 0 <= vol_input <= 200:
             raise ValueError
     except (IndexError, ValueError):
-        msg = await message.reply_text("Usage: /volume [0-200]\nExample: `/volume 100`")
-        return await delete_messages(message, msg)
+        m = await message.reply_text("Usage: /volume [0-200]")
+        return await delete_messages(message, m)
 
     try:
         queue = get_queue(chat_id)
         songlink = queue[0][2]
         seek = seek_chats.get(chat_id, 0)
-        ffmpeg_volume = vol_input / 100
 
-        await call.play(
-            chat_id,
-            MediaStream(
-                media_path=songlink,
-                audio_parameters=AudioQuality.HIGH,
-                ffmpeg_parameters=f"-ss {seek} -filter:a volume={ffmpeg_volume}"
-            ),
+        volume_filter = vol_input / 100.0
+        stream = MediaStream(
+            media_path=songlink,
+            audio_parameters=AudioQuality.HIGH,
+            ffmpeg_parameters=f"-ss {seek} -af volume={volume_filter}"
         )
+
+        await call.play(chat_id, stream)
 
         msg = await message.reply_text(f"🔊 Volume set to `{vol_input}%`.")
         await delete_messages(message, msg)
 
     except Exception as e:
-        msg = await message.reply_text(f"❌ Failed to set volume:\n`{e}`")
+        msg = await message.reply_text(f"❌ Error while setting volume:\n`{e}`")
         await delete_messages(message, msg)
