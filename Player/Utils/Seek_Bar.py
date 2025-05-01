@@ -1,5 +1,6 @@
 import asyncio
 import time
+from Player import app
 
 async def update_seek_bar(chat_id, song_duration, start_time, title, ytlink, channel, views):
     progress = 0
