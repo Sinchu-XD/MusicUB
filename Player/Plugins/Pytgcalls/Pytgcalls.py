@@ -17,7 +17,7 @@ from Player.Utils.Queue import QUEUE, get_queue, clear_queue, pop_an_item
 
 
 async def _skip(chat_id):
-    loop = await get_loop(chat_id)
+    loop = int(await get_loop(chat_id) or 0)
     if loop > 0:
         try:
             chat_queue = get_queue(chat_id)
