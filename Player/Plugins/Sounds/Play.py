@@ -75,82 +75,55 @@ async def _aPlay(_, message):
     m = await message.reply_text("**Wait Na Yrrr 😒**")
     query = message.text.split(maxsplit=1)[1]
 
-    if command in ["splay", "sp"]:
-        result = await spotify_search(query)
-        if not result["status"]:
-            return await m.edit(result["message"])
+        query = message.text.split(maxsplit=1)[1]
 
-        await m.edit("**🎵 Spotify song found... preparing audio 🎧**")
+    try:
+        search_results, stream_url = await SearchYt(query)
+        if not search_results:
+            return await m.edit("No results found")
+    except Exception as e:
+        return await m.edit(f"Error: <code>{e}</code>")
 
-        song_url = result["url"]
-        status, songlink = await ytdl("bestaudio", song_url)
-        if not status:
-            return await m.edit("❌ Failed to extract audio from Spotify track")
+    await m.edit("**ᴡᴀɪᴛ ɴᴀ ʏʀʀʀ\n\nꜱᴇᴀʀᴄʜɪɴɢ ʏᴏᴜʀ ꜱᴏɴɢ 🌚❤️..**")
+    
+    status, songlink = await ytdl("bestaudio", stream_url)
+    if not status or not songlink:
+        await m.edit(f"❌ yt-dl issues detected\n\n» No valid song link found.")
+    else:
+        title = search_results[0]['title']
+        chat_id = message.chat.id
+        total_time = f"{int(time.time() - start_time)} **Seconds**"
 
         if chat_id in QUEUE:
-            queue_num = add_to_queue(chat_id, result, songlink, song_url)
+            queue_num = add_to_queue(chat_id, search_results, songlink, stream_url)
             await m.edit(
-                f"# {queue_num} Added to Queue 🎶\n**Title:** [{result['title']}]({song_url})\n"
-                f"**Duration:** {result['duration']}\n**By:** {mention}"
+                f"# **{queue_num} ʏᴏᴜʀ ꜱᴏɴɢ ᴀᴅᴅᴇᴅ ɪɴ Qᴜᴇᴜᴇ\n\nᴘʟᴇᴀꜱᴇ ᴡᴀɪᴛ 😵‍💫**\n\n"
+                f"**SongName :** [{search_results[0]['title'][:19]}]({stream_url})\n"
+                f"**Duration :** {search_results[0]['duration']} **Minutes**\n"
+                f"**Channel :** {search_results[0]['channel']}\n"
+                f"**Views :** {search_results[0]['views']}\n"
+                f"**Requested By :** {mention}\n\n"
+                f"**Response Time :** {total_time}",
+                disable_web_page_preview=True,
             )
-            return asyncio.create_task(delete_messages(message, m))
+                
+                
+            asyncio.create_task(delete_messages(message, m))
+            return
 
         Status, Text = await Userbot.playAudio(chat_id, songlink)
         if not Status:
             return await m.edit(Text)
 
-        add_to_queue(chat_id, result, songlink, song_url)
-        return await m.edit(
-            f"**𝚂𝚙𝚘𝚝𝚒𝚏𝚢 𝚜𝚘𝚗𝚐 𝚒𝚜 𝚗𝚘𝚠 𝚙𝚕𝚊𝚢𝚒𝚗𝚐 🟢**\n**Title:** [{result['title']}]({song_url})\n"
-            f"**Duration:** {result['duration']}\n**By:** {mention}"
-        )
-
-    else:
-        try:
-            search_results, stream_url = await SearchYt(query)
-            if not search_results:
-                return await m.edit("No results found")
-        except Exception as e:
-            return await m.edit(f"Error: <code>{e}</code>")
-
-        await m.edit("**ᴡᴀɪᴛ ɴᴀ ʏʀʀʀ\n\nꜱᴇᴀʀᴄʜɪɴɢ ʏᴏᴜʀ ꜱᴏɴɢ 🌚❤️..**")
-    
-        status, songlink = await ytdl("bestaudio", stream_url)
-        if not status or not songlink:
-            await m.edit(f"❌ yt-dl issues detected\n\n» No valid song link found.")
-            title = search_results[0]['title']
-            chat_id = message.chat.id
-            total_time = f"{int(time.time() - start_time)} **Seconds**"
-
-            if chat_id in QUEUE:
-                queue_num = add_to_queue(chat_id, search_results, songlink, stream_url)
-                await m.edit(
-                    f"# **{queue_num} ʏᴏᴜʀ ꜱᴏɴɢ ᴀᴅᴅᴇᴅ ɪɴ Qᴜᴇᴜᴇ\n\nᴘʟᴇᴀꜱᴇ ᴡᴀɪᴛ 😵‍💫**\n\n"
-                    f"**SongName :** [{search_results[0]['title'][:19]}]({stream_url})\n"
-                    f"**Duration :** {search_results[0]['duration']} **Minutes**\n"
-                    f"**Channel :** {search_results[0]['channel']}\n"
-                    f"**Views :** {search_results[0]['views']}\n"
-                    f"**Requested By :** {mention}\n\n"
-                    f"**Response Time :** {total_time}",
-                    disable_web_page_preview=True,
-            )
-                asyncio.create_task(delete_messages(message, m))
-                return
-
-            Status, Text = await Userbot.playAudio(chat_id, songlink)
-            if not Status:
-                return await m.edit(Text)
-
-            add_to_queue(chat_id, search_results, songlink, stream_url)
-
-            total_time = f"{int(time.time() - start_time)} **Seconds**"
-            await m.edit(
-                f"**ѕσηg ιѕ ρℓαуιηg ιη ν¢**\n\n**SongName :** [{search_results[0]['title'][:19]}]({stream_url})\n"
-                f"**Duration :** {search_results[0]['duration']} **Minutes**\n**Channel :** {search_results[0]['channel']}\n"
-                f"**Views :** {search_results[0]['views']}\n**Requested By :** {mention}\n\n**Response Time :** {total_time}",
-                disable_web_page_preview=True,
-    )
-            return asyncio.create_task(delete_messages(message, m))
+        add_to_queue(chat_id, search_results, songlink, stream_url)
+        total_time = f"{int(time.time() - start_time)} **Seconds**"
+        await m.edit(
+            f"**ѕσηg ιѕ ρℓαуιηg ιη ν¢**\n\n**SongName :** [{search_results[0]['title'][:19]}]({stream_url})\n"
+            f"**Duration :** {search_results[0]['duration']} **Minutes**\n**Channel :** {search_results[0]['channel']}\n"
+            f"**Views :** {search_results[0]['views']}\n**Requested By :** {mention}\n\n**Response Time :** {total_time}",
+            disable_web_page_preview=True,
+        
+        return asyncio.create_task(delete_messages(message, m))
 
 
 @app.on_message((filters.command(PLAYFORCE_COMMAND, [PREFIX, RPREFIX])) & filters.group)
