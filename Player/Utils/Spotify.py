@@ -1,7 +1,11 @@
+import asyncio
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
 
-client_credentials_manager = SpotifyClientCredentials(client_id='529f0435df1c4770bbb719586ee9e710', client_secret='f578063466894149960027b193618eb3')
+client_credentials_manager = SpotifyClientCredentials(
+    client_id='529f0435df1c4770bbb719586ee9e710',
+    client_secret='f578063466894149960027b193618eb3'
+)
 sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
 
 async def spotify_search(query):
@@ -34,4 +38,12 @@ async def spotify_search(query):
             'status': False,
             'message': f"Error searching Spotify: {e}"
         }
-      
+
+# Asyncio test runner
+async def test_spotify():
+    query = "" 
+    result = await spotify_search(query)
+    print(result)
+
+if __name__ == "__main__":
+    asyncio.run(test_spotify())
