@@ -132,9 +132,14 @@ async def playforce(_, message):
 
     if len(message.command) < 2:
         return await message.reply_text("**𝑊𝑎𝑖𝑡 𝙶𝚒𝚟𝚎 𝙼𝚎 𝚂𝚘𝚗𝚐 𝙻𝚒𝚗𝚔 𝙾𝚛 𝚁𝚎𝚙𝚕𝚢 𝚃𝚘 𝚅𝚘𝚒𝚌𝚎 𝙽𝚘𝚝𝚎**")
+    
+    admins = []
+    async for admin in app.get_chat_members(chat_id, filter=ChatMembersFilter.ADMINISTRATORS):
+        admins.append(admin.user.id)
 
-    m = await message.reply_text("**Force Playing Your Song...**")
-    query = message.text.split(maxsplit=1)[1]
+    if message.from_user.id in SUDOERS or message.from_user.id in admins:
+        m = await message.reply_text("**Force Playing Your Song...**")
+        query = message.text.split(maxsplit=1)[1]
 
     try:
         search_results, stream_url = await SearchYt(query)
