@@ -84,41 +84,46 @@ async def _aPlay(_, message):
     await m.edit("**ᴡᴀɪᴛ ɴᴀ ʏʀʀʀ\n\nꜱᴇᴀʀᴄʜɪɴɢ ʏᴏᴜʀ ꜱᴏɴɢ 🌚❤️..**")
 
     status, songlink = await ytdl("bestaudio", stream_url)
-    if not status or not songlink:
-        return await m.edit("❌ yt-dl issues detected\n\n» No valid song link found.")
+    await m.edit(f"❌ yt-dl issues detected\n\n» No valid song link found.")
+    else:
+        title = search_results[0]['title']
+        chat_id = message.chat.id
+        total_time = f"{int(time.time() - start_time)} **Seconds**"
 
-    title = search_results[0]['title']
-    duration = search_results[0]['duration']
-    channel = search_results[0]['channel']
-    views = search_results[0]['views']
-    total_time = f"{int(time.time() - start_time)} **Seconds**"
+        if chat_id in QUEUE:
+            queue_num = add_to_queue(chat_id, search_results, songlink, stream_url)
+            await m.edit(
+                f"# **{queue_num} ʏᴏᴜʀ ꜱᴏɴɢ ᴀᴅᴅᴇᴅ ɪɴ Qᴜᴇᴜᴇ\n\nᴘʟᴇᴀꜱᴇ ᴡᴀɪᴛ 😵‍💫**\n\n"
+                f"**SongName :** [{search_results[0]['title'][:19]}]({stream_url})\n"
+                f"**Duration :** {search_results[0]['duration']} **Minutes**\n"
+                f"**Channel :** {search_results[0]['channel']}\n"
+                f"**Views :** {search_results[0]['views']}\n"
+                f"**Requested By :** {mention}\n\n"
+                f"**Response Time :** {total_time}",
+                disable_web_page_preview=True,
+            )
+                
+                
+            asyncio.create_task(delete_messages(message, m))
+            return
 
-    if chat_id in QUEUE:
-        queue_num = add_to_queue(chat_id, title, duration, songlink, stream_url)
+        Status, Text = await Userbot.playAudio(chat_id, songlink)
+        if not Status:
+            return await m.edit(Text)
+
+        add_to_queue(chat_id, search_results, songlink, stream_url)
+        total_time = f"{int(time.time() - start_time)} **Seconds**"
+
         await m.edit(
-            f"# {queue_num}\n**ʏᴏᴜʀ ꜱᴏɴɢ ᴀᴅᴅᴇᴅ ɪɴ Qᴜᴇᴜᴇ 😵‍💫**\n\n"
-            f"**SongName:** [{title[:19]}]({stream_url})\n"
-            f"**Duration:** {duration} Minutes\n**Channel:** {channel}\n"
-            f"**Views:** {views}\n**Requested By:** {mention}\n"
-            f"**Response Time:** {total_time}",
+            f"**ѕσηg ιѕ ρℓαуιηg ιη ν¢**\n\n**SongName :** [{search_results[0]['title'][:19]}]({stream_url})\n"
+            f"**Duration :** {search_results[0]['duration']} **Minutes**\n**Channel :** {search_results[0]['channel']}\n"
+            f"**Views :** {search_results[0]['views']}\n**Requested By :** {mention}\n\n**Response Time :** {total_time}",
+
+
             disable_web_page_preview=True,
-        )
+    )
         return asyncio.create_task(delete_messages(message, m))
 
-    Status, Text = await Userbot.playAudio(chat_id, songlink)
-    if not Status:
-        return await m.edit(Text)
-
-    add_to_queue(chat_id, title, duration, songlink, stream_url)
-
-    await m.edit(
-        f"**ѕσηg ιѕ ρℓαуιηg ιη ν¢**\n\n**SongName:** [{title[:19]}]({stream_url})\n"
-        f"**Duration:** {duration} Minutes\n**Channel:** {channel}\n"
-        f"**Views:** {views}\n**Requested By:** {mention}\n"
-        f"**Response Time:** {total_time}",
-        disable_web_page_preview=True,
-    )
-    return asyncio.create_task(delete_messages(message, m))
 
 
 @app.on_message((filters.command(PLAYFORCE_COMMAND, [PREFIX, RPREFIX])) & filters.group)
