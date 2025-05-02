@@ -3,7 +3,7 @@ import hashlib
 import logging
 import yt_dlp
 import asyncio
-from YouTubeMusic.YtSearch import Search
+from YouTubeMusic.Search import Search
 
 COOKIES_FILE = "cookies/cookies.txt"
 CACHE_DIR = 'cached_songs'
