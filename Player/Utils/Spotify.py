@@ -41,7 +41,7 @@ async def spotify_search(query):
 
 # Asyncio test runner
 async def test_spotify():
-    query = "" 
+    query = input("Enter song name: ")
     result = await spotify_search(query)
     print(result)
 
