@@ -120,7 +120,7 @@ async def _aPlay(_, message):
             f"**Duration :** {search_results[0]['duration']} **Minutes**\n**Channel :** {search_results[0]['channel']}\n"
             f"**Views :** {search_results[0]['views']}\n**Requested By :** {mention}\n\n**Response Time :** {total_time}",
             disable_web_page_preview=True,
-        
+        )
         return asyncio.create_task(delete_messages(message, m))
 
 
