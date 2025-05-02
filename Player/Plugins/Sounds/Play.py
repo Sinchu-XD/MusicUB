@@ -75,8 +75,6 @@ async def _aPlay(_, message):
     m = await message.reply_text("**Wait Na Yrrr 😒**")
     query = message.text.split(maxsplit=1)[1]
 
-        query = message.text.split(maxsplit=1)[1]
-
     try:
         search_results, stream_url = await SearchYt(query)
         if not search_results:
