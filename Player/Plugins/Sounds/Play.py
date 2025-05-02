@@ -5,6 +5,7 @@ Copyright ©️ 2025
 from Player import app, call, seek_chats
 from Player.Core import Userbot
 from Player.Utils.YtDetails import SearchYt, ytdl
+from Player.Utils.Spotify import spotify_search
 from Player.Utils.Queue import QUEUE, add_to_queue
 from Player.Utils.Delete import delete_messages
 from pyrogram.enums import ChatMembersFilter
@@ -17,7 +18,7 @@ import hashlib
 import logging
 import config
 
-PLAY_COMMAND = ["P", "PLAY"]
+PLAY_COMMAND = ["P", "PLAY", "SP", "SPLAY"]
 PLAYFORCE_COMMAND = ["PFORCE", "PLAYFORCE"]
 PREFIX = config.PREFIX
 RPREFIX = config.RPREFIX
