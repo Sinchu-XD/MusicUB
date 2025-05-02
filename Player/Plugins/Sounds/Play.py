@@ -38,6 +38,7 @@ async def _aPlay(_, message):
     start_time = time.time()
     chat_id = message.chat.id
     mention = message.from_user.mention
+    command = message.command[0].lower()
     if chat_id in seek_chats:
         del seek_chats[chat_id]
         
