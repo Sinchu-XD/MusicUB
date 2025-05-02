@@ -39,6 +39,7 @@ async def _aPlay(_, message):
     chat_id = message.chat.id
     mention = message.from_user.mention
     command = message.command[0].lower()
+    await message.delete()
     if chat_id in seek_chats:
         del seek_chats[chat_id]
         
@@ -129,6 +130,7 @@ async def playforce(_, message):
     start_time = time.time()
     chat_id = message.chat.id
     mention = message.from_user.mention
+    await message.delete()
 
     seek_chats.pop(chat_id, None)
 
