@@ -6,7 +6,7 @@ sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
 
 async def spotify_search(query):
     try:
-        results = sp.search(q=query, type='track', limit=1)  # Limit to 1 result
+        results = sp.search(q=query, type='track', limit=1) 
         
         if results['tracks']['items']:
             track = results['tracks']['items'][0]
