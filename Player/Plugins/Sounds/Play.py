@@ -86,6 +86,7 @@ async def _aPlay(_, message):
     await m.edit("**ᴡᴀɪᴛ ɴᴀ ʏʀʀʀ\n\nꜱᴇᴀʀᴄʜɪɴɢ ʏᴏᴜʀ ꜱᴏɴɢ 🌚❤️..**")
     
     status, songlink = await ytdl("bestaudio", stream_url)
+    print(songlink)
     if not status or not songlink:
         await m.edit(f"❌ yt-dl issues detected\n\n» No valid song link found.")
     else:
