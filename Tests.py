@@ -1,6 +1,6 @@
 import asyncio
 from Player import call
-from Player.UserBot import playAudio
+from Player.Core.Userbot import playAudio
 from pytgcalls.types import MediaStream, VideoQuality, AudioQuality
 
 chat_id = "-1002523755325"
