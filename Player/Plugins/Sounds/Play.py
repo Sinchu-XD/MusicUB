@@ -12,6 +12,7 @@ from pyrogram.enums import ChatMembersFilter
 from Player.Misc import SUDOERS
 from pyrogram import filters
 import os
+import re
 import asyncio
 import time
 import hashlib
@@ -22,7 +23,7 @@ PLAY_COMMAND = ["P", "PLAY", "SP", "SPLAY"]
 PLAYFORCE_COMMAND = ["PFORCE", "PLAYFORCE"]
 PREFIX = config.PREFIX
 RPREFIX = config.RPREFIX
-
+YOUTUBE_REGEX = r"^(https?\:\/\/)?(www\.youtube\.com|youtu\.?be)\/.+"
 
 async def processReplyToMessage(message):
     msg = message.reply_to_message
@@ -75,6 +76,19 @@ async def _aPlay(_, message):
 
     m = await message.reply_text("**Wait Na Yrrr 😒**")
     query = message.text.split(maxsplit=1)[1]
+    
+    if re.match(YOUTUBE_REGEX, query):
+    stream_url = query
+    await m.edit("**𝑾𝒂𝒊𝒕... 𝑫𝒐𝒘𝒏𝒍𝒐𝒂𝒅𝒊𝒏𝒈 𝒅𝒊𝒓𝒆𝒄𝒕 𝒍𝒊𝒏𝒌...**")
+    try:
+        result = await ytdl("bestaudio", stream_url)
+        resp, songlink = result[0], result[1]
+        if not resp or not songlink:
+            return await m.edit("❌ yt-dl failed to fetch direct audio.")
+
+    except Exception as e:
+        return await m.edit(f"**yt-dl error:** <code>{e}</code>")
+else:
 
     try:
         search_results, stream_url = await SearchYt(query)
