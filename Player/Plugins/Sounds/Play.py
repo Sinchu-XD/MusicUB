@@ -33,7 +33,8 @@ async def processReplyToMessage(message):
         return audio_original, m
     return None, None
 
-@app.on_message((filters.command(PLAY_COMMAND, [PREFIX, RPREFIX])) & filters.group
+
+@app.on_message((filters.command(PLAY_COMMAND, [PREFIX, RPREFIX])) & filters.group)
 async def _aPlay(_, message):
     start_time = time.time()
     chat_id = message.chat.id
@@ -77,7 +78,7 @@ async def _aPlay(_, message):
     else:
         m = await message.reply_text("**Wait Na Yrrr 😒**")
     query = message.text.split(maxsplit=1)[1]
-    
+
     try:
         search_results, stream_url = await SearchYt(query)
         if not search_results:
@@ -86,7 +87,7 @@ async def _aPlay(_, message):
         return await m.edit(f"Error: <code>{e}</code>")
 
     await m.edit("**ᴡᴀɪᴛ ɴᴀ ʏʀʀʀ\n\nꜱᴇᴀʀᴄʜɪɴɢ ʏᴏᴜʀ ꜱᴏɴɢ 🌚❤️..**")
-    
+
     status, songlink = await ytdl("bestaudio", stream_url)
     print(songlink)
     if not status or not songlink:
@@ -95,7 +96,7 @@ async def _aPlay(_, message):
         title = search_results[0]['title']
         chat_id = message.chat.id
         total_time = f"{int(time.time() - start_time)} **Seconds**"
-                if chat_id in QUEUE:
+        if chat_id in QUEUE:
             queue_num = add_to_queue(chat_id, search_results, songlink, stream_url)
             await m.edit(
                 f"# **{queue_num} ʏᴏᴜʀ ꜱᴏɴɢ ᴀᴅᴅᴇᴅ ɪɴ Qᴜᴇᴜᴇ\n\nᴘʟᴇᴀꜱᴇ ᴡᴀɪᴛ 😵‍💫**\n\n"
@@ -107,8 +108,7 @@ async def _aPlay(_, message):
                 f"**Response Time :** {total_time}",
                 disable_web_page_preview=True,
             )
-                
-                
+
             asyncio.create_task(delete_messages(message, m))
             return
 
@@ -122,11 +122,12 @@ async def _aPlay(_, message):
             f"**ѕσηg ιѕ ρℓαуιηg ιη ν¢**\n\n**SongName :** [{search_results[0]['title'][:19]}]({stream_url})\n"
             f"**Duration :** {search_results[0]['duration']} **Minutes**\n**Channel :** {search_results[0]['channel']}\n"
             f"**Views :** {search_results[0]['views']}\n**Requested By :** {mention}\n\n**Response Time :** {total_time}",
+        )
         asyncio.create_task(delete_messages(message, m))
         return
-            
 
-@app.on_message((filters.command(PLAYFORCE_COMMAND, [PREFIX, RPREFIX])) & filters.group
+
+@app.on_message((filters.command(PLAYFORCE_COMMAND, [PREFIX, RPREFIX])) & filters.group)
 async def playforce(_, message):
     start_time = time.time()
     chat_id = message.chat.id
@@ -137,7 +138,7 @@ async def playforce(_, message):
 
     if len(message.command) < 2:
         return await message.reply_text("**𝑊𝑎𝑖𝑡 𝙶𝚒𝚟𝚎 𝙼𝚎 𝚂𝚘𝚗𝚐 𝙻𝚒𝚗𝚔 𝙾𝚛 𝚁𝚎𝚙𝚕𝚢 𝚃𝚘 𝚅𝚘𝚒𝚌𝚎 𝙽𝚘𝚝𝚎**")
-    
+
     admins = [admin.user.id async for admin in app.get_chat_members(chat_id, filter=ChatMembersFilter.ADMINISTRATORS)]
 
     if message.from_user.id not in SUDOERS and message.from_user.id not in admins:
