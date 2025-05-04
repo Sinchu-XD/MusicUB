@@ -9,7 +9,7 @@ audio_file = "http://docs.evostream.com/sample_content/assets/sintel1m720p.mp4"
 
 async def start_call():
     try:
-        await call.start(chat_id)
+        await call.start()
         print(f"Call started for chat_id: {chat_id}")
     except Exception as e:
         print(f"Error starting call: {e}")
