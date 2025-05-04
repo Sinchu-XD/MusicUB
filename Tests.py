@@ -6,9 +6,18 @@ from pytgcalls.types import MediaStream, VideoQuality, AudioQuality
 chat_id = "-1002523755325"
 audio_file = "http://docs.evostream.com/sample_content/assets/sintel1m720p.mp4"
 
-# Functions
+
+async def start_call():
+    try:
+        await call.start(chat_id)
+        print(f"Call started for chat_id: {chat_id}")
+    except Exception as e:
+        print(f"Error starting call: {e}")
+
 async def play_audio():
     try:
+        await start_call()
+
         result, error = await playAudio(chat_id, audio_file)
         if result:
             print("Audio playing successfully!")
