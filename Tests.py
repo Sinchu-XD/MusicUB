@@ -18,5 +18,4 @@ async def play_audio():
         print(f"Error during audio playback: {e}")
 
 if __name__ == "__main__":
-    await call.start()
     asyncio.run(play_audio())
