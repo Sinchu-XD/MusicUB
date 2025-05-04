@@ -139,7 +139,7 @@ else:
         return
             
 
-@app.on_message((filters.command(PLAYFORCE_COMMAND, [PREFIX, RPREFIX])) & filters.group)
+@app.on_message((filters.command(PLAYFORCE_COMMAND, [PREFIX, RPREFIX])) & filters.group
 async def playforce(_, message):
     start_time = time.time()
     chat_id = message.chat.id
