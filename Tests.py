@@ -16,3 +16,6 @@ async def play_audio():
             print(f"Failed to play audio: {error}")
     except Exception as e:
         print(f"Error during audio playback: {e}")
+
+if __name__ == "__main__":
+    asyncio.run(main())
