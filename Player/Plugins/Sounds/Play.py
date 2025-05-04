@@ -33,7 +33,7 @@ async def processReplyToMessage(message):
         return audio_original, m
     return None, None
 
-@app.on_message((filters.command(PLAY_COMMAND, [PREFIX, RPREFIX])) & filters.group)
+@app.on_message((filters.command(PLAY_COMMAND, [PREFIX, RPREFIX])) & filters.group
 async def _aPlay(_, message):
     start_time = time.time()
     chat_id = message.chat.id
