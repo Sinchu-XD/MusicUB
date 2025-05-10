@@ -5,7 +5,8 @@ Copyright ©️ 2025
 
 from Player import app, call, seek_chats
 from Player.Core import Userbot
-from Player.Utils.YtDetails import SearchYt, ytdl
+import yt_dlp
+from YouTubeMusic.Search import Search
 from Player.Utils.Queue import QUEUE, add_to_queue
 from Player.Utils.Delete import delete_messages
 from Player.Misc import SUDOERS
@@ -21,6 +22,52 @@ PLAY_COMMAND = ["V", "VPLAY"]
 PLAYFORCE_COMMAND = ["VPFORCE", "VPLAYFORCE"]
 PREFIX = config.PREFIX
 RPREFIX = config.RPREFIX
+
+async def SearchYt(query: str):
+    results = Search(query, limit=1)
+
+    if not results:
+        raise Exception("No results found.")
+
+    search_data = []
+    for item in results:
+        search_data.append({
+            "title": item["title"],
+            "artist": item["artist_name"],
+            "channel": item["channel_name"],
+            "duration": item["duration"],
+            "views": item["views"],
+            "thumbnail": item["thumbnail"],
+            "url": item["url"]
+        })
+
+    stream_url = results[0]["url"]
+    
+    return search_data, stream_url
+
+async def ytdl(format: str, url: str):
+
+    ydl_opts = {
+        'format': format,
+        'geo_bypass': True,
+        'noplaylist': True,
+        'quiet': True,
+        'cookiefile': COOKIES_FILE,
+        'nocheckcertificate': True,
+        'force_generic_extractor': True,
+        'extractor_retries': 3,
+        'outtmpl': cached_path,
+    }
+
+    try:
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            info_dict = ydl.extract_info(url, download=False)
+            logging.info(f"Downloaded file: {cached_path}")
+            return (1, cached_path)
+    except Exception as e:
+        logging.error(f"Error during download: {e}")
+        return (0, str(e))
+
 
 def clean_filename(name: str) -> str:
     return re.sub(r'[<>:"/\\|?*]', '', name).strip().replace(' ', '_')
