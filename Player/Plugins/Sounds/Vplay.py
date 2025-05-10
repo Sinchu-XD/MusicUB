@@ -43,9 +43,11 @@ async def ytdl(format: str, url: str):
 
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            info_dict = ydl.extract_info(url, download=False)
-            logging.info(f"Extracted info: {info_dict}")
-            return (1, cached_path)
+            info = ydl.extract_info(url, download=False)
+            if 'url' in info:
+                return (1, info['url'])
+            else:
+                return (0, "No URL found")
     except Exception as e:
         logging.error(f"Error during download: {e}")
         return (0, str(e))
