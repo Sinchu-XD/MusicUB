@@ -23,7 +23,6 @@ PLAYFORCE_COMMAND = ["VPFORCE", "VPLAYFORCE"]
 PREFIX = config.PREFIX
 RPREFIX = config.RPREFIX
 COOKIES_FILE = "cookies/cookies.txt"
-cached_path = config.CACHED_PATH  # Ensure you have this path defined in your config
 
 # Configure logging for better debugging
 logging.basicConfig(level=logging.INFO)
