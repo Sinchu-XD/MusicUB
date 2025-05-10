@@ -3,6 +3,7 @@ Telegram @Itz_Your_4Bhi
 Copyright ©️ 2025
 """
 
+import logging
 from Player import app, call, seek_chats
 from Player.Core import Userbot
 import yt_dlp
@@ -13,7 +14,6 @@ from Player.Misc import SUDOERS
 from pyrogram import filters
 import os
 import re
-import glob
 import asyncio
 import time
 import config
@@ -22,6 +22,11 @@ PLAY_COMMAND = ["V", "VPLAY"]
 PLAYFORCE_COMMAND = ["VPFORCE", "VPLAYFORCE"]
 PREFIX = config.PREFIX
 RPREFIX = config.RPREFIX
+COOKIES_FILE = "cookies/cookies.txt"
+cached_path = config.CACHED_PATH  # Ensure you have this path defined in your config
+
+# Configure logging for better debugging
+logging.basicConfig(level=logging.INFO)
 
 async def SearchYt(query: str):
     results = Search(query, limit=1)
@@ -56,13 +61,12 @@ async def ytdl(format: str, url: str):
         'nocheckcertificate': True,
         'force_generic_extractor': True,
         'extractor_retries': 3,
-        'outtmpl': cached_path,
     }
 
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info_dict = ydl.extract_info(url, download=False)
-            logging.info(f"Downloaded file: {cached_path}")
+            logging.info(f"Extracted info: {info_dict}")
             return (1, cached_path)
     except Exception as e:
         logging.error(f"Error during download: {e}")
@@ -185,57 +189,3 @@ async def _aPlay(_, message):
         disable_web_page_preview=True,
     )
     return asyncio.create_task(delete_messages(message, m))
-
-
-@app.on_message((filters.command(PLAYFORCE_COMMAND, [PREFIX, RPREFIX])) & filters.group)
-async def playforce(_, message):
-    start_time = time.time()
-    chat_id = message.chat.id
-    mention = message.from_user.mention
-
-    seek_chats.pop(chat_id, None)
-
-    if len(message.text.split(maxsplit=1)) < 2:
-        return await message.reply_text("**𝑊𝑎𝑖𝑡 𝙶𝚒𝚟𝚎 𝙼𝚎 𝚂𝚘𝚗𝚐 𝙻𝚒𝚗𝚔 𝙾𝚛 𝚁𝚎𝚙𝚕𝚢 𝚃𝚘 𝚅𝚘𝚒𝚌𝚎 𝙽𝚘𝚝𝚎**")
-
-    query = message.text.split(maxsplit=1)[1]
-    m = await message.reply_text("**Force Playing Your Song...**")
-
-    try:
-        search_results, stream_url = await SearchYt(query)
-        if not search_results:
-            return await m.edit("No results found.")
-    except Exception as e:
-        return await m.edit(f"Error while searching: <code>{e}</code>")
-
-    await m.edit("**Fetching Song Details...**")
-
-    try:
-        status, songlink = await ytdl("best[height<=?720][width<=?1280]", stream_url)
-        duration = search_results[0]['duration']
-    except Exception as e:
-        return await m.edit(f"Error while downloading: <code>{e}</code>")
-
-    if not status or not songlink:
-        return await m.edit("❌ yt-dl issues detected.\n\n» No valid song link found.")
-
-    QUEUE[chat_id] = [(search_results[0]['title'], message.from_user.id, songlink)]
-    seek_chats.pop(chat_id, None)
-
-    Status, Text = await Userbot.playVideo(chat_id, songlink)
-    if not Status:
-        return await m.edit(Text)
-
-    total_time = f"{int(time.time() - start_time)} **Seconds**"
-    await m.edit(
-        f"**𝑆𝑜𝑛𝑔 𝐹𝑜𝑟𝑐𝑒 𝑃𝑙𝑎𝑦𝑒𝑑 𝑎𝑡 ν𝑐**\n\n"
-        f"**SongName :** [{search_results[0]['title'][:19]}]({stream_url})\n"
-        f"**Duration :** {duration} **Minutes**\n"
-        f"**Channel :** {search_results[0]['channel']}\n"
-        f"**Views :** {search_results[0]['views']}\n"
-        f"**Requested By :** {mention}\n\n"
-        f"**Response Time :** {total_time}",
-        disable_web_page_preview=True,
-    )
-    return asyncio.create_task(delete_messages(message, m))
-    
