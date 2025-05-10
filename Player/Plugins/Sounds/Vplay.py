@@ -59,17 +59,29 @@ def clean_filename(name: str) -> str:
 async def processReplyToMessage(message):
     msg = message.reply_to_message
     if msg and (msg.video or msg.video_note):
-        m = await message.reply_text("Rukja... Tera video download kar raha hu...")
+        m = await message.reply("⬇️ Downloading... Please wait.")
 
-        file_name = getattr(msg.video, "file_name", None) or "video.mp4"
+        # Use msg.video or msg.video_note generically
+        media = msg.video or msg.video_note
+
+        # Fastest filename handling
+        file_name = getattr(media, "file_name", None) or f"{media.file_unique_id}.mp4"
         safe_file_name = clean_filename(file_name)
+        file_path = f"downloads/{safe_file_name}"
+
         try:
-            video_original = await msg.download(file_name=f"downloads/{safe_file_name}")
+            # Use high buffer size and minimal overhead
+            video_original = await msg.download(
+                file_name=file_path,
+                block=True,         # Wait until complete (better control)
+                progress_timeout=0  # No progress overhead
+            )
             return video_original, m
         except Exception as e:
-            await m.edit(f"❌ Download failed: `{e}`")
+            await m.edit(f"❌ Download failed:\n`{e}`")
             return None, m
     return None, None
+
 
 @app.on_message((filters.command(PLAY_COMMAND, [PREFIX, RPREFIX])) & filters.group)
 async def _aPlay(_, message):
