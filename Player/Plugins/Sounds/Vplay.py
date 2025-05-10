@@ -7,7 +7,7 @@ import logging
 from Player import app, call, seek_chats
 from Player.Core import Userbot
 import yt_dlp
-from YouTubeMusic.Search import Search
+from Player.Utils.YtDetails import SearchYt
 from Player.Utils.Queue import QUEUE, add_to_queue
 from Player.Utils.Delete import delete_messages
 from Player.Misc import SUDOERS
@@ -27,27 +27,6 @@ COOKIES_FILE = "cookies/cookies.txt"
 # Configure logging for better debugging
 logging.basicConfig(level=logging.INFO)
 
-async def SearchYt(query: str):
-    results = Search(query, limit=1)
-
-    if not results:
-        raise Exception("No results found.")
-
-    search_data = []
-    for item in results:
-        search_data.append({
-            "title": item["title"],
-            "artist": item["artist_name"],
-            "channel": item["channel_name"],
-            "duration": item["duration"],
-            "views": item["views"],
-            "thumbnail": item["thumbnail"],
-            "url": item["url"]
-        })
-
-    stream_url = results[0]["url"]
-    
-    return search_data, stream_url
 
 async def ytdl(format: str, url: str):
 
