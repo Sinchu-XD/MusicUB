@@ -90,6 +90,30 @@ def progress_bar(current, total, message: Message, start_time):
     except:
         pass
 
+async def processReplyToMessage(message: Message):
+    msg = message.reply_to_message
+    if msg and (msg.video or msg.video_note):
+        m = await message.reply("⬇️ Starting download...")
+        media = msg.video or msg.video_note
+
+        file_name = getattr(media, "file_name", None) or f"{media.file_unique_id}.mp4"
+        safe_file_name = clean_filename(file_name)
+        file_path = f"downloads/{safe_file_name}"
+        start_time = time.time()
+
+        try:
+            await app.send_chat_action(message.chat.id, ChatAction.UPLOAD_VIDEO)
+            video_original = await msg.download(
+                file_name=file_path,
+                progress=progress_bar,
+                progress_args=(m, start_time)
+            )
+            return video_original, m
+        except Exception as e:
+            await m.edit(f"❌ Download failed:\n`{e}`")
+            return None, m
+    return None, None
+
 
 @app.on_message((filters.command(PLAY_COMMAND, [PREFIX, RPREFIX])) & filters.group)
 async def _aPlay(_, message):
