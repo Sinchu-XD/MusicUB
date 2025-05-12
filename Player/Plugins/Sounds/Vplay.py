@@ -56,31 +56,38 @@ async def ytdl(format: str, url: str):
 def clean_filename(name: str) -> str:
     return re.sub(r'[<>:"/\\|?*]', '', name).strip().replace(' ', '_')
 
-async def processReplyToMessage(message):
-    msg = message.reply_to_message
-    if msg and (msg.video or msg.video_note):
-        m = await message.reply("⬇️ Downloading... Please wait.")
+last_update = {}
 
-        # Use msg.video or msg.video_note generically
-        media = msg.video or msg.video_note
+def progress_bar(current, total, message: Message, start_time):
+    now = time.time()
+    msg_id = message.chat.id
 
-        # Fastest filename handling
-        file_name = getattr(media, "file_name", None) or f"{media.file_unique_id}.mp4"
-        safe_file_name = clean_filename(file_name)
-        file_path = f"downloads/{safe_file_name}"
+    # Throttle updates to once every 3 seconds or 5% change
+    if msg_id in last_update:
+        last_time, last_percent = last_update[msg_id]
+        percent = int((current / total) * 100)
+        if now - last_time < 3 and abs(percent - last_percent) < 5:
+            return  # Skip update
 
-        try:
-            # Use high buffer size and minimal overhead
-            video_original = await msg.download(
-                file_name=file_path,
-                block=True,         # Wait until complete (better control)
-                progress_timeout=0  # No progress overhead
-            )
-            return video_original, m
-        except Exception as e:
-            await m.edit(f"❌ Download failed:\n`{e}`")
-            return None, m
-    return None, None
+    last_update[msg_id] = (now, int((current / total) * 100))
+
+    done = int(20 * current / total)
+    bar = f"[{'█' * done}{'░' * (20 - done)}]"
+    percent = (current / total) * 100
+    speed = current / (now - start_time + 1)
+    eta = (total - current) / speed if speed > 0 else 0
+
+    text = (
+        f"📥 Downloading...\n"
+        f"{bar} {percent:.1f}%\n"
+        f"**{current // (1024 * 1024)}MB / {total // (1024 * 1024)}MB**\n"
+        f"ETA: `{int(eta)}s`"
+    )
+
+    try:
+        asyncio.create_task(message.edit(text))
+    except:
+        pass
 
 
 @app.on_message((filters.command(PLAY_COMMAND, [PREFIX, RPREFIX])) & filters.group)
