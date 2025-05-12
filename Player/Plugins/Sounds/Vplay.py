@@ -7,6 +7,7 @@ import logging
 from Player import app, call, seek_chats
 from Player.Core import Userbot
 import yt_dlp
+from pyrogram.enums import ChatAction
 from pyrogram.types import Message
 from Player.Utils.YtDetails import SearchYt
 from Player.Utils.Queue import QUEUE, add_to_queue
