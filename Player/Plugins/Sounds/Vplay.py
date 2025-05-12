@@ -1,8 +1,3 @@
-"""
-Telegram @Itz_Your_4Bhi
-Copyright ©️ 2025
-"""
-
 import logging
 from Player import app, call, seek_chats
 from Player.Core import Userbot
@@ -31,7 +26,6 @@ logging.basicConfig(level=logging.INFO)
 
 
 async def ytdl(format: str, url: str):
-
     ydl_opts = {
         'format': format,
         'geo_bypass': True,
@@ -57,6 +51,7 @@ async def ytdl(format: str, url: str):
 
 def clean_filename(name: str) -> str:
     return re.sub(r'[<>:"/\\|?*]', '', name).strip().replace(' ', '_')
+
 
 last_update = {}
 
@@ -88,7 +83,8 @@ def progress_bar(current, total, message: Message, start_time):
 
     try:
         asyncio.create_task(message.edit(text))
-    except:
+    except Exception as e:
+        logging.error(f"Error updating progress: {e}")
         pass
 
 async def processReplyToMessage(message: Message):
@@ -214,3 +210,4 @@ async def _aPlay(_, message):
         disable_web_page_preview=True,
     )
     return asyncio.create_task(delete_messages(message, m))
+    
