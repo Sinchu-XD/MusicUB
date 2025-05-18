@@ -35,8 +35,7 @@ async def processReplyToMessage(message):
     return None, None
 
 
-@app.on_message((filters.command(PLAY_COMMAND, [PREFIX, RPREFIX])) & filters.group)
-@spam_check
+@app.on_message((filters.command(PLAY_COMMAND, [PREFIX, RPREFIX])) & filters.group & spam_check())
 async def _aPlay(_, message):
     start_time = time.time()
     chat_id = message.chat.id
