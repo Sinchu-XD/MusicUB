@@ -2,7 +2,7 @@ import time
 from pyrogram import filters
 from pyrogram.types import Message
 from Player import app
-
+from Player.Utils.Delete import delete_messages
 
 COMMAND_COOLDOWN = 3
 user_last_command = {}
@@ -28,11 +28,12 @@ async def check_spam(_, __, message: Message):
 async def enable_spam_protection(_, message: Message):
     chat_id = message.chat.id
     enabled_chats.add(chat_id)
-    await message.reply_text("✅ Spam protection has been enabled in this group.")
+    m = await message.reply_text("✅ Spam protection has been enabled in this group.")
+    asyncio.create_task(delete_messages(message, m))
 
 @app.on_message(filters.command("spam_off") & filters.group)
 async def disable_spam_protection(_, message: Message):
     chat_id = message.chat.id
     enabled_chats.discard(chat_id)
-    await message.reply_text("❎ Spam protection has been disabled in this group.")
-  
+    m = await message.reply_text("❎ Spam protection has been disabled in this group.")
+    asyncio.create_task(delete_messages(message, m))
