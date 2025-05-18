@@ -82,14 +82,12 @@ async def _queue(_, message):
     chat_id = message.chat.id
     if chat_id in QUEUE and len(get_queue(chat_id)) > 1:
         queue = get_queue(chat_id)
+        print(queue)
         output = "**🎵 Queue:**\n"
         for i, item in enumerate(queue):
             title = item[1][0]
-            print(title)
             duration = item[1][3]
-            print(duration)
             link = item[3]
-            print(link)
             output += f"{i + 1}. [{title}]({link}) - {duration}\n"
         await message.reply_text(output, disable_web_page_preview=True)
     else:
