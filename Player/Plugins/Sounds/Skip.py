@@ -81,13 +81,13 @@ async def skip_song(_, message):
 async def _queue(_, message):
     chat_id = message.chat.id
     if chat_id in QUEUE and len(get_queue(chat_id)) > 1:
-        queue = get_queue(chat_id)[1:]
+        queue = get_queue(chat_id)
         print(queue)
         output = "**🎵 Queue:**\n"
         for i, item in enumerate(queue):
-            title = item[0]
-            duration = item[3]
-            link = item[6]
+            title = item[1][0]
+            duration = item[1][3]
+            link = item[3]
             output += f"{i + 1}. [{title}]({link}) - {duration}\n"
         await message.reply_text(output, disable_web_page_preview=True)
     else:
