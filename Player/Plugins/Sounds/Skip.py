@@ -84,9 +84,9 @@ async def _queue(_, message):
         queue = get_queue(chat_id)[1:]
         output = "**🎵 Queue:**\n"
         for i, item in enumerate(queue):
-            title = item[1]
-            duration = item[2]
-            link = item[3]
+            title = item[0]
+            duration = item[3]
+            link = item[6]
             output += f"{i + 1}. [{title}]({link}) - {duration}\n"
         await message.reply_text(output, disable_web_page_preview=True)
     else:
