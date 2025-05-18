@@ -154,7 +154,7 @@ async def playforce(_, message):
     except Exception as e:
         return await m.edit(f"Error while searching: <code>{e}</code>")
 
-    await m.edit("**Fetching Song Details...**")
+    await m.edit("**ᴘʟᴀʏɪɴɢ ꜰᴏʀᴄᴇꜰᴜʟʟʏ 🌟...**")
 
     try:
         result = await ytdl("bestaudio", stream_url)
