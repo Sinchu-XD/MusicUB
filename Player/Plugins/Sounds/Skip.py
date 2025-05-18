@@ -80,18 +80,33 @@ async def skip_song(_, message):
 @app.on_message(filters.command("queue", [PREFIX, RPREFIX]) & filters.group)
 async def _queue(_, message):
     chat_id = message.chat.id
-    if chat_id in QUEUE and len(get_queue(chat_id)) > 1:
-        queue = get_queue(chat_id)
-        print(queue)
-        output = "**🎵 Queue:**\n"
-        for i, item in enumerate(queue):
-            title = item[1][0]
-            duration = item[1][3]
-            link = item[3]
-            output += f"{i + 1}. [{title}]({link}) - {duration}\n"
-        await message.reply_text(output, disable_web_page_preview=True)
-    else:
-        await message.reply_text("⚠️ Queue is empty!")
+    queue = get_queue(chat_id)
+
+    if not queue:
+        return await message.reply_text("📭 **No songs in queue.**")
+
+    output = "**🎶 Now Playing:**\n"
+
+    # Now Playing (first song)
+    try:
+        current = queue[0]
+        meta = current[1][0]
+        output += f"▶️ [{meta['title']}]({meta['url']}) - {meta['duration']}\n"
+    except Exception as e:
+        output += f"▶️ Error parsing current song: {e}\n"
+
+    # Up Next (rest of the queue)
+    if len(queue) > 1:
+        output += "\n**📜 Up Next:**\n"
+        for i, item in enumerate(queue[1:], start=1):
+            try:
+                meta = item[1][0]
+                output += f"{i}. [{meta['title']}]({meta['url']}) - {meta['duration']}\n"
+            except Exception as e:
+                output += f"{i}. ❌ Error: {e}\n"
+
+    await message.reply_text(output, disable_web_page_preview=True)
+
 
 
 async def stop(chat_id):
