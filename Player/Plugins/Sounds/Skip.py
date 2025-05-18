@@ -82,6 +82,7 @@ async def _queue(_, message):
     chat_id = message.chat.id
     if chat_id in QUEUE and len(get_queue(chat_id)) > 1:
         queue = get_queue(chat_id)[1:]
+        print(queue)
         output = "**🎵 Queue:**\n"
         for i, item in enumerate(queue):
             title = item[0]
