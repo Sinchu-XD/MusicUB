@@ -100,14 +100,12 @@ async def processReplyToMessage(message: Message):
 
         try:
             await app.send_chat_action(message.chat.id, ChatAction.UPLOAD_VIDEO)
-            video_original = await msg.download(
-                file_name=file_path,
-                progress=progress_bar,
-                progress_args=(m, start_time)
-            )
+            video_original = await msg.download(file_name=file_path)
+            await m.reply("✅ Download complete!")
             return video_original, m
         except Exception as e:
-            await m.edit(f"❌ Download failed:\n`{e}`")
+            logging.error(f"Download failed: {e}")
+            await m.reply(f"❌ Download failed:\n`{e}`")
             return None, m
     return None, None
 
