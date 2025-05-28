@@ -119,39 +119,44 @@ async def _aPlay(_, message):
     if chat_id in seek_chats:
         seek_chats.pop(chat_id)
 
+    # Handle replied video or video_note
     if message.reply_to_message and (message.reply_to_message.video or message.reply_to_message.video_note):
         input_filename, m = await processReplyToMessage(message)
         if not input_filename:
             return
 
-        await m.edit("Rukja...Tera Video Play kar raha hu...")
-        Status, Text = await Userbot.playVideo(chat_id, input_filename)
-        if not Status:
-            return await m.edit(Text)
-
         video = message.reply_to_message.video or message.reply_to_message.video_note
         video_title = message.reply_to_message.text or "Unknown"
-        await message.delete()
 
         if chat_id in QUEUE:
             queue_num = add_to_queue(
                 chat_id,
                 video_title[:19],
                 video.duration,
-                video.file_id,
+                input_filename,
                 message.reply_to_message.link,
             )
             await m.edit(f"# {queue_num}\n{video_title[:19]}\nTera video queue me daal diya hu")
-        else:
-            finish_time = time.time()
-            total_time_taken = str(int(finish_time - start_time)) + "s"
-            await m.edit(
-                f"Tera video play kar rha hu aaja vc\n\n"
-                f"VideoName:- [{video_title[:19]}]({message.reply_to_message.link})\n"
-                f"Duration:- {video.duration}\n"
-                f"Time taken to play:- {total_time_taken}",
-                disable_web_page_preview=True,
-            )
+            return asyncio.create_task(delete_messages(message, m))
+
+        await m.edit("Rukja...Tera Video Play kar raha hu...")
+
+        Status, Text = await Userbot.playVideo(chat_id, input_filename)
+        if not Status:
+            return await m.edit(Text)
+
+        finish_time = time.time()
+        total_time_taken = str(int(finish_time - start_time)) + "s"
+        await message.delete()
+
+        await m.edit(
+            f"Tera video play kar rha hu aaja vc\n\n"
+            f"VideoName:- [{video_title[:19]}]({message.reply_to_message.link})\n"
+            f"Duration:- {video.duration}\n"
+            f"Time taken to play:- {total_time_taken}",
+            disable_web_page_preview=True,
+        )
+        add_to_queue(chat_id, video_title[:19], video.duration, input_filename, message.reply_to_message.link)
         return asyncio.create_task(delete_messages(message, m))
 
     # Check if query was provided
