@@ -1,4 +1,4 @@
-import asyncio
+"""import asyncio
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
 
@@ -47,3 +47,4 @@ async def test_spotify():
 
 if __name__ == "__main__":
     asyncio.run(test_spotify())
+"""
