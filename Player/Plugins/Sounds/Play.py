@@ -5,7 +5,7 @@ Copyright ©️ 2025
 from Player import app, call, seek_chats
 from Player.Core import Userbot
 from Player.Utils.YtDetails import SearchYt, ytdl
-from Player.Utils.Spotify import spotify_search
+#from Player.Utils.Spotify import spotify_search
 from Player.Plugins.Start.Spam import spam_check
 from Player.Utils.Queue import QUEUE, add_to_queue
 from Player.Utils.Delete import delete_messages
