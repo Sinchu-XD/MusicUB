@@ -15,7 +15,7 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 
 
 async def SearchYt(query: str):
-    results = await Search(query, limit=1)
+    results = Search(query, limit=1)
 
     if not results:
         raise Exception("No results found.")
