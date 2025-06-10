@@ -90,14 +90,15 @@ async def _aPlay(_, message):
     if chat_id in QUEUE:
         queue_num = add_to_queue(chat_id, search_results, songlink, stream_url)
         await m.edit(
-            f"# {queue_num} ʏᴏᴜʀ ꜱᴏɴɢ ᴀᴅᴅᴇᴅ ɪɴ Qᴜᴇᴜᴇ\n\n"
-            f"**SongName :** [{title[:19]}]({stream_url})\n"
-            f"**Duration :** {search_results[0]['duration']} Minutes\n"
-            f"**Channel :** {search_results[0]['channel']}\n"
-            f"**Views :** {search_results[0]['views']}\n"
-            f"**Requested By :** {mention}",
-            disable_web_page_preview=True,
-        )
+                f"**#{queue_num} ʏᴏᴜʀ ꜱᴏɴɢ ᴀᴅᴅᴇᴅ ɪɴ Qᴜᴇᴜᴇ\n\nᴘʟᴇᴀꜱᴇ ᴡᴀɪᴛ 😵‍💫**\n\n"
+                f"**SongName :** [{search_results[0]['title'][:19]}]({stream_url})\n"
+                f"**Duration :** {search_results[0]['duration']} **Minutes**\n"
+                f"**Channel :** {search_results[0]['channel']}\n"
+                f"**Views :** {search_results[0]['views']}\n"
+                f"**Requested By :** {mention}\n\n"
+                f"**Response Time :** {total_time}",
+                disable_web_page_preview=True,
+            )
         return asyncio.create_task(delete_messages(message, m))
 
     Status, Text = await Userbot.playAudio(chat_id, songlink)
