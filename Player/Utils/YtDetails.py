@@ -4,6 +4,8 @@ import logging
 import yt_dlp
 import asyncio
 from YouTubeMusic.Search import Search
+from YouTubeMusic.Stream import get_audio_url
+
 
 COOKIES_FILE = "cookies/cookies.txt"
 CACHE_DIR = 'cached_songs'
