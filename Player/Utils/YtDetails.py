@@ -59,7 +59,7 @@ async def ytdl(url: str):
     logging.info(f"[CACHE MISS] Fetching URL via get_audio_url()")
 
     try:
-        stream_url = await get_audio_url(url, "cookies/cookies.txt")
+        stream_url = get_audio_url(url, "cookies/cookies.txt")
         if not stream_url:
             return (0, "Failed to get audio stream URL")
 
