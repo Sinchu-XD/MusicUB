@@ -82,7 +82,7 @@ async def _aPlay(_, message):
 
     await m.edit("**ᴡᴀɪᴛ ɴᴀ ʏʀʀʀ\n\nꜱᴇᴀʀᴄʜɪɴɢ ʏᴏᴜʀ ꜱᴏɴɢ 🌚❤️..**")
 
-    status, songlink = ytdl(stream_url)
+    status, songlink = await ytdl(stream_url)
     if not songlink:
         return await m.edit("❌ Failed to extract stream URL.")
 
@@ -141,7 +141,7 @@ async def playforce(_, message):
     except Exception as e:
         return await m.edit(f"Error while searching: <code>{e}</code>")
 
-    status, songlink = ytdl(stream_url)
+    status, songlink = await ytdl(stream_url)
     if not songlink:
         return await m.edit("❌ Failed to extract audio stream URL.")
 
