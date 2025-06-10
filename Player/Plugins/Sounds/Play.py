@@ -87,6 +87,7 @@ async def _aPlay(_, message):
         return await m.edit("❌ Failed to extract stream URL.")
 
     title = search_results[0]['title']
+    total_time = f"{int(time.time() - start_time)} **Seconds**"
     if chat_id in QUEUE:
         queue_num = add_to_queue(chat_id, search_results, songlink, stream_url)
         await m.edit(
