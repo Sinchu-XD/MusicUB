@@ -15,26 +15,27 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 
 
 async def SearchYt(query: str):
-    results = Search(query, limit=1)
+    results = await Search(query, limit=1)
 
-    if not results:
+    if not results or not results.get("main_results"):
         raise Exception("No results found.")
 
-    search_data = []
-    for item in results:
-        search_data.append({
-            "title": item["title"],
-            "artist": item["artist_name"],
-            "channel": item["channel_name"],
-            "duration": item["duration"],
-            "views": item["views"],
-            "thumbnail": item["thumbnail"],
-            "url": item["url"]
-        })
+    item = results["main_results"][0] 
 
-    stream_url = results[0]["url"]
-    
+    search_data = [{
+        "title": item.get("title"),
+        "artist": item.get("artist_name"),
+        "channel": item.get("channel_name"),
+        "duration": item.get("duration"),
+        "views": item.get("views"),
+        "thumbnail": item.get("thumbnail"),
+        "url": item.get("url")
+    }]
+
+    stream_url = item["url"] 
+
     return search_data, stream_url
+
 
 async def ytdl(format: str, url: str):
     hashed = hashlib.md5(url.encode()).hexdigest()
