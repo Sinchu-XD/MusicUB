@@ -37,36 +37,45 @@ async def SearchYt(query: str):
     return search_data, stream_url
 
 
-async def ytdl(format: str, url: str):
+import os
+import hashlib
+import aiohttp
+import logging
+from YouTubeMusic.Stream import get_audio_url
+
+CACHE_DIR = "downloads"
+os.makedirs(CACHE_DIR, exist_ok=True)
+
+async def ytdl(url: str):
     hashed = hashlib.md5(url.encode()).hexdigest()
     cached_path = os.path.join(CACHE_DIR, f"{hashed}.webm")
 
     if os.path.exists(cached_path):
-        logging.info(f"Cache hit for URL: {url}")
+        logging.info(f"[CACHE HIT] {url}")
         return (1, cached_path)
 
-    logging.info(f"Cache miss for URL: {url} - Downloading...")
-
-    ydl_opts = {
-        'format': format,
-        'geo_bypass': True,
-        'noplaylist': True,
-        'quiet': True,
-        'cookiefile': COOKIES_FILE,
-        'nocheckcertificate': True,
-        'force_generic_extractor': True,
-        'extractor_retries': 3,
-        'outtmpl': cached_path,
-    }
+    logging.info(f"[CACHE MISS] Fetching URL via get_audio_url()")
 
     try:
-        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            info_dict = ydl.extract_info(url, download=True)
-            logging.info(f"Downloaded file: {cached_path}")
-            return (1, cached_path)
+        stream_url = await get_audio_url(url, "cookies/cookies.txt")
+        if not stream_url:
+            return (0, "Failed to get audio stream URL")
+
+        async with aiohttp.ClientSession() as session:
+            async with session.get(stream_url) as resp:
+                if resp.status != 200:
+                    return (0, f"HTTP error: {resp.status}")
+                with open(cached_path, "wb") as f:
+                    while chunk := await resp.content.read(1024 * 64):
+                        f.write(chunk)
+
+        logging.info(f"[DOWNLOADED] {cached_path}")
+        return (1, cached_path)
+
     except Exception as e:
-        logging.error(f"Error during download: {e}")
+        logging.error(f"[ERROR] {e}")
         return (0, str(e))
+
 
 async def main():
     query = input("Enter song name: ")
