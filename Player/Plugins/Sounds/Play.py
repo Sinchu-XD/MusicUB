@@ -2,22 +2,19 @@
 Telegram @Itz_Your_4Bhi
 Copyright ©️ 2025
 """
+
 from Player import app, call, seek_chats
 from Player.Core import Userbot
-from Player.Utils.YtDetails import SearchYt, ytdl
-#from Player.Utils.Spotify import spotify_search
+from Player.Utils.YtDetails import SearchYt
+from YouTubeMusic.Stream import get_audio_url
 from Player.Plugins.Start.Spam import spam_check
 from Player.Utils.Queue import QUEUE, add_to_queue
 from Player.Utils.Delete import delete_messages
 from pyrogram.enums import ChatMembersFilter
 from Player.Misc import SUDOERS
 from pyrogram import filters
-import os
-import re
-import asyncio
 import time
-import hashlib
-import logging
+import asyncio
 import config
 
 PLAY_COMMAND = ["P", "PLAY", "SP", "SPLAY"]
@@ -40,18 +37,14 @@ async def _aPlay(_, message):
     start_time = time.time()
     chat_id = message.chat.id
     mention = message.from_user.mention
-    command = message.command[0].lower()
     await message.delete()
 
-    if chat_id in seek_chats:
-        del seek_chats[chat_id]
+    seek_chats.pop(chat_id, None)
 
     if message.reply_to_message:
         input_filename, m = await processReplyToMessage(message)
         if input_filename is None:
-            return await message.reply_text(
-                "**𝙶𝚒𝚟𝚎 𝙼𝚎 𝚂𝚘𝚗𝚐 𝙻𝚒𝚗𝚔 𝙾𝚛 𝚁𝚎𝚙𝚕𝚢 𝚃𝚘 𝚅𝚘𝚒𝚌𝚎 𝙽𝚘𝚝𝚎😒**"
-            )
+            return await message.reply_text("**𝙶𝚒𝚟𝚎 𝙼𝚎 𝚂𝚘𝚗𝚐 𝙻𝚒𝚗𝚔 𝙾𝚛 𝚁𝚎𝚙𝚕𝚢 𝚃𝚘 𝚅𝚘𝚒𝚌𝚎 𝙽𝚘𝚝𝚎😒**")
 
         await m.edit("𝑊𝑎𝑖𝑡 𝑁𝑎 𝑌𝑟𝑟𝑟 😒..")
         Status, Text = await Userbot.playAudio(chat_id, input_filename)
@@ -89,43 +82,36 @@ async def _aPlay(_, message):
 
     await m.edit("**ᴡᴀɪᴛ ɴᴀ ʏʀʀʀ\n\nꜱᴇᴀʀᴄʜɪɴɢ ʏᴏᴜʀ ꜱᴏɴɢ 🌚❤️..**")
 
-    status, songlink = await ytdl("bestaudio", stream_url)
-    print(songlink)
-    if not status or not songlink:
-        await m.edit(f"❌ yt-dl issues detected\n\n» No valid song link found.")
-    else:
-        title = search_results[0]['title']
-        chat_id = message.chat.id
-        total_time = f"{int(time.time() - start_time)} **Seconds**"
-        if chat_id in QUEUE:
-            queue_num = add_to_queue(chat_id, search_results, songlink, stream_url)
-            await m.edit(
-                f"# **{queue_num} ʏᴏᴜʀ ꜱᴏɴɢ ᴀᴅᴅᴇᴅ ɪɴ Qᴜᴇᴜᴇ\n\nᴘʟᴇᴀꜱᴇ ᴡᴀɪᴛ 😵‍💫**\n\n"
-                f"**SongName :** [{search_results[0]['title'][:19]}]({stream_url})\n"
-                f"**Duration :** {search_results[0]['duration']} **Minutes**\n"
-                f"**Channel :** {search_results[0]['channel']}\n"
-                f"**Views :** {search_results[0]['views']}\n"
-                f"**Requested By :** {mention}\n\n"
-                f"**Response Time :** {total_time}",
-                disable_web_page_preview=True,
-            )
+    songlink = await get_audio_url(stream_url, "cookies/cookies.txt")
+    if not songlink:
+        return await m.edit("❌ Failed to extract stream URL.")
 
-            asyncio.create_task(delete_messages(message, m))
-            return
-
-        Status, Text = await Userbot.playAudio(chat_id, songlink)
-        if not Status:
-            return await m.edit(Text)
-
-        add_to_queue(chat_id, search_results, songlink, stream_url)
-        total_time = f"{int(time.time() - start_time)} **Seconds**"
+    title = search_results[0]['title']
+    if chat_id in QUEUE:
+        queue_num = add_to_queue(chat_id, search_results, songlink, stream_url)
         await m.edit(
-            f"**ѕσηg ιѕ ρℓαуιηg ιη ν¢**\n\n**SongName :** [{search_results[0]['title'][:19]}]({stream_url})\n"
-            f"**Duration :** {search_results[0]['duration']} **Minutes**\n**Channel :** {search_results[0]['channel']}\n"
-            f"**Views :** {search_results[0]['views']}\n**Requested By :** {mention}\n\n**Response Time :** {total_time}",
+            f"# {queue_num} ʏᴏᴜʀ ꜱᴏɴɢ ᴀᴅᴅᴇᴅ ɪɴ Qᴜᴇᴜᴇ\n\n"
+            f"**SongName :** [{title[:19]}]({stream_url})\n"
+            f"**Duration :** {search_results[0]['duration']} Minutes\n"
+            f"**Channel :** {search_results[0]['channel']}\n"
+            f"**Views :** {search_results[0]['views']}\n"
+            f"**Requested By :** {mention}",
+            disable_web_page_preview=True,
         )
-        asyncio.create_task(delete_messages(message, m))
-        return
+        return asyncio.create_task(delete_messages(message, m))
+
+    Status, Text = await Userbot.playAudio(chat_id, songlink)
+    if not Status:
+        return await m.edit(Text)
+
+    add_to_queue(chat_id, search_results, songlink, stream_url)
+    total_time = f"{int(time.time() - start_time)} **Seconds**"
+    await m.edit(
+        f"**ѕσηg ιѕ ρℓαуιηg ιη ν¢**\n\n**SongName :** [{title[:19]}]({stream_url})\n"
+        f"**Duration :** {search_results[0]['duration']} Minutes\n**Channel :** {search_results[0]['channel']}\n"
+        f"**Views :** {search_results[0]['views']}\n**Requested By :** {mention}\n\n**Response Time :** {total_time}",
+    )
+    return asyncio.create_task(delete_messages(message, m))
 
 
 @app.on_message((filters.command(PLAYFORCE_COMMAND, [PREFIX, RPREFIX])) & filters.group)
@@ -144,6 +130,7 @@ async def playforce(_, message):
 
     if message.from_user.id not in SUDOERS and message.from_user.id not in admins:
         return await message.reply_text("**Only Admins or SUDO Users can use Force Play!**")
+
     m = await message.reply_text("**Force Playing Your Song...**")
     query = message.text.split(maxsplit=1)[1]
 
@@ -154,18 +141,9 @@ async def playforce(_, message):
     except Exception as e:
         return await m.edit(f"Error while searching: <code>{e}</code>")
 
-    await m.edit("**ᴘʟᴀʏɪɴɢ ꜰᴏʀᴄᴇꜰᴜʟʟʏ 🌟...**")
-
-    try:
-        result = await ytdl("bestaudio", stream_url)
-        resp = result[0]
-        songlink = result[1]
-        duration = search_results[0]['duration']
-    except Exception as e:
-        return await m.edit(f"Error while downloading: <code>{e}</code>")
-
-    if resp == 0 or not songlink:
-        return await m.edit("❌ yt-dl issues detected.\n\n» No valid song link found.")
+    songlink = await get_audio_url(stream_url, "cookies/cookies.txt")
+    if not songlink:
+        return await m.edit("❌ Failed to extract audio stream URL.")
 
     QUEUE[chat_id] = [(search_results[0]['title'], message.from_user.id, songlink)]
     seek_chats.pop(chat_id, None)
@@ -178,7 +156,7 @@ async def playforce(_, message):
     await m.edit(
         f"**𝑆𝑜𝑛𝑔 𝐹𝑜𝑟𝑐𝑒 𝑃𝑙𝑎𝑦𝑒𝑑 𝑎𝑡 ν𝑐**\n\n"
         f"**SongName :** [{search_results[0]['title'][:19]}]({stream_url})\n"
-        f"**Duration :** {duration} **Minutes**\n\n"
+        f"**Duration :** {search_results[0]['duration']} Minutes\n"
         f"**Channel :** {search_results[0]['channel']}\n"
         f"**Views :** {search_results[0]['views']}\n"
         f"**Requested By :** {mention}\n\n"
@@ -186,3 +164,4 @@ async def playforce(_, message):
         disable_web_page_preview=True,
     )
     return asyncio.create_task(delete_messages(message, m))
+    
