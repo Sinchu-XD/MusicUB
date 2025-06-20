@@ -129,13 +129,8 @@ async def _aPlay(_, message):
         video_title = message.reply_to_message.text or "Unknown"
 
         if chat_id in QUEUE:
-            queue_num = add_to_queue(
-                chat_id,
-                video_title[:19],
-                video.duration,
-                input_filename,
-                message.reply_to_message.link,
-            )
+            queue_num = add_to_queue(chat_id, video_title[:19], video.duration, input_filename)
+
             await m.edit(f"# {queue_num}\n{video_title[:19]}\nTera video queue me daal diya hu")
             return asyncio.create_task(delete_messages(message, m))
 
@@ -156,7 +151,8 @@ async def _aPlay(_, message):
             f"Time taken to play:- {total_time_taken}",
             disable_web_page_preview=True,
         )
-        add_to_queue(chat_id, video_title[:19], video.duration, input_filename, message.reply_to_message.link)
+        add_to_queue(chat_id, video_title[:19], video.duration, input_filename)
+
         return asyncio.create_task(delete_messages(message, m))
 
     # Check if query was provided
