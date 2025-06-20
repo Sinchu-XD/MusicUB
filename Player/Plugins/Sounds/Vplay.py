@@ -119,7 +119,7 @@ async def _aPlay(_, message):
     if chat_id in seek_chats:
         seek_chats.pop(chat_id)
 
-    # Handle replied video or video_note
+    # 💥 Handle Direct Telegram Video (Always Force Play)
     if message.reply_to_message and (message.reply_to_message.video or message.reply_to_message.video_note):
         input_filename, m = await processReplyToMessage(message)
         if not input_filename:
@@ -128,17 +128,20 @@ async def _aPlay(_, message):
         video = message.reply_to_message.video or message.reply_to_message.video_note
         video_title = message.reply_to_message.text or "Unknown"
 
-        if chat_id in QUEUE:
-            queue_num = add_to_queue(chat_id, video_title[:19], video.duration, input_filename)
+        await m.edit("Rukja... Tera Video Play kar raha hu...")
 
-            await m.edit(f"# {queue_num}\n{video_title[:19]}\nTera video queue me daal diya hu")
-            return asyncio.create_task(delete_messages(message, m))
-
-        await m.edit("Rukja...Tera Video Play kar raha hu...")
+        try:
+            await Userbot.stopVideo(chat_id)
+        except Exception:
+            pass  # Ignore if nothing was playing
 
         Status, Text = await Userbot.playVideo(chat_id, input_filename)
         if not Status:
             return await m.edit(Text)
+
+        # 💣 Remove any leftover queue after force play
+        from Player.Utils.Queue import clear_queue
+        clear_queue(chat_id)
 
         finish_time = time.time()
         total_time_taken = str(int(finish_time - start_time)) + "s"
@@ -146,15 +149,13 @@ async def _aPlay(_, message):
 
         await m.edit(
             f"Tera video play kar rha hu aaja vc\n\n"
-            f"VideoName:- [{video_title[:19]}]({message.reply_to_message.link})\n"
-            f"Duration:- {video.duration}\n"
+            f"VideoName:- `{video_title[:19]}`\n"
             f"Time taken to play:- {total_time_taken}",
             disable_web_page_preview=True,
         )
-        add_to_queue(chat_id, video_title[:19], video.duration, input_filename)
 
         return asyncio.create_task(delete_messages(message, m))
-
+        
     # Check if query was provided
     if len(message.text.split(maxsplit=1)) < 2:
         return await message.reply_text("❌ Please provide a video name or URL.\n\n**Usage:** `/vplay <video name or link>`")
