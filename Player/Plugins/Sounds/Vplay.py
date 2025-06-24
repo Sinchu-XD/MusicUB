@@ -10,6 +10,7 @@ from Player.Utils.Delete import delete_messages
 from Player.Misc import SUDOERS
 from pyrogram import filters
 import os
+from io import BytesIO
 import re
 import asyncio
 import time
@@ -87,27 +88,38 @@ def progress_bar(current, total, message: Message, start_time):
         logging.error(f"Error updating progress: {e}")
         pass
 
+TEMP_DIR = "temp_video"
+os.makedirs(TEMP_DIR, exist_ok=True)
+
 async def processReplyToMessage(message: Message):
     msg = message.reply_to_message
-    if msg and (msg.video or msg.video_note):
-        m = await message.reply("⬇️ Starting download...")
-        media = msg.video or msg.video_note
+    if not msg or not (msg.video or msg.video_note or msg.document):
+        return None, None
 
-        file_name = getattr(media, "file_name", None) or f"{media.file_unique_id}.mp4"
-        safe_file_name = clean_filename(file_name)
-        file_path = f"downloads/{safe_file_name}"
-        start_time = time.time()
+    media = msg.video or msg.video_note or msg.document
+    file_name = getattr(media, "file_name", None) or f"{media.file_unique_id}.mp4"
+    safe_file_name = clean_filename(file_name)
+    file_path = os.path.join(TEMP_DIR, safe_file_name)
 
-        try:
-            await app.send_chat_action(message.chat.id, ChatAction.UPLOAD_VIDEO)
-            video_original = await msg.download(file_name=file_path)
-            await m.reply("✅ Download complete!")
-            return video_original, m
-        except Exception as e:
-            logging.error(f"Download failed: {e}")
-            await m.reply(f"❌ Download failed:\n`{e}`")
-            return None, m
-    return None, None
+    m = await message.reply("📥 Downloading video into memory...")
+
+    try:
+        await app.send_chat_action(message.chat.id, ChatAction.RECORD_VIDEO)
+
+        # Download video into memory
+        file = await app.download_media(msg, in_memory=True)
+
+        # Save memory buffer to disk for playVideo (if it needs a path)
+        with open(file_path, "wb") as f:
+            f.write(file.read())
+
+        await m.edit("✅ Video downloaded, preparing playback...")
+        return file_path, m
+
+    except Exception as e:
+        logging.error(f"Download failed: {e}")
+        await m.edit(f"❌ Failed to process video:\n`{e}`")
+        return None, m
 
 
 @app.on_message((filters.command(PLAY_COMMAND, [PREFIX, RPREFIX])) & filters.group)
