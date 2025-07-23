@@ -5,6 +5,8 @@ Copyright ©️ 2025
 
 from Player import app, call, seek_chats
 from Player.Core import Userbot
+from Player.Utils.YouTube.Search import Search
+from Player.Utils.YouTube.Ytdl import Ytdl
 from Player.Utils.YtDetails import SearchYt, ytdl
 from YouTubeMusic.Stream import get_audio_url
 from Player.Plugins.Start.Spam import spam_check
