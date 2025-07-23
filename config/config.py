@@ -15,7 +15,7 @@ SESSION_STRING: str = os.getenv("SESSION_STRING", "BQBclYcAZZe_0_YNC3mOH2z2Hnlje
 
 OWNER_ID: list[int] = [int(os.getenv("OWNER_ID", 7862043458))]
 
-MONGO_URL = os.getenv("MONGO_URI", "mongodb+srv://Music:Sinchu@cluster0.afnf5ch.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
+MONGO_URI = os.getenv("MONGO_URI", "mongodb+srv://Music:Sinchu@cluster0.afnf5ch.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
 
 LOG_GROUP_ID: int = int(os.getenv("LOG_GROUP_ID", -1002523755325))
 
