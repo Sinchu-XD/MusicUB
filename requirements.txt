@@ -1,8 +1,9 @@
 pyrofork
-git+https://github.com/pytgcalls/pytgcalls
+py-tgcalls==2.1.1
 youtube-search-python
-yt-dlp==2025.3.25
+yt-dlp
 tgcrypto
 speedtest-cli
 ffprobe
 httpx==0.26.0
+YouTubeMusic
