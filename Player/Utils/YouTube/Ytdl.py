@@ -10,7 +10,7 @@ async def Ytdl(url: str) -> str:
     # Check if stream URL is already cached
     db = await get_cached_stream(url_hash)
     if db and db.get("stream_url"):
-        print("✅ Using cached stream URL")
+        #print("✅ Using cached stream URL")
         return db["stream_url"]
 
     # Otherwise, fetch new stream URL
