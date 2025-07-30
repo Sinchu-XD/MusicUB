@@ -92,12 +92,11 @@ async def handler(client: PyTgCalls, update: Update):
             f"**ѕσηg ιѕ ρℓαуιηg ιη ν¢**\n\n"
             f"**SongName :** [{resp[0][:19]}]({resp[4]})\n"
             f"**Duration :** {resp[1]} **Minutes**\n"
-            f"**Channel :** {resp[2]}\n"
-            f"**Views :** {resp[3]}\n\n"
-            f"**Response Time :** `{total_time}` **Seconds**",
+            f"**Response Time :** `{total_time}` **Seconds**\n\n\n"
+            f"[**Click Here For Make Your Own Music Bot**](https://t.me/NotRealAbhii)",
             disable_web_page_preview=True,
         )
-        await asyncio.sleep(10)
+        await asyncio.sleep(60)
         await m.delete()
 
 
