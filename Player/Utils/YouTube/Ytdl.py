@@ -4,24 +4,19 @@ from YouTubeMusic.Stream import get_audio_url
 
 async def Ytdl(url: str) -> str:
     await ensure_indexes()
-
     url_hash = hashlib.md5(url.encode()).hexdigest()
 
-    # Check if stream URL is already cached
     db = await get_cached_stream(url_hash)
     if db and db.get("stream_url"):
-        #print("✅ Using cached stream URL")
         return db["stream_url"]
 
-    # Otherwise, fetch new stream URL
     stream_url = get_audio_url(url, "cookies/cookies.txt")
     if not stream_url:
-        raise Exception("❌ Failed to get stream URL")
+        raise Exception("Failed to get stream URL")
 
-    # Save to DB (no file path now)
     await add_cached_stream(url_hash, stream_url, url, path=None)
-
     return stream_url
+
     
 """  
 import os
