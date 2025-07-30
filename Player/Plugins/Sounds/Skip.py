@@ -68,8 +68,7 @@ async def skip_song(_, message):
         await m.edit(
             f"**ѕσηg ιѕ ρℓαуιηg ιη ν¢**\n\n**SongName :** [{search_results[0]['title'][:19]}]({stream_url})\n"
             f"**Duration :** {search_results[0]['duration']} **Minutes**\n**Requested By :** {mention}\n\n**Response Time :** {total_time}\n\n\n"
-            f"[**Click Here For Make Your Own Music Bot**](https://t.me/NotRealABhii)"
-            ,
+            f"[**Click Here For Make Your Own Music Bot**](https://t.me/NotRealABhii)",
             disable_web_page_preview=True,
         )
 
