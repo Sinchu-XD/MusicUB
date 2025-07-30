@@ -96,10 +96,9 @@ async def _aPlay(_, message):
             f"**#{queue_num} ʏᴏᴜʀ ꜱᴏɴɢ ᴀᴅᴅᴇᴅ ɪɴ Qᴜᴇᴜᴇ\n\nᴘʟᴇᴀꜱᴇ ᴡᴀɪᴛ 😵‍💫**\n\n"
             f"**SongName :** [{title[:19]}]({stream_url})\n"
             f"**Duration :** {search_results[0]['duration']} **Minutes**\n"
-            f"**Channel :** {search_results[0]['channel']}\n"
-            f"**Views :** {search_results[0]['views']}\n"
             f"**Requested By :** {mention}\n\n"
-            f"**Response Time :** {total_time}",
+            f"**Response Time :** {total_time}\n\n\n"
+            f"[**Click Here For Make Your Own Music Bot**](https://t.me/Itz_Your_4Bhi)",
             disable_web_page_preview=True,
         )
         return asyncio.create_task(delete_messages(message, m))
@@ -112,10 +111,9 @@ async def _aPlay(_, message):
     await m.edit(
         f"**ѕσηg ιѕ ρℓαуιηg ιη ν¢**\n\n**SongName :** [{title[:19]}]({stream_url})\n"
         f"**Duration :** {search_results[0]['duration']} Minutes\n"
-        f"**Channel :** {search_results[0]['channel']}\n"
-        f"**Views :** {search_results[0]['views']}\n"
         f"**Requested By :** {mention}\n\n"
-        f"**Response Time :** {total_time}",
+        f"**Response Time :** {total_time}\n\n\n"
+        f"[**Click Here For Make Your Own Music Bot**](https://t.me/Itz_Your_4Bhi)"'
     )
     return asyncio.create_task(delete_messages(message, m))
 
@@ -164,10 +162,9 @@ async def playforce(_, message):
         f"**𝑆𝑜𝑛𝑔 𝐹𝑜𝑟𝑐𝑒 𝑃𝑙𝑎𝑦𝑒𝑑 𝑎𝑡 ν𝑐**\n\n"
         f"**SongName :** [{search_results[0]['title'][:19]}]({stream_url})\n"
         f"**Duration :** {search_results[0]['duration']} Minutes\n"
-        f"**Channel :** {search_results[0]['channel']}\n"
-        f"**Views :** {search_results[0]['views']}\n"
         f"**Requested By :** {mention}\n\n"
-        f"**Response Time :** {total_time}",
+        f"**Response Time :** {total_time}\n\n\n"
+        f"[**Click Here For Make Your Own Music Bot**](https://t.me/Itz_Your_4Bhi)",
         disable_web_page_preview=True,
     )
     return asyncio.create_task(delete_messages(message, m))
