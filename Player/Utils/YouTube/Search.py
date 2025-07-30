@@ -15,12 +15,15 @@ async def SearchYt(query: str):
         item = res["main_results"][0]
         await add_cached_search(normalized, item)
 
-    return [{
+    search_data = [{
         "title": item.get("title"),
         "artist": item.get("artist_name"),
         "channel": item.get("channel_name"),
         "duration": item.get("duration"),
         "views": item.get("views"),
         "thumbnail": item.get("thumbnail"),
-        "url": item.get("url"),
-    }], item.get("url")
+        "url": item.get("url")
+    }]
+
+    song_link = item["url"]
+    return search_data, song_link
