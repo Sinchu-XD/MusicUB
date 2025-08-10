@@ -93,7 +93,7 @@ async def handler(client: PyTgCalls, update: Update):
             f"**SongName :** [{resp[0][:19]}]({resp[4]})\n"
             f"**Duration :** {resp[1]} **Minutes**\n"
             f"**Response Time :** `{total_time}` **Seconds**\n\n\n"
-            f"[**Click Here For Make Your Own Music Bot**](https://t.me/NotRealAbhii)",
+            f"[**Click Here For Make Your Own Music Bot**](https://t.me/NotRealAbhiii)",
             disable_web_page_preview=True,
         )
         await asyncio.sleep(60)
