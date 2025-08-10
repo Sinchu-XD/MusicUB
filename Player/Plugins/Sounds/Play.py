@@ -113,7 +113,7 @@ async def _aPlay(_, message):
         f"**Duration :** {search_results[0]['duration']} Minutes\n"
         f"**Requested By :** {mention}\n\n"
         f"**Response Time :** {total_time}\n\n\n"
-        f"[**Click Here For Make Your Own Music Bot**](https://t.me/NotRealABhii)"
+        f"[**Click Here For Make Your Own Music Bot**](https://t.me/NotRealABhiii)"
     )
     return asyncio.create_task(delete_messages(message, m))
 
