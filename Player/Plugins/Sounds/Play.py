@@ -5,8 +5,9 @@ Copyright ©️ 2025
 
 from Player import app, call, seek_chats
 from Player.Core import Userbot
-from Player.Utils.YouTube.Search import SearchYt
-from Player.Utils.YouTube.Ytdl import Ytdl
+#from Player.Utils.YouTube.Search import SearchYt
+#from Player.Utils.YouTube.Ytdl import Ytdl
+from Player.Utils.YtDetails import SearchYt, ytdl as Ytdl
 from YouTubeMusic.Stream import get_audio_url
 from Player.Plugins.Start.Spam import spam_check
 from Player.Utils.Queue import QUEUE, add_to_queue
@@ -84,7 +85,7 @@ async def _aPlay(_, message):
     await m.edit("**ᴡᴀɪᴛ ɴᴀ ʏʀʀʀ\n\nꜱᴇᴀʀᴄʜɪɴɢ ʏᴏᴜʀ ꜱᴏɴɢ 🌚❤️..**")
 
     try:
-        songlink = await Ytdl(stream_url)
+        status, songlink = await Ytdl(stream_url)
     except Exception as e:
         return await m.edit(f"❌ Failed to extract stream URL.\n\nError: `{e}`")
 
@@ -146,7 +147,7 @@ async def playforce(_, message):
         return await m.edit(f"Error while searching: <code>{e}</code>")
 
     try:
-        songlink = await Ytdl(stream_url)
+        status, songlink = await Ytdl(stream_url)
     except Exception as e:
         return await m.edit(f"❌ Failed to extract stream URL.\n\nError: `{e}`")
 
