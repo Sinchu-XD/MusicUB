@@ -15,7 +15,7 @@ api_hash: str = config.API_HASH
 session_string: str = config.SESSION_STRING
 
 MusicBot = Client(
-    name="Lyla", api_id=api_id, api_hash=api_hash, session_string=session_string
+    name="Player", api_id=api_id, api_hash=api_hash, session_string=session_string
 )
 
 MusicUser = PyTgCalls(MusicBot)
