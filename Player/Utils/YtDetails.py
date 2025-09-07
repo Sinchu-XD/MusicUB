@@ -84,7 +84,7 @@ async def main():
     try:
         search_results, stream_url = await SearchYt(query)
         format = "ba"
-        status, stream_url = await ytdl(format, stream_url)
+        status, stream_url = await ytdl(stream_url)
         
         if status:
             print(f"Stream URL: {stream_url}")
