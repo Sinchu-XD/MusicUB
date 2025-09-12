@@ -17,12 +17,15 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 
 
 async def SearchYt(query: str):
+    print(f"[SearchYt] 🔍 Searching for query: {query}")
     results = await Search(query, limit=1)
 
     if not results or not results.get("main_results"):
+        print("[SearchYt] ❌ No results found.")
         raise Exception("No results found.")
 
-    item = results["main_results"][0] 
+    item = results["main_results"][0]  
+    print(f"[SearchYt] ✅ Got result: {item.get('title')}")
 
     search_data = [{
         "title": item.get("title"),
@@ -34,7 +37,8 @@ async def SearchYt(query: str):
         "url": item.get("url")
     }]
 
-    stream_url = item["url"] 
+    stream_url = item["url"]  
+    print(f"[SearchYt] 🎵 Stream URL found: {stream_url}")
 
     return search_data, stream_url
 
@@ -49,34 +53,42 @@ CACHE_DIR = "downloads"
 os.makedirs(CACHE_DIR, exist_ok=True)
 
 async def ytdl(url: str):
+    print(f"[ytdl] 🔗 Processing URL: {url}")
     hashed = hashlib.md5(url.encode()).hexdigest()
     cached_path = os.path.join(CACHE_DIR, f"{hashed}.webm")
 
     if os.path.exists(cached_path):
-        logging.info(f"[CACHE HIT] {url}")
+        print(f"[ytdl] ✅ CACHE HIT: {cached_path}")
         return (1, cached_path)
 
-    logging.info(f"[CACHE MISS] Fetching URL via get_audio_url()")
+    print(f"[ytdl] ❌ CACHE MISS: Downloading audio...")
 
     try:
         stream_url = get_audio_url(url, "cookies/cookies.txt")
+        print(f"[ytdl] 🎵 Extracted stream URL: {stream_url}")
+
         if not stream_url:
+            print("[ytdl] ❌ Failed to get stream URL")
             return (0, "Failed to get audio stream URL")
 
         async with aiohttp.ClientSession() as session:
             async with session.get(stream_url) as resp:
                 if resp.status != 200:
+                    print(f"[ytdl] ❌ HTTP Error: {resp.status}")
                     return (0, f"HTTP error: {resp.status}")
+
+                print(f"[ytdl] ⬇️ Downloading chunks into {cached_path} ...")
                 with open(cached_path, "wb") as f:
                     while chunk := await resp.content.read(1024 * 64):
                         f.write(chunk)
 
-        logging.info(f"[DOWNLOADED] {cached_path}")
+        print(f"[ytdl] ✅ Downloaded and cached: {cached_path}")
         return (1, cached_path)
 
     except Exception as e:
-        logging.error(f"[ERROR] {e}")
+        print(f"[ytdl] ❌ ERROR: {e}")
         return (0, str(e))
+
 
 
 async def main():
