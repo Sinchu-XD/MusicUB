@@ -8,15 +8,15 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 COOKIES_FILE = "cookies/cookies.txt"
 
 async def SearchYt(query: str):
-    print(f"[SearchYt] 🔍 Searching for query: {query}")
+  #  print(f"[SearchYt] 🔍 Searching for query: {query}")
     results = await Search(query, limit=1)
 
     if not results or not results.get("main_results"):
-        print("[SearchYt] ❌ No results found.")
+     #   print("[SearchYt] ❌ No results found.")
         raise Exception("No results found.")
 
     item = results["main_results"][0]  
-    print(f"[SearchYt] ✅ Got result: {item.get('title')}")
+  #  print(f"[SearchYt] ✅ Got result: {item.get('title')}")
 
     search_data = [{
         "title": item.get("title"),
@@ -29,7 +29,7 @@ async def SearchYt(query: str):
     }]
 
     stream_url = item["url"]  
-    print(f"[SearchYt] 🎵 Stream URL found: {stream_url}")
+  #  print(f"[SearchYt] 🎵 Stream URL found: {stream_url}")
 
     return search_data, stream_url
 
@@ -38,14 +38,14 @@ async def ytdl(url: str):
     """
     Directly get audio stream URL without downloading.
     """
-    print(f"[ytdl] 🔗 Processing URL: {url}")
+  #  print(f"[ytdl] 🔗 Processing URL: {url}")
 
     try:
         stream_url = get_audio_url(url, COOKIES_FILE)
         if not stream_url:
-            print("[ytdl] ❌ Failed to get stream URL")
+   #         print("[ytdl] ❌ Failed to get stream URL")
             return 0, "Failed to get audio stream URL"
-        print(f"[ytdl] 🎵 Stream URL ready: {stream_url}")
+    #    print(f"[ytdl] 🎵 Stream URL ready: {stream_url}")
         return 1, stream_url
     except Exception as e:
         print(f"[ytdl] ❌ ERROR: {e}")
