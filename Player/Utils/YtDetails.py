@@ -1,20 +1,11 @@
-import os
-import hashlib
-import logging
-import yt_dlp
 import asyncio
+import logging
 from YouTubeMusic.Search import Search
 from YouTubeMusic.Stream import get_audio_url
 
-
-COOKIES_FILE = "cookies/cookies.txt"
-CACHE_DIR = 'cached_songs'
-
-if not os.path.exists(CACHE_DIR):
-    os.makedirs(CACHE_DIR)
-
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
+COOKIES_FILE = "cookies/cookies.txt"
 
 async def SearchYt(query: str):
     print(f"[SearchYt] 🔍 Searching for query: {query}")
@@ -43,63 +34,32 @@ async def SearchYt(query: str):
     return search_data, stream_url
 
 
-import os
-import hashlib
-import aiohttp
-import logging
-from YouTubeMusic.Stream import get_audio_url
-
-CACHE_DIR = "downloads"
-os.makedirs(CACHE_DIR, exist_ok=True)
-
 async def ytdl(url: str):
+    """
+    Directly get audio stream URL without downloading.
+    """
     print(f"[ytdl] 🔗 Processing URL: {url}")
-    hashed = hashlib.md5(url.encode()).hexdigest()
-    cached_path = os.path.join(CACHE_DIR, f"{hashed}.webm")
-
-    if os.path.exists(cached_path):
-        print(f"[ytdl] ✅ CACHE HIT: {cached_path}")
-        return (1, cached_path)
-
-    print(f"[ytdl] ❌ CACHE MISS: Downloading audio...")
 
     try:
-        stream_url = get_audio_url(url, "cookies/cookies.txt")
-        print(f"[ytdl] 🎵 Extracted stream URL: {stream_url}")
-
+        stream_url = get_audio_url(url, COOKIES_FILE)
         if not stream_url:
             print("[ytdl] ❌ Failed to get stream URL")
-            return (0, "Failed to get audio stream URL")
-
-        async with aiohttp.ClientSession() as session:
-            async with session.get(stream_url) as resp:
-                if resp.status != 200:
-                    print(f"[ytdl] ❌ HTTP Error: {resp.status}")
-                    return (0, f"HTTP error: {resp.status}")
-
-                print(f"[ytdl] ⬇️ Downloading chunks into {cached_path} ...")
-                with open(cached_path, "wb") as f:
-                    while chunk := await resp.content.read(1024 * 64):
-                        f.write(chunk)
-
-        print(f"[ytdl] ✅ Downloaded and cached: {cached_path}")
-        return (1, cached_path)
-
+            return 0, "Failed to get audio stream URL"
+        print(f"[ytdl] 🎵 Stream URL ready: {stream_url}")
+        return 1, stream_url
     except Exception as e:
         print(f"[ytdl] ❌ ERROR: {e}")
-        return (0, str(e))
-
+        return 0, str(e)
 
 
 async def main():
     query = input("Enter song name: ")
     try:
-        search_results, stream_url = await SearchYt(query)
-        format = "ba"
-        status, stream_url = await ytdl(stream_url)
+        search_results, youtube_url = await SearchYt(query)
+        status, stream_url = await ytdl(youtube_url)
         
         if status:
-            print(f"Stream URL: {stream_url}")
+            print(f"Stream URL ready to play: {stream_url}")
         else:
             print(f"Error: {stream_url}")
         
@@ -118,3 +78,4 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+    
