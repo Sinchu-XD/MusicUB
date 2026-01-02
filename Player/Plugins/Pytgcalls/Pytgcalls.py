@@ -3,7 +3,6 @@ Telegram @Itz_Your_4Bhi
 Copyright ©️ 2025
 """
 
-import time
 import asyncio
 from pytgcalls import PyTgCalls, filters
 from pytgcalls.types import Update, MediaStream, ChatUpdate
@@ -11,52 +10,75 @@ from pytgcalls.types import Update, MediaStream, ChatUpdate
 from Player import call, app, seek_chats
 from Player.Utils.Loop import get_loop, set_loop
 from Player.Utils.Queue import (
-    QUEUE,
     get_queue,
     pop_an_item,
     clear_queue,
+    add_to_queue,
 )
+from Player.Utils.AutoPlay import is_autoplay_on, get_recommendation
+from Player.Core import Userbot
+
+# last_played_title[chat_id] = title
+from Player.Plugins.Sounds.Play import last_played_title   # path apne project ke hisaab se adjust karna
+
 
 # ─────────────────────────────
-# INTERNAL SKIP / AUTO-NEXT
+# INTERNAL NEXT / LOOP / AUTOPLAY
 # ─────────────────────────────
-async def _skip(chat_id):
+async def _next(chat_id):
     loop = await get_loop(chat_id)
     queue = get_queue(chat_id)
 
     # ───── LOOP ENABLED ─────
     if loop > 0 and queue:
         await set_loop(chat_id, loop - 1)
+        title, duration, stream_url, _ = queue[0]
+        await call.play(
+            chat_id,
+            MediaStream(stream_url, video_flags=MediaStream.Flags.IGNORE)
+        )
+        return title, duration
 
-        title, duration, stream_url, requested_by = queue[0]
+    # ───── NORMAL QUEUE ─────
+    if queue:
+        if len(queue) > 1:
+            pop_an_item(chat_id)
+            title, duration, stream_url, _ = get_queue(chat_id)[0]
+            await call.play(
+                chat_id,
+                MediaStream(stream_url, video_flags=MediaStream.Flags.IGNORE)
+            )
+            return title, duration
+
+        # queue me sirf ek hi song tha
+        clear_queue(chat_id)
+
+    # ───── AUTOPLAY ─────
+    if await is_autoplay_on(chat_id):
+        last_title = last_played_title.get(chat_id)
+        if not last_title:
+            await stop(chat_id)
+            return None
+
+        rec = await get_recommendation(last_title)
+        if not rec:
+            await stop(chat_id)
+            return None
+
+        title, duration, stream_url = rec
+
+        add_to_queue(chat_id, title, duration, stream_url, "AutoPlay")
+        last_played_title[chat_id] = title
 
         await call.play(
             chat_id,
             MediaStream(stream_url, video_flags=MediaStream.Flags.IGNORE)
         )
+        return title, duration
 
-        return title, duration, stream_url
-
-    # ───── NORMAL QUEUE ─────
-    if not queue:
-        await stop(chat_id)
-        return None
-
-    if len(queue) == 1:
-        clear_queue(chat_id)
-        await stop(chat_id)
-        return None
-
-    # ───── NEXT SONG ─────
-    pop_an_item(chat_id)
-    title, duration, stream_url, requested_by = get_queue(chat_id)[0]
-
-    await call.play(
-        chat_id,
-        MediaStream(stream_url, video_flags=MediaStream.Flags.IGNORE)
-    )
-
-    return title, duration, stream_url
+    # ───── NOTHING LEFT ─────
+    await stop(chat_id)
+    return None
 
 
 # ─────────────────────────────
@@ -67,22 +89,21 @@ async def on_stream_end(client: PyTgCalls, update: Update):
     chat_id = update.chat_id
     seek_chats.pop(chat_id, None)
 
-    result = await _skip(chat_id)
+    result = await _next(chat_id)
     if not result:
         return
 
-    title, duration, stream_url = result
+    title, duration = result
 
-    m = await app.send_message(
+    msg = await app.send_message(
         chat_id,
         f"**🎶 Now Playing**\n\n"
         f"**Title:** {title[:25]}\n"
-        f"**Duration:** {duration}\n"
-        f"[Enjoy the music ❤️]"
+        f"**Duration:** {duration}"
     )
 
-    await asyncio.sleep(45)
-    await m.delete()
+    await asyncio.sleep(40)
+    await msg.delete()
 
 
 # ─────────────────────────────
@@ -105,4 +126,3 @@ async def on_left_call(client, update):
     clear_queue(chat_id)
     await set_loop(chat_id, 0)
     seek_chats.pop(chat_id, None)
-
