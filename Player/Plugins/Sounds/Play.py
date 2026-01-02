@@ -18,6 +18,8 @@ from Player.Utils.Queue import QUEUE, add_to_queue
 from Player.Utils.Delete import delete_messages
 from Player.Misc import SUDOERS
 
+# 🔑 Autoplay ke liye last played title
+last_played_title = {}
 
 PLAY_COMMAND = ["P", "PLAY", "SP", "SPLAY"]
 PLAYFORCE_COMMAND = ["PFORCE", "PLAYFORCE"]
@@ -67,6 +69,9 @@ async def play_music(_, message):
         audio = message.reply_to_message.audio or message.reply_to_message.voice
         title = message.reply_to_message.text or "Telegram Audio"
 
+        # 🔑 store last played title (for autoplay)
+        last_played_title[chat_id] = title
+
         if chat_id in QUEUE:
             q = add_to_queue(chat_id, title, audio.duration, file_path, mention)
             await m.edit(f"**#{q} Added to queue**")
@@ -99,6 +104,10 @@ async def play_music(_, message):
 
     title = search_results[0]["title"]
     duration = search_results[0]["duration"]
+
+    # 🔑 store last played title (for autoplay)
+    last_played_title[chat_id] = title
+
     total_time = int(time.time() - start_time)
 
     # ───── QUEUE MODE ─────
@@ -170,6 +179,9 @@ async def playforce(_, message):
 
     title = search_results[0]["title"]
     duration = search_results[0]["duration"]
+
+    # 🔑 store last played title (for autoplay)
+    last_played_title[chat_id] = title
 
     QUEUE[chat_id] = [(title, duration, songlink, mention)]
 
