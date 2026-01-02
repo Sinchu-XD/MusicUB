@@ -1,55 +1,46 @@
-import asyncio
+import os
 import logging
 from YouTubeMusic.Search import Search
 from YouTubeMusic.Stream import get_audio_url
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.INFO)
 
-COOKIES_FILE = "cookies/cookies.txt"
+COOKIES_FILE = "cookies/cookies.txt" if os.path.exists("cookies/cookies.txt") else None
 
+
+# ─────────────────────────────
+# SEARCH YOUTUBE MUSIC
+# ─────────────────────────────
 async def SearchYt(query: str):
-  #  print(f"[SearchYt] 🔍 Searching for query: {query}")
     results = await Search(query, limit=1)
 
     if not results or not results.get("main_results"):
-     #   print("[SearchYt] ❌ No results found.")
-        raise Exception("No results found.")
+        return [], None
 
-    item = results["main_results"][0]  
-  #  print(f"[SearchYt] ✅ Got result: {item.get('title')}")
+    item = results["main_results"][0]
 
     search_data = [{
         "title": item.get("title"),
-        "artist": item.get("artist_name"),
-        "channel": item.get("channel_name"),
-        "duration": item.get("duration"),
-        "views": item.get("views"),
+        "duration": item.get("duration") or "Unknown",
         "thumbnail": item.get("thumbnail"),
         "url": item.get("url")
     }]
 
-    stream_url = item["url"]  
-  #  print(f"[SearchYt] 🎵 Stream URL found: {stream_url}")
-
-    return search_data, stream_url
+    return search_data, item.get("url")
 
 
+# ─────────────────────────────
+# GET AUDIO STREAM URL
+# ─────────────────────────────
 async def ytdl(url: str):
-    """
-    Directly get audio stream URL without downloading.
-    """
-  #  print(f"[ytdl] 🔗 Processing URL: {url}")
-
     try:
         stream_url = get_audio_url(url, COOKIES_FILE)
         if not stream_url:
-   #         print("[ytdl] ❌ Failed to get stream URL")
-            return 0, "Failed to get audio stream URL"
-    #    print(f"[ytdl] 🎵 Stream URL ready: {stream_url}")
-        return 1, stream_url
+            return False, "Failed to get stream URL"
+        return True, stream_url
     except Exception as e:
-        print(f"[ytdl] ❌ ERROR: {e}")
-        return 0, str(e)
+        logging.error(f"YT stream error: {e}")
+        return False, str(e)
 
 
 async def main():
