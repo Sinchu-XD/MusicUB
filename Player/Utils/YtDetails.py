@@ -7,6 +7,11 @@ logging.basicConfig(level=logging.INFO)
 
 COOKIES_FILE = "cookies/cookies.txt" if os.path.exists("cookies/cookies.txt") else None
 
+# ─────────────────────────────
+# UNLIMITED STREAM CACHE
+# ─────────────────────────────
+STREAM_CACHE = {}   # {youtube_url: stream_url}
+
 
 # ─────────────────────────────
 # SEARCH YOUTUBE MUSIC
@@ -30,43 +35,48 @@ async def SearchYt(query: str):
 
 
 # ─────────────────────────────
-# GET AUDIO STREAM URL
+# GET AUDIO STREAM URL (UNLIMITED CACHE)
 # ─────────────────────────────
 async def ytdl(url: str):
+    # ───── CACHE HIT ─────
+    if url in STREAM_CACHE:
+        logging.info("⚡ Using cached stream URL")
+        return True, STREAM_CACHE[url]
+
+    # ───── CACHE MISS ─────
     try:
         stream_url = get_audio_url(url, COOKIES_FILE)
         if not stream_url:
             return False, "Failed to get stream URL"
+
+        STREAM_CACHE[url] = stream_url
+        logging.info("📌 Cached new stream URL (unlimited)")
+
         return True, stream_url
+
     except Exception as e:
         logging.error(f"YT stream error: {e}")
         return False, str(e)
 
 
-async def main():
-    query = input("Enter song name: ")
-    try:
-        search_results, youtube_url = await SearchYt(query)
-        status, stream_url = await ytdl(youtube_url)
-        
-        if status:
-            print(f"Stream URL ready to play: {stream_url}")
-        else:
-            print(f"Error: {stream_url}")
-        
-        for idx, item in enumerate(search_results, 1):
-            print(f"\nResult {idx}:")
-            print(f"Title: {item['title']}")
-            print(f"Artist: {item['artist']}")
-            print(f"Channel: {item['channel']}")
-            print(f"Duration: {item['duration']}")
-            print(f"Views: {item['views']}")
-            print(f"Thumbnail: {item['thumbnail']}")
-            print(f"URL: {item['url']}")
-    
-    except Exception as e:
-        print(f"Search Error: {e}")
-
+# ─────────────────────────────
+# TEST (OPTIONAL)
+# ─────────────────────────────
 if __name__ == "__main__":
+    import asyncio
+
+    async def main():
+        query = input("Enter song name: ")
+        search_results, youtube_url = await SearchYt(query)
+
+        if not youtube_url:
+            print("No result found")
+            return
+
+        status, stream_url = await ytdl(youtube_url)
+        print("1st call:", "OK" if status else stream_url)
+
+        status, stream_url = await ytdl(youtube_url)
+        print("2nd call (cached):", "OK" if status else stream_url)
+
     asyncio.run(main())
-    
