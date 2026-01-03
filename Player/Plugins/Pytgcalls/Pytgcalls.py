@@ -4,6 +4,7 @@ Copyright ©️ 2025
 """
 
 import asyncio
+import logging
 from pytgcalls import PyTgCalls, filters
 from pytgcalls.types import Update, MediaStream, ChatUpdate
 
@@ -18,9 +19,10 @@ from Player.Utils.Queue import (
 from Player.Utils.AutoPlay import is_autoplay_on, get_recommendation
 from Player.Core import Userbot
 
-# last_played_title[chat_id] = title
-from Player.Plugins.Sounds.Play import last_played_title   # path apne project ke hisaab se adjust karna
+# 🔑 shared from play.py
+from Player.Plugins.Sounds.Play import last_played_title
 
+logging.basicConfig(level=logging.INFO)
 
 # ─────────────────────────────
 # INTERNAL NEXT / LOOP / AUTOPLAY
@@ -50,34 +52,27 @@ async def _next(chat_id):
             )
             return title, duration
 
-        # queue me sirf ek hi song tha
+        # last song finished
         clear_queue(chat_id)
 
     # ───── AUTOPLAY ─────
     if await is_autoplay_on(chat_id):
         last_title = last_played_title.get(chat_id)
-        if not last_title:
-            await stop(chat_id)
-            return None
+        if last_title:
+            rec = await get_recommendation(last_title)
+            if rec:
+                title, duration, stream_url = rec
+                add_to_queue(chat_id, title, duration, stream_url, "AutoPlay")
+                last_played_title[chat_id] = title
 
-        rec = await get_recommendation(last_title)
-        if not rec:
-            await stop(chat_id)
-            return None
-
-        title, duration, stream_url = rec
-
-        add_to_queue(chat_id, title, duration, stream_url, "AutoPlay")
-        last_played_title[chat_id] = title
-
-        await call.play(
-            chat_id,
-            MediaStream(stream_url, video_flags=MediaStream.Flags.IGNORE)
-        )
-        return title, duration
+                await call.play(
+                    chat_id,
+                    MediaStream(stream_url, video_flags=MediaStream.Flags.IGNORE)
+                )
+                return title, duration
 
     # ───── NOTHING LEFT ─────
-    await stop(chat_id)
+    await hard_cleanup(chat_id)
     return None
 
 
@@ -94,7 +89,6 @@ async def on_stream_end(client: PyTgCalls, update: Update):
         return
 
     title, duration = result
-
     msg = await app.send_message(
         chat_id,
         f"**🎶 Now Playing**\n\n"
@@ -107,9 +101,16 @@ async def on_stream_end(client: PyTgCalls, update: Update):
 
 
 # ─────────────────────────────
-# STOP VC
+# HARD CLEANUP (CORE FIX)
 # ─────────────────────────────
-async def stop(chat_id):
+async def hard_cleanup(chat_id):
+    logging.warning(f"VC cleanup triggered for chat {chat_id}")
+
+    clear_queue(chat_id)
+    seek_chats.pop(chat_id, None)
+    last_played_title.pop(chat_id, None)
+    await set_loop(chat_id, 0)
+
     try:
         await call.leave_call(chat_id)
     except:
@@ -117,12 +118,20 @@ async def stop(chat_id):
 
 
 # ─────────────────────────────
-# LEFT VC CLEANUP
+# VC LEFT / DISCONNECTED HANDLER
 # ─────────────────────────────
-@call.on_update(filters.chat_update(ChatUpdate.Status.LEFT_CALL))
+@call.on_update(filters.chat_update(
+    ChatUpdate.Status.LEFT_CALL
+))
 async def on_left_call(client, update):
-    chat_id = update.chat_id
-    await stop(chat_id)
-    clear_queue(chat_id)
-    await set_loop(chat_id, 0)
-    seek_chats.pop(chat_id, None)
+    await hard_cleanup(update.chat_id)
+
+
+# ─────────────────────────────
+# EXTRA SAFETY: VC KICK / END
+# ─────────────────────────────
+@call.on_update(filters.chat_update(
+    ChatUpdate.Status.KICKED
+))
+async def on_kicked_call(client, update):
+    await hard_cleanup(update.chat_id)
