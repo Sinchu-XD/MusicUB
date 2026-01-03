@@ -18,7 +18,7 @@ from Player.Utils.Queue import QUEUE, add_to_queue
 from Player.Utils.Delete import delete_messages
 from Player.Misc import SUDOERS
 
-# 🔑 Autoplay ke liye last played title
+# 🔑 Autoplay support
 last_played_title = {}
 
 PLAY_COMMAND = ["P", "PLAY", "SP", "SPLAY"]
@@ -41,14 +41,18 @@ async def processReplyToMessage(message):
 
 
 # ─────────────────────────────
-# PLAY COMMAND
+# PLAY COMMAND (NORMAL)
 # ─────────────────────────────
 @app.on_message(
-    (filters.command(PLAY_COMMAND, [PREFIX, RPREFIX]))
+    filters.command(PLAY_COMMAND, [PREFIX, RPREFIX])
     & filters.group
     & spam_check()
 )
 async def play_music(_, message):
+    # 🔥 IMPORTANT FIX: playforce exclusion
+    if message.command[0].lower() in ["playforce", "pforce"]:
+        return
+
     start_time = time.time()
     chat_id = message.chat.id
     mention = message.from_user.mention
@@ -69,7 +73,6 @@ async def play_music(_, message):
         audio = message.reply_to_message.audio or message.reply_to_message.voice
         title = message.reply_to_message.text or "Telegram Audio"
 
-        # 🔑 store last played title (for autoplay)
         last_played_title[chat_id] = title
 
         if chat_id in QUEUE:
@@ -77,72 +80,59 @@ async def play_music(_, message):
             await m.edit(f"**#{q} Added to queue**")
             return asyncio.create_task(delete_messages(message, m))
 
-        total_time = int(time.time() - start_time)
         await m.edit(
             f"**🎶 Playing in VC**\n\n"
             f"**Title:** {title[:25]}\n"
             f"**Duration:** {audio.duration}\n"
-            f"**Requested by:** {mention}\n"
-            f"**Response:** {total_time}s"
+            f"**Requested by:** {mention}"
         )
         return asyncio.create_task(delete_messages(message, m))
 
     # ───── TEXT QUERY ─────
     if len(message.command) < 2:
-        return await message.reply_text("❌ Give song name or link.")
+        return await message.reply_text("❌ Give song name.")
 
-    m = await message.reply_text("🔍 Searching your song...")
+    m = await message.reply_text("🔍 Searching...")
     query = message.text.split(maxsplit=1)[1]
 
-    search_results, stream_url = await SearchYt(query)
+    search_results, yt_url = await SearchYt(query)
     if not search_results:
         return await m.edit("❌ No results found.")
 
-    status, songlink = await Ytdl(stream_url)
+    status, stream_url = await Ytdl(yt_url)
     if not status:
-        return await m.edit(songlink)
+        return await m.edit(stream_url)
 
     title = search_results[0]["title"]
     duration = search_results[0]["duration"]
 
-    # 🔑 store last played title (for autoplay)
     last_played_title[chat_id] = title
 
-    total_time = int(time.time() - start_time)
-
-    # ───── QUEUE MODE ─────
     if chat_id in QUEUE:
-        q = add_to_queue(chat_id, title, duration, songlink, mention)
-        await m.edit(
-            f"**#{q} Added to queue**\n\n"
-            f"**Title:** {title[:25]}\n"
-            f"**Duration:** {duration}\n"
-            f"**Requested by:** {mention}"
-        )
+        q = add_to_queue(chat_id, title, duration, stream_url, mention)
+        await m.edit(f"**#{q} Added to queue**")
         return asyncio.create_task(delete_messages(message, m))
 
-    # ───── PLAY NOW ─────
-    status, text = await Userbot.playAudio(chat_id, songlink)
+    status, text = await Userbot.playAudio(chat_id, stream_url)
     if not status:
         return await m.edit(text)
 
-    add_to_queue(chat_id, title, duration, songlink, mention)
+    add_to_queue(chat_id, title, duration, stream_url, mention)
 
     await m.edit(
         f"**🎶 Playing in VC**\n\n"
         f"**Title:** {title[:25]}\n"
         f"**Duration:** {duration}\n"
-        f"**Requested by:** {mention}\n"
-        f"**Response:** {total_time}s"
+        f"**Requested by:** {mention}"
     )
     return asyncio.create_task(delete_messages(message, m))
 
 
 # ─────────────────────────────
-# PLAY FORCE
+# PLAY FORCE (ADMIN ONLY)
 # ─────────────────────────────
 @app.on_message(
-    (filters.command(PLAYFORCE_COMMAND, [PREFIX, RPREFIX]))
+    filters.command(PLAYFORCE_COMMAND, [PREFIX, RPREFIX])
     & filters.group
 )
 async def playforce(_, message):
@@ -164,38 +154,35 @@ async def playforce(_, message):
     ]
 
     if message.from_user.id not in admins and message.from_user.id not in SUDOERS:
-        return await message.reply_text("❌ Only admins / sudo users.")
+        return await message.reply_text("❌ Only admins can use playforce.")
 
     m = await message.reply_text("⚡ Force playing...")
     query = message.text.split(maxsplit=1)[1]
 
-    search_results, stream_url = await SearchYt(query)
+    search_results, yt_url = await SearchYt(query)
     if not search_results:
         return await m.edit("❌ No results found.")
 
-    status, songlink = await Ytdl(stream_url)
+    status, stream_url = await Ytdl(yt_url)
     if not status:
-        return await m.edit(songlink)
+        return await m.edit(stream_url)
 
     title = search_results[0]["title"]
     duration = search_results[0]["duration"]
 
-    # 🔑 store last played title (for autoplay)
     last_played_title[chat_id] = title
 
-    QUEUE[chat_id] = [(title, duration, songlink, mention)]
+    QUEUE[chat_id] = [(title, duration, stream_url, mention)]
 
-    status, text = await Userbot.playAudio(chat_id, songlink)
+    status, text = await Userbot.playAudio(chat_id, stream_url)
     if not status:
         return await m.edit(text)
 
-    total_time = int(time.time() - start_time)
     await m.edit(
-        f"**⚡ Force Played**\n\n"
+        f"**⚡ Force Playing**\n\n"
         f"**Title:** {title[:25]}\n"
         f"**Duration:** {duration}\n"
-        f"**Requested by:** {mention}\n"
-        f"**Response:** {total_time}s"
+        f"**Requested by:** {mention}"
     )
     return asyncio.create_task(delete_messages(message, m))
 
