@@ -1,20 +1,25 @@
 import os
 import logging
 from YouTubeMusic.Search import Search
-from YouTubeMusic.Stream import get_audio_url
+from YouTubeMusic.Stream import get_stream_url
 
 logging.basicConfig(level=logging.INFO)
 
+# ─────────────────────────────
+# COOKIES
+# ─────────────────────────────
 COOKIES_FILE = "cookies/cookies.txt" if os.path.exists("cookies/cookies.txt") else None
 
+
 # ─────────────────────────────
-# UNLIMITED STREAM CACHE
+# STREAM CACHES
 # ─────────────────────────────
-STREAM_CACHE = {}   # {youtube_url: stream_url}
+AUDIO_STREAM_CACHE = {}   # {youtube_url: audio_stream_url}
+VIDEO_STREAM_CACHE = {}   # {youtube_url: video_stream_url}
 
 
 # ─────────────────────────────
-# SEARCH YOUTUBE MUSIC
+# SEARCH YOUTUBE
 # ─────────────────────────────
 async def SearchYt(query: str):
     results = await Search(query, limit=1)
@@ -28,34 +33,69 @@ async def SearchYt(query: str):
         "title": item.get("title"),
         "duration": item.get("duration") or "Unknown",
         "thumbnail": item.get("thumbnail"),
-        "url": item.get("url")
+        "url": item.get("url"),
     }]
 
     return search_data, item.get("url")
 
 
 # ─────────────────────────────
-# GET AUDIO STREAM URL (UNLIMITED CACHE)
+# AUDIO STREAM  (/play)
 # ─────────────────────────────
-async def ytdl(url: str):
-    # ───── CACHE HIT ─────
-    if url in STREAM_CACHE:
-        logging.info("⚡ Using cached stream URL")
-        return True, STREAM_CACHE[url]
+async def ytdl_audio(url: str):
+    # CACHE HIT
+    if url in AUDIO_STREAM_CACHE:
+        logging.info("⚡ Using cached AUDIO stream URL")
+        return True, AUDIO_STREAM_CACHE[url]
 
-    # ───── CACHE MISS ─────
+    # CACHE MISS
     try:
-        stream_url = get_audio_url(url, COOKIES_FILE)
-        if not stream_url:
-            return False, "Failed to get stream URL"
+        stream_url = get_stream_url(
+            video_url=url,
+            cookies_path=COOKIES_FILE,
+            mode="audio"
+        )
 
-        STREAM_CACHE[url] = stream_url
-        logging.info("📌 Cached new stream URL (unlimited)")
+        if not stream_url:
+            return False, "Failed to get audio stream URL"
+
+        AUDIO_STREAM_CACHE[url] = stream_url
+        logging.info("📌 Cached new AUDIO stream URL")
 
         return True, stream_url
 
     except Exception as e:
-        logging.error(f"YT stream error: {e}")
+        logging.error(f"AUDIO stream error: {e}")
+        return False, str(e)
+
+
+# ─────────────────────────────
+# VIDEO STREAM WITH SOUND  (/vplay)
+# ─────────────────────────────
+async def ytdl_video(url: str):
+    # CACHE HIT
+    if url in VIDEO_STREAM_CACHE:
+        logging.info("⚡ Using cached VIDEO stream URL")
+        return True, VIDEO_STREAM_CACHE[url]
+
+    # CACHE MISS
+    try:
+        stream_url = get_stream_url(
+            video_url=url,
+            cookies_path=COOKIES_FILE,
+            mode="video"
+        )
+
+        if not stream_url:
+            return False, "Failed to get video stream URL"
+
+        VIDEO_STREAM_CACHE[url] = stream_url
+        logging.info("📌 Cached new VIDEO stream URL")
+
+        return True, stream_url
+
+    except Exception as e:
+        logging.error(f"VIDEO stream error: {e}")
         return False, str(e)
 
 
@@ -66,17 +106,19 @@ if __name__ == "__main__":
     import asyncio
 
     async def main():
-        query = input("Enter song name: ")
-        search_results, youtube_url = await SearchYt(query)
+        query = input("Enter song / video name: ")
 
+        _, youtube_url = await SearchYt(query)
         if not youtube_url:
-            print("No result found")
+            print("❌ No result found")
             return
 
-        status, stream_url = await ytdl(youtube_url)
-        print("1st call:", "OK" if status else stream_url)
+        # AUDIO TEST
+        s, a = await ytdl_audio(youtube_url)
+        print("Audio:", "OK" if s else a)
 
-        status, stream_url = await ytdl(youtube_url)
-        print("2nd call (cached):", "OK" if status else stream_url)
+        # VIDEO TEST
+        s, v = await ytdl_video(youtube_url)
+        print("Video:", "OK" if s else v)
 
     asyncio.run(main())
