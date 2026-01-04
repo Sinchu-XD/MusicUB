@@ -1,225 +1,142 @@
-import logging
-from Player import app, call, seek_chats
+"""
+Telegram @Itz_Your_4Bhi
+Copyright ©️ 2025
+"""
+
+import time
+import asyncio
+import config
+
+from pyrogram import filters
+from pyrogram.enums import ChatMembersFilter
+
+from Player import app, seek_chats
 from Player.Core import Userbot
-import yt_dlp
-from pyrogram.enums import ChatAction
-from pyrogram.types import Message
-from Player.Utils.YtDetails import SearchYt
+from Player.Utils.YtDetails import SearchYt, ytdl as Ytdl
 from Player.Utils.Queue import QUEUE, add_to_queue
 from Player.Utils.Delete import delete_messages
 from Player.Misc import SUDOERS
-from pyrogram import filters
-import os
-from io import BytesIO
-import re
-import asyncio
-import time
-import config
+
+# 🔑 Autoplay support
+from Player.Plugins.Sounds.Play import last_played_title
 
 PLAY_COMMAND = ["V", "VPLAY"]
 PLAYFORCE_COMMAND = ["VPFORCE", "VPLAYFORCE"]
+
 PREFIX = config.PREFIX
 RPREFIX = config.RPREFIX
-COOKIES_FILE = "cookies/cookies.txt"
-
-# Configure logging for better debugging
-logging.basicConfig(level=logging.INFO)
 
 
-async def ytdl(format: str, url: str):
-    ydl_opts = {
-        'format': format,
-        'geo_bypass': True,
-        'noplaylist': True,
-        'quiet': True,
-        'cookiefile': COOKIES_FILE,
-        'nocheckcertificate': True,
-        'force_generic_extractor': True,
-        'extractor_retries': 3,
-    }
-
-    try:
-        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            info = ydl.extract_info(url, download=False)
-            if 'url' in info:
-                return (1, info['url'])
-            else:
-                return (0, "No URL found")
-    except Exception as e:
-        logging.error(f"Error during download: {e}")
-        return (0, str(e))
-
-
-def clean_filename(name: str) -> str:
-    return re.sub(r'[<>:"/\\|?*]', '', name).strip().replace(' ', '_')
-
-
-last_update = {}
-
-def progress_bar(current, total, message: Message, start_time):
-    now = time.time()
-    msg_id = message.chat.id
-
-    # Throttle updates to once every 3 seconds or 5% change
-    if msg_id in last_update:
-        last_time, last_percent = last_update[msg_id]
-        percent = int((current / total) * 100)
-        if now - last_time < 3 and abs(percent - last_percent) < 5:
-            return  # Skip update
-
-    last_update[msg_id] = (now, int((current / total) * 100))
-
-    done = int(20 * current / total)
-    bar = f"[{'█' * done}{'░' * (20 - done)}]"
-    percent = (current / total) * 100
-    speed = current / (now - start_time + 1)
-    eta = (total - current) / speed if speed > 0 else 0
-
-    text = (
-        f"📥 Downloading...\n"
-        f"{bar} {percent:.1f}%\n"
-        f"**{current // (1024 * 1024)}MB / {total // (1024 * 1024)}MB**\n"
-        f"ETA: `{int(eta)}s`"
-    )
-
-    try:
-        asyncio.create_task(message.edit(text))
-    except Exception as e:
-        logging.error(f"Error updating progress: {e}")
-        pass
-
-TEMP_DIR = "temp_video"
-os.makedirs(TEMP_DIR, exist_ok=True)
-
-async def processReplyToMessage(message: Message):
-    msg = message.reply_to_message
-    if not msg or not (msg.video or msg.video_note or msg.document):
-        return None, None
-
-    media = msg.video or msg.video_note or msg.document
-    file_name = getattr(media, "file_name", None) or f"{media.file_unique_id}.mp4"
-    safe_file_name = clean_filename(file_name)
-    file_path = os.path.join(TEMP_DIR, safe_file_name)
-
-    m = await message.reply("📥 Downloading video into memory...")
-
-    try:
-        await app.send_chat_action(message.chat.id, ChatAction.RECORD_VIDEO)
-
-        # Download video into memory
-        file = await app.download_media(msg, in_memory=True)
-
-        # Save memory buffer to disk for playVideo (if it needs a path)
-        with open(file_path, "wb") as f:
-            f.write(file.read())
-
-        await m.edit("✅ Video downloaded, preparing playback...")
-        return file_path, m
-
-    except Exception as e:
-        logging.error(f"Download failed: {e}")
-        await m.edit(f"❌ Failed to process video:\n`{e}`")
-        return None, m
-
-
-@app.on_message((filters.command(PLAY_COMMAND, [PREFIX, RPREFIX])) & filters.group)
-async def _aPlay(_, message):
+# ─────────────────────────────
+# PLAY VIDEO (NORMAL)
+# ─────────────────────────────
+@app.on_message(
+    filters.command(PLAY_COMMAND, [PREFIX, RPREFIX])
+    & filters.group
+)
+async def play_video(_, message):
     start_time = time.time()
     chat_id = message.chat.id
     mention = message.from_user.mention
 
-    if chat_id in seek_chats:
-        seek_chats.pop(chat_id)
+    await message.delete()
+    seek_chats.pop(chat_id, None)
 
-    # 💥 Handle Direct Telegram Video (Always Force Play)
-    if message.reply_to_message and (message.reply_to_message.video or message.reply_to_message.video_note):
-        input_filename, m = await processReplyToMessage(message)
-        if not input_filename:
-            return
+    if len(message.command) < 2:
+        return await message.reply_text("❌ Give video name.")
 
-        video = message.reply_to_message.video or message.reply_to_message.video_note
-        video_title = message.reply_to_message.text or "Unknown"
-
-        await m.edit("Rukja... Tera Video Play kar raha hu...")
-
-        try:
-            await Userbot.stopVideo(chat_id)
-        except Exception:
-            pass  # Ignore if nothing was playing
-
-        Status, Text = await Userbot.playVideo(chat_id, input_filename)
-        if not Status:
-            return await m.edit(Text)
-
-        # 💣 Remove any leftover queue after force play
-        from Player.Utils.Queue import clear_queue
-        clear_queue(chat_id)
-
-        finish_time = time.time()
-        total_time_taken = str(int(finish_time - start_time)) + "s"
-        await message.delete()
-
-        await m.edit(
-            f"Tera video play kar rha hu aaja vc\n\n"
-            f"VideoName:- `{video_title[:19]}`\n"
-            f"Time taken to play:- {total_time_taken}",
-            disable_web_page_preview=True,
-        )
-
-        return asyncio.create_task(delete_messages(message, m))
-        
-    # Check if query was provided
-    if len(message.text.split(maxsplit=1)) < 2:
-        return await message.reply_text("❌ Please provide a video name or URL.\n\n**Usage:** `/vplay <video name or link>`")
-
+    m = await message.reply_text("🔍 Searching video...")
     query = message.text.split(maxsplit=1)[1]
-    m = await message.reply_text("**ᴡᴀɪᴛ ɴᴀ ʏʀʀʀ\n\nꜱᴇᴀʀᴄʜɪɴɢ ʏᴏᴜʀ ꜱᴏɴɢ 🌚❤️..**")
 
-    try:
-        search_results, stream_url = await SearchYt(query)
-        if not search_results:
-            return await m.edit("No results found.")
-    except Exception as e:
-        return await m.edit(f"Error: <code>{e}</code>")
+    search_results, yt_url = await SearchYt(query)
+    if not search_results:
+        return await m.edit("❌ No results found.")
 
-    status, songlink = await ytdl("best[height<=?720][width<=?1280]", stream_url)
-    if not status or not songlink:
-        return await m.edit(f"❌ yt-dl issues detected\n\n» No valid song link found.")
+    status, stream_url = await Ytdl(yt_url)
+    if not status:
+        return await m.edit(stream_url)
 
-    title = search_results[0]['title']
-    duration = search_results[0]['duration']
-    channel = search_results[0]['channel']
-    views = search_results[0]['views']
-    total_time = f"{int(time.time() - start_time)} **Seconds**"
+    title = search_results[0]["title"]
+    duration = search_results[0]["duration"]
 
+    # 🔥 Autoplay fix
+    last_played_title[chat_id] = title
+
+    # ───── QUEUE ─────
     if chat_id in QUEUE:
-        queue_num = add_to_queue(chat_id, search_results, songlink, stream_url)
-        await m.edit(
-            f"# **{queue_num} ʏᴏᴜʀ ꜱᴏɴɢ ᴀᴅᴅᴇᴅ ɪɴ Qᴜᴇᴜᴇ**\n\n"
-            f"**SongName :** [{title[:19]}]({stream_url})\n"
-            f"**Duration :** {duration} **Minutes**\n"
-            f"**Channel :** {channel}\n"
-            f"**Views :** {views}\n"
-            f"**Requested By :** {mention}\n\n"
-            f"**Response Time :** {total_time}",
-            disable_web_page_preview=True,
-        )
+        q = add_to_queue(chat_id, title, duration, stream_url, mention)
+        await m.edit(f"**#{q} Added to queue**")
         return asyncio.create_task(delete_messages(message, m))
 
-    Status, Text = await Userbot.playVideo(chat_id, songlink)
-    if not Status:
-        return await m.edit(Text)
+    # ───── PLAY ─────
+    status, text = await Userbot.playVideo(chat_id, stream_url)
+    if not status:
+        return await m.edit(text)
 
-    add_to_queue(chat_id, search_results, songlink, stream_url)
+    add_to_queue(chat_id, title, duration, stream_url, mention)
+
     await m.edit(
-        f"**ѕσηg ιѕ ρℓαуιηg ιη ν¢**\n\n"
-        f"**SongName :** [{title[:19]}]({stream_url})\n"
-        f"**Duration :** {duration} **Minutes**\n"
-        f"**Channel :** {channel}\n"
-        f"**Views :** {views}\n"
-        f"**Requested By :** {mention}\n\n"
-        f"**Response Time :** {total_time}",
-        disable_web_page_preview=True,
+        f"**🎬 Video Playing in VC**\n\n"
+        f"**Title:** {title[:25]}\n"
+        f"**Duration:** {duration}\n"
+        f"**Requested by:** {mention}"
     )
     return asyncio.create_task(delete_messages(message, m))
-    
+
+
+# ─────────────────────────────
+# PLAY FORCE VIDEO (ADMIN)
+# ─────────────────────────────
+@app.on_message(
+    filters.command(PLAYFORCE_COMMAND, [PREFIX, RPREFIX])
+    & filters.group
+)
+async def playforce_video(_, message):
+    chat_id = message.chat.id
+    mention = message.from_user.mention
+
+    await message.delete()
+    seek_chats.pop(chat_id, None)
+
+    if len(message.command) < 2:
+        return await message.reply_text("❌ Give video name.")
+
+    admins = [
+        admin.user.id
+        async for admin in app.get_chat_members(
+            chat_id, filter=ChatMembersFilter.ADMINISTRATORS
+        )
+    ]
+
+    if message.from_user.id not in admins and message.from_user.id not in SUDOERS:
+        return await message.reply_text("❌ Only admins can use force play.")
+
+    m = await message.reply_text("⚡ Force playing video...")
+    query = message.text.split(maxsplit=1)[1]
+
+    search_results, yt_url = await SearchYt(query)
+    if not search_results:
+        return await m.edit("❌ No results found.")
+
+    status, stream_url = await Ytdl(yt_url)
+    if not status:
+        return await m.edit(stream_url)
+
+    title = search_results[0]["title"]
+    duration = search_results[0]["duration"]
+
+    last_played_title[chat_id] = title
+
+    QUEUE[chat_id] = [(title, duration, stream_url, mention)]
+
+    status, text = await Userbot.playVideo(chat_id, stream_url)
+    if not status:
+        return await m.edit(text)
+
+    await m.edit(
+        f"**⚡ Force Video Playing**\n\n"
+        f"**Title:** {title[:25]}\n"
+        f"**Duration:** {duration}\n"
+        f"**Requested by:** {mention}"
+    )
+    return asyncio.create_task(delete_messages(message, m))
