@@ -12,7 +12,7 @@ from pyrogram.enums import ChatMembersFilter
 
 from Player import app, seek_chats
 from Player.Core import Userbot
-from Player.Utils.YtDetails import SearchYt, ytdl as Ytdl
+from Player.Utils.YtDetails import SearchYt, ytdl_audio as Ytdl
 from Player.Plugins.Start.Spam import spam_check
 from Player.Utils.Queue import QUEUE, add_to_queue
 from Player.Utils.Delete import delete_messages
