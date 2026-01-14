@@ -53,17 +53,7 @@ async def stop(chat_id: int):
 
 
 # ─────────────────────────────
-# CHECK VC ACTIVE
-# ─────────────────────────────
-def is_vc_active(chat_id: int) -> bool:
-    try:
-        return call.is_connected(chat_id)
-    except Exception:
-        return False
-
-
-# ─────────────────────────────
-# SKIP COMMAND
+# SKIP COMMAND (FINAL FIX)
 # ─────────────────────────────
 @app.on_message(filters.command(SKIP_COMMAND, [PREFIX, RPREFIX]) & filters.group)
 async def skip_song(_, message):
@@ -73,11 +63,14 @@ async def skip_song(_, message):
 
     seek_chats.pop(chat_id, None)
 
-    # ❌ VC not running
-    if not is_vc_active(chat_id):
+    # ✅ ONLY QUEUE CHECK (VC CHECK REMOVED)
+    queue = get_queue(chat_id)
+
+    if not queue:
         clear_queue(chat_id)
         return await message.reply_text("❌ **Nothing is playing in VC.**")
 
+    # ───── ADMIN CHECK ─────
     admins = [
         admin.user.id
         async for admin in app.get_chat_members(
@@ -99,10 +92,8 @@ async def skip_song(_, message):
         )
         return await delete_messages(message, m)
 
-    queue = get_queue(chat_id)
-
-    # ───── NO / LAST SONG ─────
-    if not queue or len(queue) == 1:
+    # ───── LAST / ONLY SONG ─────
+    if len(queue) == 1:
         clear_queue(chat_id)
 
         # ─── AUTOPLAY ───
@@ -191,4 +182,3 @@ async def show_queue(_, message):
             output += f"{i}. {title} ({duration}) — {requested_by}\n"
 
     await message.reply_text(output)
-    
