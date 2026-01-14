@@ -5,133 +5,116 @@ Copyright ©️ 2025
 
 import asyncio
 import logging
-from pytgcalls import PyTgCalls, filters
 from pytgcalls.types import Update, MediaStream, ChatUpdate
 
 from Player import call, app, seek_chats
-from Player.Utils.Loop import get_loop, set_loop
-from Player.Utils.Queue import (
-    get_queue,
-    pop_an_item,
-    clear_queue,
-    add_to_queue,
-)
+from Player.Utils.YtDetails import ytdl
+from Player.Utils.Seek_Bar import update_seek_bar, parse_duration
 from Player.Utils.AutoPlay import is_autoplay_on, get_recommendation
-from Player.Core import Userbot
+from Player.Utils.Loop import get_loop, set_loop
+from Player.Utils.Queue import QUEUE, get_queue, clear_queue, pop_an_item
 
-# 🔑 shared from play.py
-from Player.Plugins.Sounds.Play import last_played_title
-
-logging.basicConfig(level=logging.INFO)
-
-# ─────────────────────────────
-# INTERNAL NEXT / LOOP / AUTOPLAY
-# ─────────────────────────────
-async def _next(chat_id):
+async def _skip(chat_id):
     loop = await get_loop(chat_id)
-    queue = get_queue(chat_id)
+    if loop > 0:
+        try:
+            chat_queue = get_queue(chat_id)
+            loop -= 1
+            await set_loop(chat_id, loop)
+            current = chat_queue[0]
+            title = current[1][0]['title']
+            duration = current[1][0]['duration']
+            #duration = parse_duration(raw_duration)
+            channel = current[1][0]['channel']
+            views = current[1][0]['views']
+            songlink = current[2]
+            ytlink = current[3]
 
-    # ───── LOOP ENABLED ─────
-    if loop > 0 and queue:
-        await set_loop(chat_id, loop - 1)
-        title, duration, stream_url, _ = queue[0]
-        await call.play(
-            chat_id,
-            MediaStream(stream_url, video_flags=MediaStream.Flags.IGNORE)
-        )
-        return title, duration
+            await call.play(chat_id, MediaStream(songlink, video_flags=MediaStream.Flags.IGNORE))
+            start_time = time.time()
 
-    # ───── NORMAL QUEUE ─────
-    if queue:
-        if len(queue) > 1:
-            pop_an_item(chat_id)
-            title, duration, stream_url, _ = get_queue(chat_id)[0]
-            await call.play(
-                chat_id,
-                MediaStream(stream_url, video_flags=MediaStream.Flags.IGNORE)
-            )
-            return title, duration
+            finish_time = time.time()
+            return [title, duration, channel, views, ytlink, finish_time]
+        except Exception as e:
+            return [2, f"❌ **Loop Play Failed:**\n`{e}`"]
 
-        # last song finished
-        clear_queue(chat_id)
+    if chat_id in QUEUE:
+        chat_queue = get_queue(chat_id)
+        if len(chat_queue) == 1:
+            await stop(chat_id)
+            clear_queue(chat_id)
+            return 1
+        else:
+            try:
+                pop_an_item(chat_id)
+                next_song = chat_queue[0]
+                title = next_song[1][0]['title']
+                duration = next_song[1][0]['duration']
+               # duration = parse_duration(raw_duration)
+                channel = next_song[1][0]['channel']
+                views = next_song[1][0]['views']
+                songlink = next_song[2]
+                ytlink = next_song[3]
+                
+                await call.play(chat_id, MediaStream(songlink, video_flags=MediaStream.Flags.IGNORE))
+                start_time = time.time()
+                
+                finish_time = time.time()
+                return [title, duration, channel, views, ytlink, finish_time]
+            except Exception as e:
+                return [2, f"❌ **Skip Error:** `{e}`"]
 
-    # ───── AUTOPLAY ─────
-    if await is_autoplay_on(chat_id):
-        last_title = last_played_title.get(chat_id)
-        if last_title:
-            rec = await get_recommendation(last_title)
-            if rec:
-                title, duration, stream_url = rec
-                add_to_queue(chat_id, title, duration, stream_url, "AutoPlay")
-                last_played_title[chat_id] = title
+    await stop(chat_id)
+    return 1
 
-                await call.play(
-                    chat_id,
-                    MediaStream(stream_url, video_flags=MediaStream.Flags.IGNORE)
-                )
-                return title, duration
-
-    # ───── NOTHING LEFT ─────
-    await hard_cleanup(chat_id)
-    return None
-
-
-# ─────────────────────────────
-# STREAM END HANDLER
-# ─────────────────────────────
 @call.on_update(filters.stream_end())
-async def on_stream_end(client: PyTgCalls, update: Update):
+async def handler(client: PyTgCalls, update: Update):
+    start_time = time.time()
     chat_id = update.chat_id
-    seek_chats.pop(chat_id, None)
 
-    result = await _next(chat_id)
-    if not result:
+
+    if chat_id in seek_chats:
+        del seek_chats[chat_id]
+
+
+    resp = await _skip(chat_id)
+
+    if resp == 1:
         return
 
-    title, duration = result
-    msg = await app.send_message(
-        chat_id,
-        f"**🎶 Now Playing**\n\n"
-        f"**Title:** {title[:25]}\n"
-        f"**Duration:** {duration}"
-    )
-
-    await asyncio.sleep(40)
-    await msg.delete()
 
 
-# ─────────────────────────────
-# HARD CLEANUP (CORE FIX)
-# ─────────────────────────────
-async def hard_cleanup(chat_id):
-    logging.warning(f"VC cleanup triggered for chat {chat_id}")
 
-    clear_queue(chat_id)
-    seek_chats.pop(chat_id, None)
-    last_played_title.pop(chat_id, None)
-    await set_loop(chat_id, 0)
 
+
+    if resp[0] == 2:
+        await app.send_message(chat_id, resp[1])
+    else:
+        total_time = int(time.time() - resp[5])
+        m = await app.send_message(
+            chat_id,
+            f"**ѕσηg ιѕ ρℓαуιηg ιη ν¢**\n\n"
+            f"**SongName :** [{resp[0][:19]}]({resp[4]})\n"
+            f"**Duration :** {resp[1]} **Minutes**\n"
+            f"**Response Time :** `{total_time}` **Seconds**\n\n\n"
+            f"[**Click Here For Make Your Own Music Bot**](https://t.me/NotRealAbhiii)",
+            disable_web_page_preview=True,
+        )
+        await asyncio.sleep(60)
+        await m.delete()
+
+
+async def stop(chat_id):
     try:
         await call.leave_call(chat_id)
     except:
         pass
 
-
-# ─────────────────────────────
-# VC LEFT / DISCONNECTED HANDLER
-# ─────────────────────────────
-@call.on_update(filters.chat_update(
-    ChatUpdate.Status.LEFT_CALL
-))
+@call.on_update(filters.chat_update(ChatUpdate.Status.LEFT_CALL))
 async def on_left_call(client, update):
-    await hard_cleanup(update.chat_id)
-
-
-# ─────────────────────────────
-# EXTRA SAFETY: VC KICK / END
-# ─────────────────────────────
-@call.on_update(filters.chat_update(
-    ChatUpdate.Status.KICKED
-))
-async def on_kicked_call(client, update):
-    await hard_cleanup(update.chat_id)
+    chat_id = update.chat_id
+    await stop(chat_id)
+    clear_queue(chat_id)
+    await set_loop(chat_id, 0)
+    if chat_id in seek_chats:
+        del seek_chats[chat_id]
