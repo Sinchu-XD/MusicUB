@@ -10,11 +10,11 @@ import config
 from pyrogram import filters
 from pyrogram.enums import ChatMembersFilter
 
-from Player import app, seek_chats
+from Player import app, seek_chats, call
 from Player.Core import Userbot
 from Player.Utils.YtDetails import SearchYt, ytdl_audio as Ytdl
 from Player.Plugins.Start.Spam import spam_check
-from Player.Utils.Queue import QUEUE, add_to_queue
+from Player.Utils.Queue import QUEUE, add_to_queue, clear_queue
 from Player.Utils.Delete import delete_messages
 from Player.Misc import SUDOERS
 
@@ -26,6 +26,16 @@ PLAYFORCE_COMMAND = ["PFORCE", "PLAYFORCE"]
 
 PREFIX = config.PREFIX
 RPREFIX = config.RPREFIX
+
+
+# ─────────────────────────────
+# VC STATUS CHECK (🔥 IMPORTANT)
+# ─────────────────────────────
+async def is_vc_active(chat_id: int) -> bool:
+    try:
+        return call.is_connected(chat_id)
+    except Exception:
+        return False
 
 
 # ─────────────────────────────
@@ -49,16 +59,16 @@ async def processReplyToMessage(message):
     & spam_check()
 )
 async def play_music(_, message):
-    # 🔥 IMPORTANT FIX: playforce exclusion
     if message.command[0].lower() in ["playforce", "pforce"]:
         return
 
-    start_time = time.time()
     chat_id = message.chat.id
     mention = message.from_user.mention
 
     await message.delete()
     seek_chats.pop(chat_id, None)
+
+    vc_active = await is_vc_active(chat_id)
 
     # ───── REPLY AUDIO ─────
     if message.reply_to_message:
@@ -66,19 +76,22 @@ async def play_music(_, message):
         if not file_path:
             return await message.reply_text("❌ Reply to an audio / voice note.")
 
+        if vc_active and chat_id in QUEUE:
+            audio = message.reply_to_message.audio or message.reply_to_message.voice
+            title = message.reply_to_message.text or "Telegram Audio"
+            q = add_to_queue(chat_id, title, audio.duration, file_path, mention)
+            await m.edit(f"**#{q} Added to queue**")
+            return asyncio.create_task(delete_messages(message, m))
+
+        # 🔥 VC not active → fresh play
+        clear_queue(chat_id)
         status, text = await Userbot.playAudio(chat_id, file_path)
         if not status:
             return await m.edit(text)
 
         audio = message.reply_to_message.audio or message.reply_to_message.voice
         title = message.reply_to_message.text or "Telegram Audio"
-
-        last_played_title[chat_id] = title
-
-        if chat_id in QUEUE:
-            q = add_to_queue(chat_id, title, audio.duration, file_path, mention)
-            await m.edit(f"**#{q} Added to queue**")
-            return asyncio.create_task(delete_messages(message, m))
+        add_to_queue(chat_id, title, audio.duration, file_path, mention)
 
         await m.edit(
             f"**🎶 Playing in VC**\n\n"
@@ -106,13 +119,13 @@ async def play_music(_, message):
     title = search_results[0]["title"]
     duration = search_results[0]["duration"]
 
-    last_played_title[chat_id] = title
-
-    if chat_id in QUEUE:
+    if vc_active and chat_id in QUEUE:
         q = add_to_queue(chat_id, title, duration, stream_url, mention)
         await m.edit(f"**#{q} Added to queue**")
         return asyncio.create_task(delete_messages(message, m))
 
+    # 🔥 VC not active → fresh play
+    clear_queue(chat_id)
     status, text = await Userbot.playAudio(chat_id, stream_url)
     if not status:
         return await m.edit(text)
@@ -136,7 +149,6 @@ async def play_music(_, message):
     & filters.group
 )
 async def playforce(_, message):
-    start_time = time.time()
     chat_id = message.chat.id
     mention = message.from_user.mention
 
@@ -170,8 +182,7 @@ async def playforce(_, message):
     title = search_results[0]["title"]
     duration = search_results[0]["duration"]
 
-    last_played_title[chat_id] = title
-
+    clear_queue(chat_id)
     QUEUE[chat_id] = [(title, duration, stream_url, mention)]
 
     status, text = await Userbot.playAudio(chat_id, stream_url)
@@ -185,4 +196,4 @@ async def playforce(_, message):
         f"**Requested by:** {mention}"
     )
     return asyncio.create_task(delete_messages(message, m))
-
+    
