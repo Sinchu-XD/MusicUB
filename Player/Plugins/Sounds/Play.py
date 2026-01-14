@@ -10,11 +10,16 @@ import config
 from pyrogram import filters
 from pyrogram.enums import ChatMembersFilter
 
-from Player import app, seek_chats, call
+from Player import app, seek_chats
 from Player.Core import Userbot
 from Player.Utils.YtDetails import SearchYt, ytdl_audio as Ytdl
 from Player.Plugins.Start.Spam import spam_check
-from Player.Utils.Queue import QUEUE, add_to_queue, clear_queue
+from Player.Utils.Queue import (
+    QUEUE,
+    get_queue,
+    add_to_queue,
+    clear_queue,
+)
 from Player.Utils.Delete import delete_messages
 from Player.Misc import SUDOERS
 
@@ -29,13 +34,10 @@ RPREFIX = config.RPREFIX
 
 
 # ─────────────────────────────
-# VC STATUS CHECK (🔥 IMPORTANT)
+# QUEUE CHECK (🔥 MAIN FIX)
 # ─────────────────────────────
-async def is_vc_active(chat_id: int) -> bool:
-    try:
-        return call.is_connected(chat_id)
-    except Exception:
-        return False
+def should_add_to_queue(chat_id: int) -> bool:
+    return bool(get_queue(chat_id))
 
 
 # ─────────────────────────────
@@ -51,7 +53,7 @@ async def processReplyToMessage(message):
 
 
 # ─────────────────────────────
-# PLAY COMMAND (NORMAL)
+# PLAY COMMAND
 # ─────────────────────────────
 @app.on_message(
     filters.command(PLAY_COMMAND, [PREFIX, RPREFIX])
@@ -68,29 +70,29 @@ async def play_music(_, message):
     await message.delete()
     seek_chats.pop(chat_id, None)
 
-    vc_active = await is_vc_active(chat_id)
-
     # ───── REPLY AUDIO ─────
     if message.reply_to_message:
         file_path, m = await processReplyToMessage(message)
         if not file_path:
             return await message.reply_text("❌ Reply to an audio / voice note.")
 
-        if vc_active and chat_id in QUEUE:
-            audio = message.reply_to_message.audio or message.reply_to_message.voice
-            title = message.reply_to_message.text or "Telegram Audio"
+        audio = message.reply_to_message.audio or message.reply_to_message.voice
+        title = message.reply_to_message.text or "Telegram Audio"
+
+        last_played_title[chat_id] = title
+
+        # 🔥 QUEUE MODE
+        if should_add_to_queue(chat_id):
             q = add_to_queue(chat_id, title, audio.duration, file_path, mention)
             await m.edit(f"**#{q} Added to queue**")
-            return asyncio.create_task(delete_messages(message, m))
+            return await delete_messages(message, m)
 
-        # 🔥 VC not active → fresh play
+        # 🔥 FRESH PLAY
         clear_queue(chat_id)
         status, text = await Userbot.playAudio(chat_id, file_path)
         if not status:
             return await m.edit(text)
 
-        audio = message.reply_to_message.audio or message.reply_to_message.voice
-        title = message.reply_to_message.text or "Telegram Audio"
         add_to_queue(chat_id, title, audio.duration, file_path, mention)
 
         await m.edit(
@@ -99,7 +101,7 @@ async def play_music(_, message):
             f"**Duration:** {audio.duration}\n"
             f"**Requested by:** {mention}"
         )
-        return asyncio.create_task(delete_messages(message, m))
+        return await delete_messages(message, m)
 
     # ───── TEXT QUERY ─────
     if len(message.command) < 2:
@@ -119,12 +121,15 @@ async def play_music(_, message):
     title = search_results[0]["title"]
     duration = search_results[0]["duration"]
 
-    if vc_active and chat_id in QUEUE:
+    last_played_title[chat_id] = title
+
+    # 🔥 QUEUE MODE
+    if should_add_to_queue(chat_id):
         q = add_to_queue(chat_id, title, duration, stream_url, mention)
         await m.edit(f"**#{q} Added to queue**")
-        return asyncio.create_task(delete_messages(message, m))
+        return await delete_messages(message, m)
 
-    # 🔥 VC not active → fresh play
+    # 🔥 FRESH PLAY
     clear_queue(chat_id)
     status, text = await Userbot.playAudio(chat_id, stream_url)
     if not status:
@@ -138,7 +143,7 @@ async def play_music(_, message):
         f"**Duration:** {duration}\n"
         f"**Requested by:** {mention}"
     )
-    return asyncio.create_task(delete_messages(message, m))
+    return await delete_messages(message, m)
 
 
 # ─────────────────────────────
@@ -184,6 +189,7 @@ async def playforce(_, message):
 
     clear_queue(chat_id)
     QUEUE[chat_id] = [(title, duration, stream_url, mention)]
+    last_played_title[chat_id] = title
 
     status, text = await Userbot.playAudio(chat_id, stream_url)
     if not status:
@@ -195,5 +201,5 @@ async def playforce(_, message):
         f"**Duration:** {duration}\n"
         f"**Requested by:** {mention}"
     )
-    return asyncio.create_task(delete_messages(message, m))
+    return await delete_messages(message, m)
     
