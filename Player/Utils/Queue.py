@@ -3,10 +3,10 @@ Telegram @Itz_Your_4Bhi
 Copyright ©️ 2025
 """
 
-QUEUE = {}
-
 import logging
 logging.basicConfig(level=logging.INFO)
+
+QUEUE = {}
 
 # ─────────────────────────────
 # ADD TO QUEUE
@@ -17,6 +17,10 @@ def add_to_queue(chat_id, title, duration, stream_url, requested_by):
 
     QUEUE[chat_id].append(
         (title, duration, stream_url, requested_by)
+    )
+
+    logging.info(
+        f"Added to queue | chat_id={chat_id} | total={len(QUEUE[chat_id])}"
     )
     return len(QUEUE[chat_id]) - 1
 
@@ -34,16 +38,23 @@ def get_queue(chat_id):
 def pop_an_item(chat_id):
     if chat_id in QUEUE and QUEUE[chat_id]:
         QUEUE[chat_id].pop(0)
+
+        # 🔥 AUTO CLEAN IF EMPTY
+        if not QUEUE[chat_id]:
+            QUEUE.pop(chat_id, None)
+            logging.info(f"Queue auto-cleared (empty) | chat_id={chat_id}")
+
         return 1
     return 0
 
 
 # ─────────────────────────────
-# CLEAR QUEUE
+# CLEAR QUEUE (HARD CLEAR)
 # ─────────────────────────────
 def clear_queue(chat_id):
     if chat_id in QUEUE:
-        QUEUE.pop(chat_id)
+        QUEUE.pop(chat_id, None)
+        logging.info(f"Queue cleared | chat_id={chat_id}")
         return 1
     return 0
 
