@@ -8,7 +8,7 @@ import logging
 from pytgcalls.types import Update, MediaStream, ChatUpdate
 
 from Player import call, app, seek_chats
-from Player.Utils.YtDetails import ytdl
+from Player.Utils.YtDetails import ytdl_audio as ytdl
 from Player.Utils.Seek_Bar import update_seek_bar, parse_duration
 from Player.Utils.AutoPlay import is_autoplay_on, get_recommendation
 from Player.Utils.Loop import get_loop, set_loop
