@@ -14,7 +14,7 @@ from pyrogram.enums import ChatMembersFilter
 from Player import app, call, seek_chats
 from Player.Core import Userbot
 from Player.Misc import SUDOERS
-from Player.Utils.Loop import get_loop
+from Player.Utils.Loop import get_loop, set_loop
 from Player.Utils.Delete import delete_messages
 from Player.Utils.Queue import (
     get_queue,
@@ -23,8 +23,7 @@ from Player.Utils.Queue import (
     add_to_queue,
 )
 from Player.Utils.AutoPlay import is_autoplay_on, get_recommendation
-
-from Player.Plugins.Sounds.Play import last_played_title 
+from Player.Plugins.Sounds.Play import last_played_title
 
 logging.basicConfig(level=logging.INFO)
 
@@ -36,13 +35,31 @@ RPREFIX = config.RPREFIX
 
 
 # ─────────────────────────────
-# STOP VC
+# STOP VC + FULL CLEAN 🔥
 # ─────────────────────────────
-async def stop(chat_id):
+async def stop(chat_id: int):
     try:
         await call.leave_call(chat_id)
-    except Exception as e:
-        logging.error(f"Error stopping VC: {e}")
+    except Exception:
+        pass
+
+    clear_queue(chat_id)
+    await set_loop(chat_id, 0)
+
+    if chat_id in seek_chats:
+        del seek_chats[chat_id]
+
+    logging.info(f"VC stopped & cleaned | chat_id={chat_id}")
+
+
+# ─────────────────────────────
+# CHECK VC ACTIVE
+# ─────────────────────────────
+def is_vc_active(chat_id: int) -> bool:
+    try:
+        return call.is_connected(chat_id)
+    except Exception:
+        return False
 
 
 # ─────────────────────────────
@@ -55,6 +72,11 @@ async def skip_song(_, message):
     mention = message.from_user.mention
 
     seek_chats.pop(chat_id, None)
+
+    # ❌ VC not running
+    if not is_vc_active(chat_id):
+        clear_queue(chat_id)
+        return await message.reply_text("❌ **Nothing is playing in VC.**")
 
     admins = [
         admin.user.id
@@ -90,7 +112,14 @@ async def skip_song(_, message):
                 rec = await get_recommendation(last_title)
                 if rec:
                     title, duration, stream_url = rec
-                    add_to_queue(chat_id, title, duration, stream_url, "AutoPlay")
+
+                    add_to_queue(
+                        chat_id,
+                        title,
+                        duration,
+                        stream_url,
+                        "AutoPlay",
+                    )
                     last_played_title[chat_id] = title
 
                     status, text = await Userbot.playAudio(chat_id, stream_url)
@@ -106,7 +135,7 @@ async def skip_song(_, message):
                     )
                     return await delete_messages(message, m)
 
-        # autoplay off → leave VC
+        # autoplay off → stop VC
         await stop(chat_id)
         await m.edit(
             f"🚫 **Queue is empty.** Leaving VC...\n🎤 {mention}"
@@ -116,10 +145,8 @@ async def skip_song(_, message):
     # ───── REMOVE CURRENT ─────
     pop_an_item(chat_id)
 
-    # ───── PLAY NEXT FROM QUEUE ─────
+    # ───── PLAY NEXT ─────
     title, duration, stream_url, requested_by = get_queue(chat_id)[0]
-
-    # 🔑 update last played title
     last_played_title[chat_id] = title
 
     try:
@@ -164,4 +191,4 @@ async def show_queue(_, message):
             output += f"{i}. {title} ({duration}) — {requested_by}\n"
 
     await message.reply_text(output)
-
+    
