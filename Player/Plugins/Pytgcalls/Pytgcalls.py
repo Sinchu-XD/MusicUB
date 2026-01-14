@@ -5,8 +5,8 @@ Copyright ©️ 2025
 
 import asyncio
 import logging
-from pytgcalls.types import Update, MediaStream, ChatUpdate, filters
-
+from pytgcalls.types import Update, MediaStream, ChatUpdate
+from pytgcalls import PyTgCalls, filters
 from Player import call, app, seek_chats
 from Player.Utils.YtDetails import ytdl_audio as ytdl
 from Player.Utils.Seek_Bar import update_seek_bar, parse_duration
